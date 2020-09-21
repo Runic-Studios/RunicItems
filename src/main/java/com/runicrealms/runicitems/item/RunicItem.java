@@ -8,41 +8,30 @@ import java.util.List;
 
 public class RunicItem extends RunicNbtItem {
 
-    private ItemStack itemStack;
+    private ItemStack currentItem; // ItemStack that we are currently displaying to the player
 
-    private String id;
-    private String itemName;
-    private Material material;
-    private short damage;
-    private List<RunicItemTag> tags;
+    private RunicDisplayableItem displayableItem; // Base ItemStack information that we get from the template
+    private String id; // Template ID
+    private List<RunicItemTag> tags; // List of tags (soulbound, untradeable, etc)
 
-    public RunicItem(String id, String itemName, Material material, short damage, List<RunicItemTag> tags) {
+    public RunicItem(String id, String displayName, Material material, short damage, List<RunicItemTag> tags) {
         this.id = id;
-        this.itemName = itemName;
-        this.material = material;
-        this.damage = damage;
+        this.displayableItem = new RunicDisplayableItem(displayName, material, damage);
         this.tags = tags;
+        // TODO - generate currentItem
     }
 
     @Override
-    public ItemStack getItemStack() {
-        return this.itemStack;
+    public ItemStack getCurrentItem() {
+        return this.currentItem;
+    }
+
+    public RunicDisplayableItem getDisplayableItem() {
+        return this.displayableItem;
     }
 
     public String getId() {
         return this.id;
-    }
-
-    public String getItemName() {
-        return this.itemName;
-    }
-
-    public Material getMaterial() {
-        return this.material;
-    }
-
-    public short getDamage() {
-        return this.damage;
     }
 
     public List<RunicItemTag> getTags() {

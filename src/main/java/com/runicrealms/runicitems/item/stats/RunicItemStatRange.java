@@ -17,4 +17,12 @@ public class RunicItemStatRange {
         return (int) (Math.floor(Math.random() * (this.max - this.min)) + this.min);
     }
 
+    public Integer getMin() {
+        return this.min;
+    }
+
+    public Integer getMax() {
+        return this.max;
+    }
+
 }
