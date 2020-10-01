@@ -33,4 +33,8 @@ public class RunicItemStat {
         return this.rawRoll;
     }
 
+    public int getRoll() {
+        return this.roll;
+    }
+
 }

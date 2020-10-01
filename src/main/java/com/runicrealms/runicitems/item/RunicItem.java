@@ -1,32 +1,64 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
+import com.runicrealms.runicitems.item.util.ItemLoreSection;
+import com.runicrealms.runicitems.item.util.DisplayableItem;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
-public class RunicItem extends RunicNbtItem {
+public abstract class RunicItem {
 
-    private ItemStack currentItem; // ItemStack that we are currently displaying to the player
+    protected ItemStack currentItem; // ItemStack that we are currently displaying to the player
 
-    private RunicDisplayableItem displayableItem; // Base ItemStack information that we get from the template
-    private String id; // Template ID
-    private List<RunicItemTag> tags; // List of tags (soulbound, untradeable, etc)
+    protected DisplayableItem displayableItem; // Base ItemStack information that we get from the template
+    protected String id; // Template ID
+    protected List<RunicItemTag> tags; // List of tags (soulbound, untradeable, etc.)
 
-    public RunicItem(String id, String displayName, Material material, short damage, List<RunicItemTag> tags) {
+    protected List<ItemLoreSection> loreSections = new ArrayList<ItemLoreSection>();
+
+    public RunicItem(String id, String displayName, Material material, short damage, List<RunicItemTag> tags, Callable<ItemLoreSection[]> loreSectionGenerator) {
         this.id = id;
-        this.displayableItem = new RunicDisplayableItem(displayName, material, damage);
+        this.displayableItem = new DisplayableItem(displayName, material, damage);
         this.tags = tags;
-        // TODO - generate currentItem
+        this.currentItem = this.displayableItem.generateItem();
+        try {
+            ItemLoreSection[] loreSections = loreSectionGenerator.call();
+            if (loreSections != null && loreSections.length > 0) {
+                for (ItemLoreSection section : loreSections) {
+                    if (section != null) {
+                        this.loreSections.add(section);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ItemMeta meta = this.currentItem.getItemMeta();
+        List<String> lore = new ArrayList<String>();
+        for (ItemLoreSection section : this.loreSections) {
+            lore.addAll(section.getLore());
+            if (!section.isEmpty()) {
+                lore.add("");
+            }
+        }
+        for (RunicItemTag tag : this.tags) {
+            lore.add(tag.getDisplay());
+        }
+        meta.setLore(lore);
+        this.currentItem.setItemMeta(meta);
+        // TODO finish generating item
     }
 
-    @Override
     public ItemStack getCurrentItem() {
         return this.currentItem;
     }
 
-    public RunicDisplayableItem getDisplayableItem() {
+    public DisplayableItem getDisplayableItem() {
         return this.displayableItem;
     }
 

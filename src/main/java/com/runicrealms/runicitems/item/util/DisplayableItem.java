@@ -1,17 +1,17 @@
-package com.runicrealms.runicitems.item;
+package com.runicrealms.runicitems.item.util;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class RunicDisplayableItem {
+public class DisplayableItem {
 
     private String displayName;
     private Material material;
     private short damage;
 
-    public RunicDisplayableItem(String displayName, Material material, short damage) {
+    public DisplayableItem(String displayName, Material material, short damage) {
         this.displayName = displayName;
         this.material = material;
         this.damage = damage;
