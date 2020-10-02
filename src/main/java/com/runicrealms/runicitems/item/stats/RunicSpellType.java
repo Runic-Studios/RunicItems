@@ -1,6 +1,6 @@
 package com.runicrealms.runicitems.item.stats;
 
-import com.runicrealms.runicitems.config.SpellReader;
+import com.runicrealms.runicitems.config.SpellLoader;
 
 public enum RunicSpellType {
 
@@ -15,7 +15,7 @@ public enum RunicSpellType {
     }
 
     public String getDescription() {
-        return SpellReader.getSpellDescription(this.identifier);
+        return SpellLoader.getSpellDescription(this.identifier);
     }
 
     public String getSpellName() {
