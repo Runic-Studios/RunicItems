@@ -9,9 +9,7 @@ public class RunicItemStat {
     private int roll;
 
     public RunicItemStat(RunicItemStatRange range, float rawRoll) {
-        this.range = range;
-        this.rawRoll = rawRoll;
-        this.roll = this.range.getMin() + (int) Math.floor(this.rawRoll * (this.range.getMax() - this.range.getMin()));
+        this(range, rawRoll, range.getMin() + (int) Math.floor(rawRoll * (range.getMax() - range.getMin())));
     }
 
     public RunicItemStat(RunicItemStatRange range, float rawRoll, int roll) {
@@ -21,8 +19,7 @@ public class RunicItemStat {
     }
 
     public RunicItemStat(RunicItemStatRange range) {
-        this.range = range;
-        this.rawRoll = new Random().nextFloat();
+        this(range, new Random().nextFloat());
     }
 
     public RunicItemStatRange getRange() {
