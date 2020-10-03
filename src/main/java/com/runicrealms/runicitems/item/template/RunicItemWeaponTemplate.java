@@ -25,7 +25,7 @@ public class RunicItemWeaponTemplate extends RunicItemTemplate {
     }
 
     @Override
-    public RunicItem generateItem() {
+    public RunicItemWeapon generateItem() {
         return new RunicItemWeapon(this.id, this.displayableItem, this.tags, this.damageRange, this.level, this.rarity);
     }
 
