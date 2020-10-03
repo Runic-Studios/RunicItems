@@ -21,9 +21,9 @@ public abstract class RunicItem {
 
     protected List<ItemLoreSection> loreSections = new ArrayList<ItemLoreSection>();
 
-    public RunicItem(String id, String displayName, Material material, short damage, List<RunicItemTag> tags, Callable<ItemLoreSection[]> loreSectionGenerator) {
+    public RunicItem(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Callable<ItemLoreSection[]> loreSectionGenerator) {
         this.id = id;
-        this.displayableItem = new DisplayableItem(displayName, material, damage);
+        this.displayableItem = displayableItem;
         this.tags = tags;
         this.currentItem = this.displayableItem.generateItem();
         try {

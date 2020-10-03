@@ -4,6 +4,7 @@ import com.runicrealms.runicitems.item.stats.RunicSpellType;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
+import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.item.util.SpellClickTrigger;
 import com.runicrealms.runicitems.util.ItemIcons;
@@ -21,10 +22,10 @@ public class RunicItemArtifact extends RunicItem {
     private int level;
     private RunicItemRarity rarity;
 
-    public RunicItemArtifact(String id, String itemName, Material material, short damage, List<RunicItemTag> tags,
+    public RunicItemArtifact(String id, DisplayableItem displayableItem, List<RunicItemTag> tags,
                              LinkedHashMap<SpellClickTrigger, RunicSpellType> spells, RunicItemStatRange damageRange,
                              int level, RunicItemRarity rarity) {
-        super(id, itemName, material, damage, tags, () -> {
+        super(id, displayableItem, tags, () -> {
             ItemLoreSection[] sections = new ItemLoreSection[2 + spells.size()];
             sections[0] = new ItemLoreSection(new String[] {
                     rarity.getDisplay(),

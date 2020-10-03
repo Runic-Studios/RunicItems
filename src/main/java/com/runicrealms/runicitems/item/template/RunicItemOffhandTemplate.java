@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item.template;
 
-import com.runicrealms.runicitems.item.RunicItemArmor;
+import com.runicrealms.runicitems.item.RunicItem;
+import com.runicrealms.runicitems.item.RunicItemOffhand;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
@@ -12,30 +13,28 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RunicItemArmorTemplate extends RunicItemTemplate {
+public class RunicItemOffhandTemplate extends RunicItemTemplate {
 
+    private LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats;
     private int level;
     private RunicItemRarity rarity;
-    private LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats;
-    private int maxGemSlots;
 
-    public RunicItemArmorTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags,
-                                  LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats, int maxGemSlots,
-                                  int level, RunicItemRarity rarity) {
+    public RunicItemOffhandTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags,
+                                    LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats,
+                                    int level, RunicItemRarity rarity) {
         super(id, displayableItem, tags);
+        this.stats = stats;
         this.level = level;
         this.rarity = rarity;
-        this.stats = stats;
-        this.maxGemSlots = maxGemSlots;
     }
 
     @Override
-    public RunicItemArmor generateItem() {
+    public RunicItem generateItem() {
         LinkedHashMap<RunicItemStatType, RunicItemStat> rolledStats = new LinkedHashMap<RunicItemStatType, RunicItemStat>();
         for (Map.Entry<RunicItemStatType, RunicItemStatRange> stat : this.stats.entrySet()) {
             rolledStats.put(stat.getKey(), new RunicItemStat(stat.getValue()));
         }
-        return new RunicItemArmor(this.id, displayableItem, this.tags, rolledStats, new LinkedHashMap<RunicItemStatType, Integer>(), this.maxGemSlots, this.level, this.rarity);
+        return new RunicItemOffhand(this.id, this.displayableItem, this.tags, rolledStats, this.level, this.rarity);
     }
 
 }

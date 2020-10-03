@@ -3,6 +3,7 @@ package com.runicrealms.runicitems.item;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
+import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.util.ItemIcons;
 import org.bukkit.ChatColor;
@@ -16,10 +17,10 @@ public class RunicItemWeapon extends RunicItem {
     private int level;
     private RunicItemRarity rarity;
 
-    public RunicItemWeapon(String id, String itemName, Material material, short damage, List<RunicItemTag> tags,
+    public RunicItemWeapon(String id, DisplayableItem displayableItem, List<RunicItemTag> tags,
                            RunicItemStatRange damageRange,
                            int level, RunicItemRarity rarity) {
-        super(id, itemName, material, damage, tags, () -> new ItemLoreSection[] {
+        super(id, displayableItem, tags, () -> new ItemLoreSection[] {
                 new ItemLoreSection(new String[] {
                         rarity.getDisplay(),
                         ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level

@@ -4,6 +4,7 @@ import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatType;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
+import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -21,10 +22,10 @@ public class RunicItemArmor extends RunicItem {
     private LinkedHashMap<RunicItemStatType, Integer> gems;
     private int maxGemSlots;
 
-    public RunicItemArmor(String id, String itemName, Material material, short damage, List<RunicItemTag> tags,
+    public RunicItemArmor(String id, DisplayableItem displayableItem, List<RunicItemTag> tags,
                           LinkedHashMap<RunicItemStatType, RunicItemStat> stats, LinkedHashMap<RunicItemStatType, Integer> gems, int maxGemSlots,
                           int level, RunicItemRarity rarity) {
-        super(id, itemName, material, damage, tags, () -> {
+        super(id, displayableItem, tags, () -> {
             List<String> lore = new ArrayList<String>();
             for (Map.Entry<RunicItemStatType, RunicItemStat> entry : stats.entrySet()) {
                 int finalValue = gems.containsKey(entry.getKey()) ? gems.get(entry.getKey()) + entry.getValue().getRoll() : entry.getValue().getRoll();
