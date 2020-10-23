@@ -1,6 +1,8 @@
 package com.runicrealms.runicitems.config;
 
 import com.runicrealms.runicitems.Plugin;
+import com.runicrealms.runicitems.SpellManager;
+import com.runicrealms.runicitems.item.stats.RunicSpell;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -9,14 +11,13 @@ import java.util.Map;
 
 public class SpellLoader {
 
-    private static Map<String, String> spells = new HashMap<String, String>();
-
     public static void loadSpells() {
+        Map<String, RunicSpell> spells = new HashMap<String, RunicSpell>();
         File file = new File(Plugin.getInstance().getDataFolder(), "spells.yml");
         if (file.exists()) {
             FileConfiguration spellConfig = ConfigUtil.getYamlConfigFile(file.getName(), Plugin.getInstance().getDataFolder());
             for (String key : spellConfig.getKeys(false)) {
-                spells.put(key, spellConfig.getString(key));
+                spells.put(key, new RunicSpell(key, spellConfig.getString(key + ".name"), spellConfig.getString(key + ".description")));
             }
         } else {
             try {
@@ -25,10 +26,7 @@ public class SpellLoader {
                 exception.printStackTrace();
             }
         }
-    }
-
-    public static String getSpellDescription(String identifier) {
-        return spells.get(identifier);
+        SpellManager.setSpells(spells);
     }
 
 }

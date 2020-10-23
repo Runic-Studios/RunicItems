@@ -7,7 +7,6 @@ import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

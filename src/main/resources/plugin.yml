@@ -1,0 +1,5 @@
+name: RunicItems
+description: Runic Realms Items Plugin, by Excel
+version: 1.0
+main: com.runicrealms.runicitems.Plugin
+api-version: 1.13

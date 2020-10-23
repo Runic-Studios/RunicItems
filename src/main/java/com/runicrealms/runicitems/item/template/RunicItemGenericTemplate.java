@@ -10,14 +10,22 @@ public class RunicItemGenericTemplate extends RunicItemTemplate {
 
     private List<String> lore;
 
-    public RunicItemGenericTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, List<String> lore) {
+    public RunicItemGenericTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags,
+                                    List<String> lore) {
         super(id, displayableItem, tags);
         this.lore = lore;
     }
 
     @Override
     public RunicItemGeneric generateItem() {
-        return new RunicItemGeneric(this.id, this.displayableItem, this.tags, this.lore);
+        return new RunicItemGeneric(
+                this.id, this.displayableItem, this.tags,
+                this.lore
+        );
+    }
+
+    public List<String> getLore() {
+        return this.lore;
     }
 
 }

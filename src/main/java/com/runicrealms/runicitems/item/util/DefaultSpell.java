@@ -1,23 +1,23 @@
 package com.runicrealms.runicitems.item.util;
 
-import com.runicrealms.runicitems.item.stats.RunicSpellType;
+import com.runicrealms.runicitems.item.stats.RunicSpell;
 
 public class DefaultSpell {
 
     private SpellClickTrigger trigger;
-    private RunicSpellType spellType;
+    private RunicSpell spell;
 
-    public DefaultSpell(SpellClickTrigger trigger, RunicSpellType spellType) {
+    public DefaultSpell(SpellClickTrigger trigger, RunicSpell spell) {
         this.trigger = trigger;
-        this.spellType = spellType;
+        this.spell = spell;
     }
 
     public SpellClickTrigger getTrigger() {
         return this.trigger;
     }
 
-    public RunicSpellType getSpellType() {
-        return this.spellType;
+    public RunicSpell getSpell() {
+        return this.spell;
     }
 
 }

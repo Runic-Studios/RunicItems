@@ -20,4 +20,16 @@ public abstract class RunicItemTemplate {
 
     public abstract RunicItem generateItem();
 
+    public String getId() {
+        return this.id;
+    }
+
+    public DisplayableItem getDisplayableItem() {
+        return this.displayableItem;
+    }
+
+    public List<RunicItemTag> getTags() {
+        return this.tags;
+    }
+
 }

@@ -6,8 +6,8 @@ import com.runicrealms.runicitems.item.stats.RunicItemStatType;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
+import com.runicrealms.runicitems.item.util.RunicItemClass;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -21,10 +21,11 @@ public class RunicItemArmor extends RunicItem {
     private LinkedHashMap<RunicItemStatType, RunicItemStat> stats;
     private LinkedHashMap<RunicItemStatType, Integer> gems;
     private int maxGemSlots;
+    private RunicItemClass runicClass;
 
     public RunicItemArmor(String id, DisplayableItem displayableItem, List<RunicItemTag> tags,
                           LinkedHashMap<RunicItemStatType, RunicItemStat> stats, LinkedHashMap<RunicItemStatType, Integer> gems, int maxGemSlots,
-                          int level, RunicItemRarity rarity) {
+                          int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(id, displayableItem, tags, () -> {
             List<String> lore = new ArrayList<String>();
             for (Map.Entry<RunicItemStatType, RunicItemStat> entry : stats.entrySet()) {
@@ -42,6 +43,7 @@ public class RunicItemArmor extends RunicItem {
             return new ItemLoreSection[] {
                     new ItemLoreSection(new String[] {
                             rarity.getDisplay(),
+                            ChatColor.GRAY + "Required Class: " + ChatColor.WHITE + runicClass.getDisplay(),
                             ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
                             ChatColor.GRAY + "[" + ChatColor.WHITE + gems.size() + ChatColor.GRAY + "/" + ChatColor.WHITE + maxGemSlots + ChatColor.GRAY + "] Gems"
                     }),
@@ -53,6 +55,7 @@ public class RunicItemArmor extends RunicItem {
         this.level = level;
         this.stats = stats;
         this.maxGemSlots = maxGemSlots;
+        this.runicClass = runicClass;
     }
 
     public LinkedHashMap<RunicItemStatType, RunicItemStat> getStats() {
@@ -73,6 +76,10 @@ public class RunicItemArmor extends RunicItem {
 
     public RunicItemRarity getRarity() {
         return this.rarity;
+    }
+
+    public RunicItemClass getRunicClass() {
+        return this.runicClass;
     }
 
 }

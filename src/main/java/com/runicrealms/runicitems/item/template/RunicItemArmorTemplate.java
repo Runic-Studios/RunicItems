@@ -7,6 +7,7 @@ import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.runicitems.item.stats.RunicItemStatType;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
+import com.runicrealms.runicitems.item.util.RunicItemClass;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,15 +19,17 @@ public class RunicItemArmorTemplate extends RunicItemTemplate {
     private RunicItemRarity rarity;
     private LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats;
     private int maxGemSlots;
+    private RunicItemClass runicClass;
 
     public RunicItemArmorTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags,
                                   LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats, int maxGemSlots,
-                                  int level, RunicItemRarity rarity) {
+                                  int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(id, displayableItem, tags);
         this.level = level;
         this.rarity = rarity;
         this.stats = stats;
         this.maxGemSlots = maxGemSlots;
+        this.runicClass = runicClass;
     }
 
     @Override
@@ -35,7 +38,31 @@ public class RunicItemArmorTemplate extends RunicItemTemplate {
         for (Map.Entry<RunicItemStatType, RunicItemStatRange> stat : this.stats.entrySet()) {
             rolledStats.put(stat.getKey(), new RunicItemStat(stat.getValue()));
         }
-        return new RunicItemArmor(this.id, displayableItem, this.tags, rolledStats, new LinkedHashMap<RunicItemStatType, Integer>(), this.maxGemSlots, this.level, this.rarity);
+        return new RunicItemArmor(
+                this.id, displayableItem, this.tags,
+                rolledStats, new LinkedHashMap<RunicItemStatType, Integer>(), this.maxGemSlots,
+                this.level, this.rarity, this.runicClass
+        );
+    }
+
+    public int getLevel() {
+        return this.level;
+    }
+
+    public RunicItemRarity getRarity() {
+        return this.rarity;
+    }
+
+    public LinkedHashMap<RunicItemStatType, RunicItemStatRange> getStats() {
+        return this.stats;
+    }
+
+    public int getMaxGemSlots() {
+        return this.maxGemSlots;
+    }
+
+    public RunicItemClass getRunicClass() {
+        return this.runicClass;
     }
 
 }
