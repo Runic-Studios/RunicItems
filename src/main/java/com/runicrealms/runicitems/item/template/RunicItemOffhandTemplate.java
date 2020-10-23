@@ -19,23 +19,23 @@ public class RunicItemOffhandTemplate extends RunicItemTemplate {
     private int level;
     private RunicItemRarity rarity;
 
-    public RunicItemOffhandTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags,
+    public RunicItemOffhandTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data,
                                     LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats,
                                     int level, RunicItemRarity rarity) {
-        super(id, displayableItem, tags);
+        super(id, displayableItem, tags, data);
         this.stats = stats;
         this.level = level;
         this.rarity = rarity;
     }
 
     @Override
-    public RunicItemOffhand generateItem() {
+    public RunicItemOffhand generateItem(int count) {
         LinkedHashMap<RunicItemStatType, RunicItemStat> rolledStats = new LinkedHashMap<RunicItemStatType, RunicItemStat>();
         for (Map.Entry<RunicItemStatType, RunicItemStatRange> stat : this.stats.entrySet()) {
             rolledStats.put(stat.getKey(), new RunicItemStat(stat.getValue()));
         }
         return new RunicItemOffhand(
-                this.id, this.displayableItem, this.tags,
+                this.id, this.displayableItem, this.tags, this.data, count,
                 rolledStats,
                 this.level, this.rarity
         );

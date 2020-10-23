@@ -5,16 +5,16 @@ import java.util.Random;
 public class RunicItemStat {
 
     private RunicItemStatRange range;
-    private float rawRoll;
+    private float rollPercentage;
     private int roll;
 
-    public RunicItemStat(RunicItemStatRange range, float rawRoll) {
-        this(range, rawRoll, range.getMin() + (int) Math.floor(rawRoll * (range.getMax() - range.getMin())));
+    public RunicItemStat(RunicItemStatRange range, float rollPercentage) {
+        this(range, rollPercentage, range.getMin() + (int) Math.floor(rollPercentage * (range.getMax() - range.getMin())));
     }
 
-    public RunicItemStat(RunicItemStatRange range, float rawRoll, int roll) {
+    public RunicItemStat(RunicItemStatRange range, float rollPercentage, int roll) {
         this.range = range;
-        this.rawRoll = rawRoll;
+        this.rollPercentage = rollPercentage;
         this.roll = roll;
     }
 
@@ -26,8 +26,8 @@ public class RunicItemStat {
         return this.range;
     }
 
-    public float getRawRoll() {
-        return this.rawRoll;
+    public float getRollPercentage() {
+        return this.rollPercentage;
     }
 
     public int getRoll() {

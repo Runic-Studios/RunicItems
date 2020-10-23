@@ -9,6 +9,7 @@ import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,10 +22,10 @@ public class RunicItemArmorTemplate extends RunicItemTemplate {
     private int maxGemSlots;
     private RunicItemClass runicClass;
 
-    public RunicItemArmorTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags,
+    public RunicItemArmorTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data,
                                   LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats, int maxGemSlots,
                                   int level, RunicItemRarity rarity, RunicItemClass runicClass) {
-        super(id, displayableItem, tags);
+        super(id, displayableItem, tags, data);
         this.level = level;
         this.rarity = rarity;
         this.stats = stats;
@@ -33,14 +34,14 @@ public class RunicItemArmorTemplate extends RunicItemTemplate {
     }
 
     @Override
-    public RunicItemArmor generateItem() {
+    public RunicItemArmor generateItem(int count) {
         LinkedHashMap<RunicItemStatType, RunicItemStat> rolledStats = new LinkedHashMap<RunicItemStatType, RunicItemStat>();
         for (Map.Entry<RunicItemStatType, RunicItemStatRange> stat : this.stats.entrySet()) {
             rolledStats.put(stat.getKey(), new RunicItemStat(stat.getValue()));
         }
         return new RunicItemArmor(
-                this.id, displayableItem, this.tags,
-                rolledStats, new LinkedHashMap<RunicItemStatType, Integer>(), this.maxGemSlots,
+                this.id, displayableItem, this.tags, this.data, count,
+                rolledStats, new ArrayList<LinkedHashMap<RunicItemStatType, Integer>>(), this.maxGemSlots,
                 this.level, this.rarity, this.runicClass
         );
     }

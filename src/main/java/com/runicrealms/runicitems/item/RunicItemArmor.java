@@ -1,5 +1,6 @@
 package com.runicrealms.runicitems.item;
 
+import com.runicrealms.plugin.database.MongoDataSection;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatType;
@@ -19,17 +20,22 @@ public class RunicItemArmor extends RunicItem {
     private int level;
     private RunicItemRarity rarity;
     private LinkedHashMap<RunicItemStatType, RunicItemStat> stats;
-    private LinkedHashMap<RunicItemStatType, Integer> gems;
+    private List<LinkedHashMap<RunicItemStatType, Integer>> gems;
     private int maxGemSlots;
     private RunicItemClass runicClass;
 
-    public RunicItemArmor(String id, DisplayableItem displayableItem, List<RunicItemTag> tags,
-                          LinkedHashMap<RunicItemStatType, RunicItemStat> stats, LinkedHashMap<RunicItemStatType, Integer> gems, int maxGemSlots,
+    public RunicItemArmor(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
+                          LinkedHashMap<RunicItemStatType, RunicItemStat> stats, List<LinkedHashMap<RunicItemStatType, Integer>> gems, int maxGemSlots,
                           int level, RunicItemRarity rarity, RunicItemClass runicClass) {
-        super(id, displayableItem, tags, () -> {
+        super(id, displayableItem, tags, data, count, () -> {
             List<String> lore = new ArrayList<String>();
             for (Map.Entry<RunicItemStatType, RunicItemStat> entry : stats.entrySet()) {
-                int finalValue = gems.containsKey(entry.getKey()) ? gems.get(entry.getKey()) + entry.getValue().getRoll() : entry.getValue().getRoll();
+                int finalValue = entry.getValue().getRoll();
+                for (LinkedHashMap<RunicItemStatType, Integer> gem : gems) {
+                    if (gem.containsKey(entry.getKey())) {
+                        finalValue += gem.get(entry.getKey());
+                    }
+                }
                 lore.add(
                         entry.getKey().getColor()
                                 + (finalValue < 0 ? "-" : "+")
@@ -62,7 +68,7 @@ public class RunicItemArmor extends RunicItem {
         return this.stats;
     }
 
-    public LinkedHashMap<RunicItemStatType, Integer> getGems() {
+    public List<LinkedHashMap<RunicItemStatType, Integer>> getGems() {
         return this.gems;
     }
 
@@ -80,6 +86,20 @@ public class RunicItemArmor extends RunicItem {
 
     public RunicItemClass getRunicClass() {
         return this.runicClass;
+    }
+
+    @Override
+    public void addSpecificItemToData(MongoDataSection section) {
+        for (RunicItemStatType statType : this.stats.keySet()) {
+            section.set("stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
+        }
+        int count = 0;
+        for (LinkedHashMap<RunicItemStatType, Integer> gem : this.gems) {
+            for (RunicItemStatType statType : gem.keySet()) {
+                section.set("gems." + count + "." + statType, gem.get(statType));
+            }
+            count++;
+        }
     }
 
 }

@@ -8,10 +8,11 @@ import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.DefaultSpell;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
  import com.runicrealms.runicitems.item.util.RunicItemClass;
- import com.runicrealms.runicitems.item.util.SpellClickTrigger;
+ import com.runicrealms.runicitems.item.util.ClickTrigger;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+ import java.util.Map;
 
 public class RunicItemArtifactTemplate extends RunicItemTemplate {
 
@@ -21,10 +22,10 @@ public class RunicItemArtifactTemplate extends RunicItemTemplate {
     private RunicItemRarity rarity;
     private RunicItemClass runicClass;
 
-    public RunicItemArtifactTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags,
+    public RunicItemArtifactTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data,
                                      DefaultSpell defaultSpell, RunicItemStatRange damageRange,
                                      int level, RunicItemRarity rarity, RunicItemClass runicClass) {
-        super(id, displayableItem, tags);
+        super(id, displayableItem, tags, data);
         this.defaultSpell = defaultSpell;
         this.damageRange = damageRange;
         this.level = level;
@@ -33,11 +34,11 @@ public class RunicItemArtifactTemplate extends RunicItemTemplate {
     }
 
     @Override
-    public RunicItemArtifact generateItem() {
-        LinkedHashMap<SpellClickTrigger, RunicSpell> spells = new LinkedHashMap<SpellClickTrigger, RunicSpell>();
+    public RunicItemArtifact generateItem(int count) {
+        LinkedHashMap<ClickTrigger, RunicSpell> spells = new LinkedHashMap<ClickTrigger, RunicSpell>();
         spells.put(this.defaultSpell.getTrigger(), this.defaultSpell.getSpell());
         return new RunicItemArtifact(
-                this.id, this.displayableItem, this.tags,
+                this.id, this.displayableItem, this.tags, this.data, count,
                 spells, this.damageRange,
                 this.level, this.rarity, this.runicClass
         );

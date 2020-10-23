@@ -1,5 +1,6 @@
 package com.runicrealms.runicitems.item;
 
+import com.runicrealms.plugin.database.MongoDataSection;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatType;
@@ -19,10 +20,10 @@ public class RunicItemOffhand extends RunicItem {
     private int level;
     private RunicItemRarity rarity;
 
-    public RunicItemOffhand(String id, DisplayableItem displayableItem, List<RunicItemTag> tags,
+    public RunicItemOffhand(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
                             LinkedHashMap<RunicItemStatType, RunicItemStat> stats,
                             int level, RunicItemRarity rarity) {
-        super(id, displayableItem, tags, () -> {
+        super(id, displayableItem, tags, data, count, () -> {
             List<String> lore = new ArrayList<String>();
             for (Map.Entry<RunicItemStatType, RunicItemStat> entry : stats.entrySet()) {
                 lore.add(
@@ -55,6 +56,13 @@ public class RunicItemOffhand extends RunicItem {
 
     public RunicItemRarity getRarity() {
         return this.rarity;
+    }
+
+    @Override
+    public void addSpecificItemToData(MongoDataSection section) {
+        for (RunicItemStatType statType : this.stats.keySet()) {
+            section.set("stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
+        }
     }
 
 }

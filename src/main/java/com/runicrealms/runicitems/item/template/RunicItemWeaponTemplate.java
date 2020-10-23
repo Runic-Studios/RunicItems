@@ -8,6 +8,7 @@ import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
 
 import java.util.List;
+import java.util.Map;
 
 public class RunicItemWeaponTemplate extends RunicItemTemplate {
 
@@ -16,10 +17,10 @@ public class RunicItemWeaponTemplate extends RunicItemTemplate {
     private RunicItemRarity rarity;
     private RunicItemClass runicClass;
 
-    public RunicItemWeaponTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags,
+    public RunicItemWeaponTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data,
                                    RunicItemStatRange damageRange,
                                    int level, RunicItemRarity rarity, RunicItemClass runicClass) {
-        super(id, displayableItem, tags);
+        super(id, displayableItem, tags, data);
         this.damageRange = damageRange;
         this.level = level;
         this.rarity = rarity;
@@ -27,9 +28,9 @@ public class RunicItemWeaponTemplate extends RunicItemTemplate {
     }
 
     @Override
-    public RunicItemWeapon generateItem() {
+    public RunicItemWeapon generateItem(int count) {
         return new RunicItemWeapon(
-                this.id, this.displayableItem, this.tags,
+                this.id, this.displayableItem, this.tags, this.data, count,
                 this.damageRange,
                 this.level, this.rarity, this.runicClass
         );

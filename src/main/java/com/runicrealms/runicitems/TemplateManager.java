@@ -19,7 +19,11 @@ public class TemplateManager {
     }
 
     public static RunicItem generateItemFromId(String id) {
-        return templates.get(id).generateItem();
+        return templates.get(id).generateItem(1);
+    }
+
+    public static RunicItem generateItemFromId(String id, int count) {
+        return templates.get(id).generateItem(count);
     }
 
 }

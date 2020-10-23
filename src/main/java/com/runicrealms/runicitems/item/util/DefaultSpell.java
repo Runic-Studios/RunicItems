@@ -4,15 +4,15 @@ import com.runicrealms.runicitems.item.stats.RunicSpell;
 
 public class DefaultSpell {
 
-    private SpellClickTrigger trigger;
+    private ClickTrigger trigger;
     private RunicSpell spell;
 
-    public DefaultSpell(SpellClickTrigger trigger, RunicSpell spell) {
+    public DefaultSpell(ClickTrigger trigger, RunicSpell spell) {
         this.trigger = trigger;
         this.spell = spell;
     }
 
-    public SpellClickTrigger getTrigger() {
+    public ClickTrigger getTrigger() {
         return this.trigger;
     }
 

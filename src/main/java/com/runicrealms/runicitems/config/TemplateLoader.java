@@ -16,7 +16,7 @@ import com.runicrealms.runicitems.item.template.RunicItemWeaponTemplate;
 import com.runicrealms.runicitems.item.util.DefaultSpell;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
-import com.runicrealms.runicitems.item.util.SpellClickTrigger;
+import com.runicrealms.runicitems.item.util.ClickTrigger;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -28,7 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ItemLoader {
+public class TemplateLoader {
 
     public static void loadTemplates() {
         File folder = new File(Plugin.getInstance().getDataFolder(), "items");
@@ -60,17 +60,21 @@ public class ItemLoader {
                 Material.getMaterial(itemConfig.getString("display.material")),
                 itemConfig.contains("display.damage") ? (short) itemConfig.getInt("display.damage") : 0
         );
-        int level;
-        RunicItemRarity rarity;
+        Map<String, Object> data = new HashMap<String, Object>();
+        if (itemConfig.contains("data")) {
+            for (String key : itemConfig.getConfigurationSection("data").getKeys(false)) {
+                data.put(key, itemConfig.get("data." + key));
+            }
+        }
         if (itemConfig.getString("type").equalsIgnoreCase("armor")) {
             return new RunicItemArmorTemplate(
-                    id, displayableItem, tags,
+                    id, displayableItem, tags, data,
                     loadStats(itemConfig), itemConfig.getInt("max-gem-slots"),
                     itemConfig.getInt("level"), loadRarity(itemConfig), loadClass(itemConfig)
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("artifact")) {
             return new RunicItemArtifactTemplate(
-                    id, displayableItem, tags,
+                    id, displayableItem, tags, data,
                     new DefaultSpell(
                             loadSpellClickTrigger(itemConfig, "default-spell"),
                             SpellManager.getSpellFromId(itemConfig.getString("default-spell.spell"))
@@ -79,18 +83,18 @@ public class ItemLoader {
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("generic")) {
             return new RunicItemGenericTemplate(
-                    id, displayableItem, tags,
+                    id, displayableItem, tags, data, loadTriggers(itemConfig),
                     itemConfig.getStringList("lore")
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("offhand")) {
             return new RunicItemOffhandTemplate(
-                    id, displayableItem, tags,
+                    id, displayableItem, tags, data,
                     loadStats(itemConfig),
                     itemConfig.getInt("level"), loadRarity(itemConfig)
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("weapon")) {
             return new RunicItemWeaponTemplate(
-                    id, displayableItem, tags,
+                    id, displayableItem, tags, data,
                     loadDamage(itemConfig),
                     itemConfig.getInt("level"), loadRarity(itemConfig), loadClass(itemConfig)
             );
@@ -128,8 +132,8 @@ public class ItemLoader {
         return stats;
     }
 
-    private static SpellClickTrigger loadSpellClickTrigger(FileConfiguration itemConfig, String key) {
-        for (SpellClickTrigger target : SpellClickTrigger.values()) {
+    private static ClickTrigger loadSpellClickTrigger(FileConfiguration itemConfig, String key) {
+        for (ClickTrigger target : ClickTrigger.values()) {
             if (target.getIdentifier().equalsIgnoreCase(itemConfig.getString(key + ".click"))) {
                 return target;
             }
@@ -146,4 +150,18 @@ public class ItemLoader {
         throw new NullPointerException();
     }
 
+    private static Map<ClickTrigger, String> loadTriggers(FileConfiguration itemConfig) {
+        Map<ClickTrigger, String> triggers = new HashMap<ClickTrigger, String>();
+        if (itemConfig.contains("triggers")) {
+            for (String key : itemConfig.getConfigurationSection("triggers").getKeys(false)) {
+                for (ClickTrigger target : ClickTrigger.values()) {
+                    if (target.getIdentifier().equalsIgnoreCase(key)) {
+                        triggers.put(target, itemConfig.getString("triggers." + key));
+                        break;
+                    }
+                }
+            }
+        }
+        return triggers;
+    }
 }

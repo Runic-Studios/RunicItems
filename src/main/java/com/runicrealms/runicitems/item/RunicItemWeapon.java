@@ -1,5 +1,6 @@
 package com.runicrealms.runicitems.item;
 
+import com.runicrealms.plugin.database.MongoDataSection;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
@@ -10,6 +11,7 @@ import com.runicrealms.runicitems.util.ItemIcons;
 import org.bukkit.ChatColor;
 
 import java.util.List;
+import java.util.Map;
 
 public class RunicItemWeapon extends RunicItem {
 
@@ -18,16 +20,16 @@ public class RunicItemWeapon extends RunicItem {
     private RunicItemRarity rarity;
     private RunicItemClass runicClass;
 
-    public RunicItemWeapon(String id, DisplayableItem displayableItem, List<RunicItemTag> tags,
+    public RunicItemWeapon(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
                            RunicItemStatRange damageRange,
                            int level, RunicItemRarity rarity, RunicItemClass runicClass) {
-        super(id, displayableItem, tags, () -> new ItemLoreSection[] {
-                new ItemLoreSection(new String[] {
+        super(id, displayableItem, tags, data, count, () -> new ItemLoreSection[]{
+                new ItemLoreSection(new String[]{
                         rarity.getDisplay(),
                         ChatColor.GRAY + "Required Class: " + ChatColor.WHITE + runicClass.getDisplay(),
                         ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level
                 }),
-                new ItemLoreSection(new String[] {
+                new ItemLoreSection(new String[]{
                         ChatColor.RED + "+ " + damageRange.getMin() + "-" + damageRange.getMax() + ItemIcons.ATTACK_ICON
                 })
         });
@@ -52,5 +54,8 @@ public class RunicItemWeapon extends RunicItem {
     public RunicItemClass getRunicClass() {
         return this.runicClass;
     }
+
+    @Override
+    public void addSpecificItemToData(MongoDataSection section) {}
 
 }
