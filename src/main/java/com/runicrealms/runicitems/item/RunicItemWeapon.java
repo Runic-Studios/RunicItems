@@ -2,7 +2,9 @@ package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.MongoDataSection;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
+import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
+import com.runicrealms.runicitems.item.stats.RunicItemStatType;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
@@ -10,30 +12,48 @@ import com.runicrealms.runicitems.item.util.RunicItemClass;
 import com.runicrealms.runicitems.util.ItemIcons;
 import org.bukkit.ChatColor;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class RunicItemWeapon extends RunicItem {
 
     private RunicItemStatRange damageRange;
+    private LinkedHashMap<RunicItemStatType, RunicItemStat> stats;
     private int level;
     private RunicItemRarity rarity;
     private RunicItemClass runicClass;
 
     public RunicItemWeapon(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
-                           RunicItemStatRange damageRange,
+                           RunicItemStatRange damageRange, LinkedHashMap<RunicItemStatType, RunicItemStat> stats,
                            int level, RunicItemRarity rarity, RunicItemClass runicClass) {
-        super(id, displayableItem, tags, data, count, () -> new ItemLoreSection[]{
-                new ItemLoreSection(new String[]{
-                        rarity.getDisplay(),
-                        ChatColor.GRAY + "Required Class: " + ChatColor.WHITE + runicClass.getDisplay(),
-                        ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level
-                }),
-                new ItemLoreSection(new String[]{
-                        ChatColor.RED + "+ " + damageRange.getMin() + "-" + damageRange.getMax() + ItemIcons.ATTACK_ICON
-                })
+        super(id, displayableItem, tags, data, count, () -> {
+            ItemLoreSection[] sections = new ItemLoreSection[2 + (stats.size() > 0 ? 1 : 0)];
+            sections[0] = new ItemLoreSection(new String[]{
+                    rarity.getDisplay(),
+                    ChatColor.GRAY + "Required Class: " + ChatColor.WHITE + runicClass.getDisplay(),
+                    ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level
+            });
+            sections[1] = new ItemLoreSection(new String[]{
+                    ChatColor.RED + "+ " + damageRange.getMin() + "-" + damageRange.getMax() + ItemIcons.ATTACK_ICON
+            });
+            List<String> lore = new ArrayList<String>();
+            for (Map.Entry<RunicItemStatType, RunicItemStat> entry : stats.entrySet()) {
+                lore.add(
+                        entry.getKey().getColor()
+                                + (entry.getValue().getRoll() < 0 ? "-" : "+")
+                                + entry.getValue().getRoll()
+                                + entry.getKey().getSuffix()
+                );
+            }
+            if (stats.size() > 0) {
+                sections[2] = new ItemLoreSection(lore);
+            }
+            return sections;
         });
         this.damageRange = damageRange;
+        this.stats = stats;
         this.level = level;
         this.rarity = rarity;
         this.runicClass = runicClass;
@@ -41,6 +61,10 @@ public class RunicItemWeapon extends RunicItem {
 
     public RunicItemStatRange getWeaponDamage() {
         return this.damageRange;
+    }
+
+    public LinkedHashMap<RunicItemStatType, RunicItemStat> getStats() {
+        return stats;
     }
 
     public int getLevel() {
@@ -56,6 +80,10 @@ public class RunicItemWeapon extends RunicItem {
     }
 
     @Override
-    public void addSpecificItemToData(MongoDataSection section) {}
+    public void addSpecificItemToData(MongoDataSection section) {
+        for (RunicItemStatType statType : this.stats.keySet()) {
+            section.set("stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
+        }
+    }
 
 }

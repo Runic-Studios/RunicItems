@@ -1,6 +1,8 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.MongoDataSection;
+import com.runicrealms.runicitems.item.stats.RunicItemStat;
+import com.runicrealms.runicitems.item.stats.RunicItemStatType;
 import com.runicrealms.runicitems.item.stats.RunicSpell;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
@@ -12,6 +14,7 @@ import com.runicrealms.runicitems.item.util.ClickTrigger;
 import com.runicrealms.runicitems.util.ItemIcons;
 import org.bukkit.ChatColor;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,15 +23,16 @@ public class RunicItemArtifact extends RunicItem {
 
     private LinkedHashMap<ClickTrigger, RunicSpell> spells;
     private RunicItemStatRange damageRange;
+    private LinkedHashMap<RunicItemStatType, RunicItemStat> stats;
     private int level;
     private RunicItemRarity rarity;
     private RunicItemClass runicClass;
 
     public RunicItemArtifact(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
-                             LinkedHashMap<ClickTrigger, RunicSpell> spells, RunicItemStatRange damageRange,
+                             LinkedHashMap<ClickTrigger, RunicSpell> spells, RunicItemStatRange damageRange, LinkedHashMap<RunicItemStatType, RunicItemStat> stats,
                              int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(id, displayableItem, tags, data, count, () -> {
-            ItemLoreSection[] sections = new ItemLoreSection[2 + spells.size()];
+            ItemLoreSection[] sections = new ItemLoreSection[2 + spells.size() + (stats.size() > 0 ? 1 : 0)];
             sections[0] = new ItemLoreSection(new String[] {
                     rarity.getDisplay(),
                     ChatColor.GRAY + "Required Class: " + ChatColor.WHITE + runicClass.getDisplay(),
@@ -45,10 +49,23 @@ public class RunicItemArtifact extends RunicItem {
                 });
                 counter++;
             }
+            List<String> lore = new ArrayList<String>();
+            for (Map.Entry<RunicItemStatType, RunicItemStat> entry : stats.entrySet()) {
+                lore.add(
+                        entry.getKey().getColor()
+                                + (entry.getValue().getRoll() < 0 ? "-" : "+")
+                                + entry.getValue().getRoll()
+                                + entry.getKey().getSuffix()
+                );
+            }
+            if (stats.size() > 0) {
+                sections[counter] = new ItemLoreSection(lore);
+            }
             return sections;
         });
         this.spells = spells;
         this.damageRange = damageRange;
+        this.stats = stats;
         this.level = level;
         this.rarity = rarity;
         this.runicClass = runicClass;
@@ -60,6 +77,10 @@ public class RunicItemArtifact extends RunicItem {
 
     public RunicItemStatRange getDamageRange() {
         return this.damageRange;
+    }
+
+    public LinkedHashMap<RunicItemStatType, RunicItemStat> getStats() {
+        return stats;
     }
 
     public int getRandomDamage() {
@@ -80,6 +101,9 @@ public class RunicItemArtifact extends RunicItem {
 
     @Override
     public void addSpecificItemToData(MongoDataSection section) {
+        for (RunicItemStatType statType : this.stats.keySet()) {
+            section.set("stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
+        }
         for (ClickTrigger trigger : spells.keySet()) {
             section.set(trigger.getIdentifier(), spells.get(trigger).getIdentifier());
         }

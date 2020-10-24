@@ -78,7 +78,7 @@ public class TemplateLoader {
                     new DefaultSpell(
                             loadSpellClickTrigger(itemConfig, "default-spell"),
                             SpellManager.getSpellFromId(itemConfig.getString("default-spell.spell"))
-                    ), loadDamage(itemConfig),
+                    ), loadDamage(itemConfig), loadStats(itemConfig),
                     itemConfig.getInt("level"), loadRarity(itemConfig), loadClass(itemConfig)
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("generic")) {
@@ -95,7 +95,7 @@ public class TemplateLoader {
         } else if (itemConfig.getString("type").equalsIgnoreCase("weapon")) {
             return new RunicItemWeaponTemplate(
                     id, displayableItem, tags, data,
-                    loadDamage(itemConfig),
+                    loadDamage(itemConfig), loadStats(itemConfig),
                     itemConfig.getInt("level"), loadRarity(itemConfig), loadClass(itemConfig)
             );
         } else {
