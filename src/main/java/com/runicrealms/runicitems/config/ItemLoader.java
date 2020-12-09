@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ItemLoader {
 
@@ -60,9 +61,13 @@ public class ItemLoader {
 
     private static LinkedHashMap<RunicItemStatType, RunicItemStat> loadStats(Data section, Map<RunicItemStatType, RunicItemStatRange> templateStats) {
         LinkedHashMap<RunicItemStatType, RunicItemStat> stats = new LinkedHashMap<RunicItemStatType, RunicItemStat>();
-        for (String key : section.getSection("stats").getKeys()) {
-            RunicItemStatType statType = RunicItemStatType.getFromIdentifier(key);
-            stats.put(statType, new RunicItemStat(templateStats.get(statType), section.get("stats." + key, Float.class)));
+        Set<String> sectionKeys = section.getSection("stats").getKeys();
+        for (RunicItemStatType templateStatType : templateStats.keySet()) {
+            if (sectionKeys.contains(templateStatType.getIdentifier())) { // Item has stat and has already been rolled (stored in database)
+                stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType), section.get("stats." + templateStatType.getIdentifier(), Float.class)));
+            } else { // Item has recently been added this stat and the roll does not exist in database, so make a new roll
+                stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType)));
+            }
         }
         return stats;
     }
