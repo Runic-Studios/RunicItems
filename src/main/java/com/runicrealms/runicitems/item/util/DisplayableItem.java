@@ -1,5 +1,6 @@
 package com.runicrealms.runicitems.item.util;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
@@ -7,9 +8,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class DisplayableItem {
 
-    private String displayName;
-    private Material material;
-    private short damage;
+    private final String displayName;
+    private final Material material;
+    private final short damage;
 
     public DisplayableItem(String displayName, Material material, short damage) {
         this.displayName = displayName;
@@ -32,6 +33,9 @@ public class DisplayableItem {
     public ItemStack generateItem() {
         ItemStack item = new ItemStack(this.material);
         ItemMeta meta = item.getItemMeta();
+        if (meta == null) {
+            meta = Bukkit.getItemFactory().getItemMeta(item.getType());
+        }
         if (meta instanceof Damageable) {
             ((Damageable) meta).setDamage(this.damage);
         }

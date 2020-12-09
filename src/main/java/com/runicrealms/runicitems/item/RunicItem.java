@@ -21,10 +21,10 @@ public abstract class RunicItem {
 
     protected ItemStack currentItem; // ItemStack that we are currently displaying to the player
 
-    protected DisplayableItem displayableItem; // Base ItemStack information that we get from the template
-    protected String id; // Template ID
-    protected List<RunicItemTag> tags; // List of tags (soulbound, untradeable, etc.)
-    protected Map<String, Object> data;
+    protected final DisplayableItem displayableItem; // Base ItemStack information that we get from the template
+    protected final String id; // Template ID
+    protected final List<RunicItemTag> tags; // List of tags (soulbound, untradeable, etc.)
+    protected final Map<String, Object> data;
 
     protected int count;
 

@@ -15,11 +15,11 @@ import java.util.Map;
 
 public class RunicItemWeaponTemplate extends RunicItemTemplate {
 
-    private RunicItemStatRange damageRange;
-    private LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats;
-    private int level;
-    private RunicItemRarity rarity;
-    private RunicItemClass runicClass;
+    private final RunicItemStatRange damageRange;
+    private final LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats;
+    private final int level;
+    private final RunicItemRarity rarity;
+    private final RunicItemClass runicClass;
 
     public RunicItemWeaponTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data,
                                    RunicItemStatRange damageRange, LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats,

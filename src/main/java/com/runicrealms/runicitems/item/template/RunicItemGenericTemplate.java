@@ -10,8 +10,8 @@ import java.util.Map;
 
 public class RunicItemGenericTemplate extends RunicItemTemplate {
 
-    private List<String> lore;
-    private Map<ClickTrigger, String> triggers;
+    private final List<String> lore;
+    private final Map<ClickTrigger, String> triggers;
 
     public RunicItemGenericTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data,
                                     Map<ClickTrigger, String> triggers, List<String> lore) {

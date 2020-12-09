@@ -9,10 +9,10 @@ import java.util.Map;
 
 public abstract class RunicItemTemplate {
 
-    protected String id;
-    protected DisplayableItem displayableItem;
-    protected List<RunicItemTag> tags;
-    protected Map<String, Object> data;
+    protected final String id;
+    protected final DisplayableItem displayableItem;
+    protected final List<RunicItemTag> tags;
+    protected final Map<String, Object> data;
 
     public RunicItemTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data) {
         this.id = id;

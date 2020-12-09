@@ -5,31 +5,33 @@ import org.bukkit.ChatColor;
 
 public enum RunicItemStatType {
 
-    HEALTH("health", ChatColor.RED, ItemIcons.HEART_ICON),
-    MANA("mana", ChatColor.DARK_AQUA, ItemIcons.MANA_ICON),
-    MANA_REGEN("mana-regen", ChatColor.DARK_AQUA, ItemIcons.MANA_ICON + "/t"),
-    SPELL_DAMAGE("spell-damage", ChatColor.YELLOW, ItemIcons.SPELL_ICON),
-    WEAPON_DAMAGE("weapon-damage", ChatColor.YELLOW, ItemIcons.ATTACK_ICON),
-    HEALTH_REGEN("health-regen", ChatColor.RED, ItemIcons.HEART_ICON + "/t"),
-    HEALING("healing", ChatColor.DARK_RED, ItemIcons.SPELL_ICON + ItemIcons.HEART_ICON),
-    SHIELD("shield", ChatColor.GRAY, ItemIcons.SHIELD_ICON),
-    AGILITY("agility", ChatColor.WHITE, ItemIcons.AGILITY_ICON),
-    CRITICAL("critical", ChatColor.YELLOW, ItemIcons.CRITICAL_ICON),
-    DODGE("dodge", ChatColor.DARK_PURPLE, ItemIcons.DODGE_ICON),
-    ATTACK_SPEED("attack-speed", ChatColor.GOLD, ItemIcons.ATTACK_ICON);
+    INTELLIGENCE("intelligence", "INT", ChatColor.DARK_AQUA, ItemIcons.WAND_ICON),
+    DEXTERITY("dexterity", "DEX", ChatColor.DARK_GREEN, ItemIcons.SHIELD_ICON),
+    STRENGTH("strength", "STR", ChatColor.DARK_RED, ItemIcons.SWORD_ICON),
+    VITALITY("vitality", "VIT", ChatColor.RED, ItemIcons.HEART_ICON),
+    WISDOM("wisdom", "WIS", ChatColor.GREEN, ItemIcons.STAR_ICON),
+    CRITICAL("critical", "CRIT", ChatColor.YELLOW, ItemIcons.SWORD_ICON + ItemIcons.SWORD_ICON),
+    DODGE("dodge", "DODGE", ChatColor.WHITE, ItemIcons.DODGE_ICON),
+    ATTACK_SPEED("attack-speed", "ATK SPD", ChatColor.GRAY, ItemIcons.ATTACK_SPEED_ICON);
 
-    private String identifier;
-    private ChatColor color;
-    private String suffix;
+    private final String identifier;
+    private final String display;
+    private final ChatColor color;
+    private final String suffix;
 
-    RunicItemStatType(String identifier, ChatColor color, String suffix) {
+    RunicItemStatType(String identifier, String display, ChatColor color, String suffix) {
         this.identifier = identifier;
+        this.display = display;
         this.color = color;
         this.suffix = suffix;
     }
 
     public String getIdentifier() {
         return this.identifier;
+    }
+
+    public String getDisplay() {
+        return this.display;
     }
 
     public ChatColor getColor() {

@@ -4,9 +4,9 @@ import java.util.Random;
 
 public class RunicItemStat {
 
-    private RunicItemStatRange range;
-    private float rollPercentage;
-    private int roll;
+    private final RunicItemStatRange range;
+    private final float rollPercentage;
+    private final int roll;
 
     public RunicItemStat(RunicItemStatRange range, float rollPercentage) {
         this(range, rollPercentage, range.getMin() + (int) Math.floor(rollPercentage * (range.getMax() - range.getMin())));

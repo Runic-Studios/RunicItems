@@ -35,12 +35,12 @@ public class ConfigUtil {
 
     public static void initDirs() {
         if (!Plugin.getInstance().getDataFolder().exists()) {
-            Plugin.getInstance().getDataFolder().mkdir();
+            Plugin.getInstance().getDataFolder().mkdirs();
         }
         File itemsFolder = getSubFolder(Plugin.getInstance().getDataFolder(), "items");
         if (itemsFolder == null) {
             itemsFolder = new File(Plugin.getInstance().getDataFolder(), "items");
-            itemsFolder.mkdir();
+            itemsFolder.mkdirs();
         }
     }
 

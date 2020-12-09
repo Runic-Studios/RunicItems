@@ -16,11 +16,11 @@ import java.util.Map;
 
 public class RunicItemArmorTemplate extends RunicItemTemplate {
 
-    private int level;
-    private RunicItemRarity rarity;
-    private LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats;
-    private int maxGemSlots;
-    private RunicItemClass runicClass;
+    private final int level;
+    private final RunicItemRarity rarity;
+    private final LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats;
+    private final int maxGemSlots;
+    private final RunicItemClass runicClass;
 
     public RunicItemArmorTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data,
                                   LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats, int maxGemSlots,

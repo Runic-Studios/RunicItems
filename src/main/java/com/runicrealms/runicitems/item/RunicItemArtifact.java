@@ -21,12 +21,12 @@ import java.util.Map;
 
 public class RunicItemArtifact extends RunicItem {
 
-    private RunicArtifactAbility ability;
-    private RunicItemStatRange damageRange;
-    private LinkedHashMap<RunicItemStatType, RunicItemStat> stats;
-    private int level;
-    private RunicItemRarity rarity;
-    private RunicItemClass runicClass;
+    private final RunicArtifactAbility ability;
+    private final RunicItemStatRange damageRange;
+    private final LinkedHashMap<RunicItemStatType, RunicItemStat> stats;
+    private final int level;
+    private final RunicItemRarity rarity;
+    private final RunicItemClass runicClass;
 
     public RunicItemArtifact(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
                              RunicArtifactAbility ability, RunicItemStatRange damageRange, LinkedHashMap<RunicItemStatType, RunicItemStat> stats,
@@ -39,7 +39,7 @@ public class RunicItemArtifact extends RunicItem {
                     ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level
             });
             sections[1] = new ItemLoreSection(new String[] {
-                    ChatColor.RED + "+ " + damageRange.getMin() + "-" + damageRange.getMax() + ItemIcons.ATTACK_ICON
+                    ChatColor.RED + "+ " + damageRange.getMin() + "-" + damageRange.getMax() + ItemIcons.SWORD_ICON
             });
             sections[2] = new ItemLoreSection(new String[] {
                     ability.getTrigger().getDisplay() + " " + ChatColor.RESET + "" + ChatColor.GREEN + ability.getAbilityName(),

@@ -10,8 +10,8 @@ public enum RunicItemRarity {
     EPIC("epic", ChatColor.LIGHT_PURPLE + "Epic"),
     CRAFTED("crafted", ChatColor.WHITE + "Crafted");
 
-    private String identifier;
-    private String display;
+    private final String identifier;
+    private final String display;
 
     RunicItemRarity(String identifier, String display) {
         this.identifier = identifier;

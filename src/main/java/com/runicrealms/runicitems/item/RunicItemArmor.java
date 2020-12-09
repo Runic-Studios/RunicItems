@@ -18,12 +18,12 @@ import java.util.Map;
 
 public class RunicItemArmor extends RunicItem {
 
-    private int level;
-    private RunicItemRarity rarity;
-    private LinkedHashMap<RunicItemStatType, RunicItemStat> stats;
-    private List<LinkedHashMap<RunicItemStatType, Integer>> gems;
-    private int maxGemSlots;
-    private RunicItemClass runicClass;
+    private final int level;
+    private final RunicItemRarity rarity;
+    private final LinkedHashMap<RunicItemStatType, RunicItemStat> stats;
+    private final List<LinkedHashMap<RunicItemStatType, Integer>> gems;
+    private final int maxGemSlots;
+    private final RunicItemClass runicClass;
 
     public RunicItemArmor(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
                           LinkedHashMap<RunicItemStatType, RunicItemStat> stats, List<LinkedHashMap<RunicItemStatType, Integer>> gems, int maxGemSlots,

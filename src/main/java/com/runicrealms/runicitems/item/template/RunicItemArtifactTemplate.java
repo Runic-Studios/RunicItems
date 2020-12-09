@@ -16,12 +16,12 @@ import java.util.List;
 
 public class RunicItemArtifactTemplate extends RunicItemTemplate {
 
-    private RunicArtifactAbility ability;
-    private RunicItemStatRange damageRange;
-    private LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats;
-    private int level;
-    private RunicItemRarity rarity;
-    private RunicItemClass runicClass;
+    private final RunicArtifactAbility ability;
+    private final RunicItemStatRange damageRange;
+    private final LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats;
+    private final int level;
+    private final RunicItemRarity rarity;
+    private final RunicItemClass runicClass;
 
     public RunicItemArtifactTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data,
                                      RunicArtifactAbility ability, RunicItemStatRange damageRange, LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats,

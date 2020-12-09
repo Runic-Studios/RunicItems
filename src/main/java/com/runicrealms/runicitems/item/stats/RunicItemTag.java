@@ -8,8 +8,8 @@ public enum RunicItemTag {
     UNTRADEABLE("untradeable", ChatColor.DARK_RED + "Untradeable"),
     QUEST_ITEM("quest-item", ChatColor.DARK_PURPLE + "Quest Item");
 
-    private String identifier;
-    private String display;
+    private final String identifier;
+    private final String display;
 
     RunicItemTag(String identifier, String display) {
         this.identifier = identifier;

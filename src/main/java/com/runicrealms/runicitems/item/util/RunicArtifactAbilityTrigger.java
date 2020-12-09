@@ -7,8 +7,8 @@ public enum RunicArtifactAbilityTrigger {
     ON_CLICK("on-click", ChatColor.GOLD + "" + ChatColor.BOLD + "ON CLICK"),
     ON_KILL("on-kill", ChatColor.GOLD + "" + ChatColor.BOLD + "ON KILL");
 
-    private String identifier;
-    private String display;
+    private final String identifier;
+    private final String display;
 
     RunicArtifactAbilityTrigger(String identifier, String display) {
         this.identifier = identifier;

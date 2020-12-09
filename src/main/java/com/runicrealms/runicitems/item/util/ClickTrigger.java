@@ -9,8 +9,8 @@ public enum ClickTrigger {
     LEFT_CLICK("left", ChatColor.GOLD + "" + ChatColor.BOLD + "LEFT CLICK"),
     SHIFT_LEFT_CLICK("shift-left", ChatColor.GOLD + "" + ChatColor.BOLD + "SNEAK + LEFT CLICK");
 
-    private String identifier;
-    private String display;
+    private final String identifier;
+    private final String display;
 
     ClickTrigger(String identifier, String display) {
         this.identifier = identifier;

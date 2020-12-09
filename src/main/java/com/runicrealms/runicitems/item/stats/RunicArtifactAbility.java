@@ -4,10 +4,10 @@ import com.runicrealms.runicitems.item.util.RunicArtifactAbilityTrigger;
 
 public class RunicArtifactAbility {
 
-    private String identifier;
-    private String name;
-    private String description;
-    private RunicArtifactAbilityTrigger trigger;
+    private final String identifier;
+    private final String name;
+    private final String description;
+    private final RunicArtifactAbilityTrigger trigger;
 
     public RunicArtifactAbility(String identifier, String name, String description, RunicArtifactAbilityTrigger trigger) {
         this.identifier = identifier;

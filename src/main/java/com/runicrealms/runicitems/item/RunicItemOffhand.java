@@ -17,9 +17,9 @@ import java.util.Map;
 
 public class RunicItemOffhand extends RunicItem {
 
-    private LinkedHashMap<RunicItemStatType, RunicItemStat> stats;
-    private int level;
-    private RunicItemRarity rarity;
+    private final LinkedHashMap<RunicItemStatType, RunicItemStat> stats;
+    private final int level;
+    private final RunicItemRarity rarity;
 
     public RunicItemOffhand(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
                             LinkedHashMap<RunicItemStatType, RunicItemStat> stats,

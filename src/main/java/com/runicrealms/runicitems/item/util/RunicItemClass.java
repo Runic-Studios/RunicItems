@@ -9,8 +9,8 @@ public enum RunicItemClass {
     ROGUE("Rogue", "rogue"),
     ANY("Any", "any");
 
-    private String display;
-    private String identifier;
+    private final String display;
+    private final String identifier;
 
     RunicItemClass(String display, String identifier) {
         this.display = display;

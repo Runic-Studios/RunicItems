@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ItemLoreSection {
@@ -8,9 +9,7 @@ public class ItemLoreSection {
     private List<String> lore = new ArrayList<String>();
 
     public ItemLoreSection(String[] lore) {
-        for (String line : lore) {
-            this.lore.add(line);
-        }
+        Collections.addAll(this.lore, lore);
     }
 
     public ItemLoreSection(List<String> lore) {

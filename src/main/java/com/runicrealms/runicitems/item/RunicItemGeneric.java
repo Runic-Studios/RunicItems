@@ -12,8 +12,8 @@ import java.util.Map;
 
 public class RunicItemGeneric extends RunicItem {
 
-    private List<String> lore;
-    private Map<ClickTrigger, String> triggers;
+    private final List<String> lore;
+    private final Map<ClickTrigger, String> triggers;
 
     public RunicItemGeneric(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
                             Map<ClickTrigger, String> triggers, List<String> lore) {
