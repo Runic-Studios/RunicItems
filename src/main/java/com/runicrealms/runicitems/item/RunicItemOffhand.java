@@ -1,10 +1,11 @@
 package com.runicrealms.runicitems.item;
 
-import com.runicrealms.plugin.database.MongoDataSection;
+import com.runicrealms.plugin.database.Data;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatType;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
+import com.runicrealms.runicitems.item.template.RunicItemOffhandTemplate;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import org.bukkit.ChatColor;
@@ -46,6 +47,14 @@ public class RunicItemOffhand extends RunicItem {
         this.rarity = rarity;
     }
 
+    public RunicItemOffhand(RunicItemOffhandTemplate template, int count, LinkedHashMap<RunicItemStatType, RunicItemStat> stats) {
+        this(
+                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count,
+                stats,
+                template.getLevel(), template.getRarity()
+        );
+    }
+
     public LinkedHashMap<RunicItemStatType, RunicItemStat> getStats() {
         return this.stats;
     }
@@ -59,7 +68,7 @@ public class RunicItemOffhand extends RunicItem {
     }
 
     @Override
-    public void addSpecificItemToData(MongoDataSection section) {
+    public void addSpecificItemToData(Data section) {
         for (RunicItemStatType statType : this.stats.keySet()) {
             section.set("stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
         }

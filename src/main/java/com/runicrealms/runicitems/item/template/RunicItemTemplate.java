@@ -35,4 +35,8 @@ public abstract class RunicItemTemplate {
         return this.tags;
     }
 
+    public Map<String, Object> getData() {
+        return this.data;
+    }
+
 }

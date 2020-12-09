@@ -2,8 +2,8 @@ package com.runicrealms.runicitems.item.template;
 
 import com.runicrealms.runicitems.item.RunicItemGeneric;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
-import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ClickTrigger;
+import com.runicrealms.runicitems.item.util.DisplayableItem;
 
 import java.util.List;
 import java.util.Map;

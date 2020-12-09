@@ -1,7 +1,10 @@
 package com.runicrealms.runicitems.item;
 
+import com.runicrealms.plugin.database.Data;
 import com.runicrealms.plugin.database.MongoDataSection;
+import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
+import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import org.bukkit.inventory.ItemStack;
@@ -99,6 +102,6 @@ public abstract class RunicItem {
         section.set("count", this.count);
     }
 
-    protected abstract void addSpecificItemToData(MongoDataSection section);
+    protected abstract void addSpecificItemToData(Data section);
 
 }

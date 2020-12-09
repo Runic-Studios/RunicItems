@@ -1,8 +1,9 @@
 package com.runicrealms.runicitems.config;
 
 import com.runicrealms.runicitems.Plugin;
-import com.runicrealms.runicitems.SpellManager;
+import com.runicrealms.runicitems.AbilityManager;
 import com.runicrealms.runicitems.TemplateManager;
+import com.runicrealms.runicitems.exception.InvalidTemplateException;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.runicitems.item.stats.RunicItemStatType;
@@ -13,13 +14,11 @@ import com.runicrealms.runicitems.item.template.RunicItemGenericTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemOffhandTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemWeaponTemplate;
-import com.runicrealms.runicitems.item.util.DefaultSpell;
+import com.runicrealms.runicitems.item.util.ClickTrigger;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
-import com.runicrealms.runicitems.item.util.ClickTrigger;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,14 +29,22 @@ import java.util.Map;
 
 public class TemplateLoader {
 
-    public static void loadTemplates() {
+    public static void loadTemplates() throws InvalidTemplateException {
         File folder = new File(Plugin.getInstance().getDataFolder(), "items");
         Map<String, RunicItemTemplate> templates = new HashMap<String, RunicItemTemplate>();
         for (File file : folder.listFiles()) {
-            FileConfiguration itemConfig = YamlConfiguration.loadConfiguration(file);
-            RunicItemTemplate template = loadTemplate(itemConfig);
-            if (template == null) throw new NullPointerException();
-            templates.put(template.getId(), template);
+
+            try {
+                FileConfiguration itemConfig = ConfigUtil.getYamlConfigFile(file.getName(), Plugin.getInstance().getDataFolder());
+                RunicItemTemplate template;
+                template = loadTemplate(itemConfig);
+                if (template == null) throw new InvalidTemplateException("Error in template: " + file.getName());
+                templates.put(template.getId(), template);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+                throw new InvalidTemplateException("Error in template: " + file.getName());
+            }
+
         }
         TemplateManager.setTemplates(templates);
     }
@@ -75,10 +82,7 @@ public class TemplateLoader {
         } else if (itemConfig.getString("type").equalsIgnoreCase("artifact")) {
             return new RunicItemArtifactTemplate(
                     id, displayableItem, tags, data,
-                    new DefaultSpell(
-                            loadSpellClickTrigger(itemConfig, "default-spell"),
-                            SpellManager.getSpellFromId(itemConfig.getString("default-spell.spell"))
-                    ), loadDamage(itemConfig), loadStats(itemConfig),
+                    AbilityManager.getAbilityFromId(itemConfig.getString("ability")), loadDamage(itemConfig), loadStats(itemConfig),
                     itemConfig.getInt("level"), loadRarity(itemConfig), loadClass(itemConfig)
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("generic")) {

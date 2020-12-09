@@ -1,10 +1,11 @@
 package com.runicrealms.runicitems.item;
 
-import com.runicrealms.plugin.database.MongoDataSection;
+import com.runicrealms.plugin.database.Data;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatType;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
+import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
@@ -64,6 +65,14 @@ public class RunicItemArmor extends RunicItem {
         this.runicClass = runicClass;
     }
 
+    public RunicItemArmor(RunicItemArmorTemplate template, int count, LinkedHashMap<RunicItemStatType, RunicItemStat> stats, List<LinkedHashMap<RunicItemStatType, Integer>> gems) {
+        this(
+                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count,
+                stats, gems, template.getMaxGemSlots(),
+                template.getLevel(), template.getRarity(), template.getRunicClass()
+        );
+    }
+
     public LinkedHashMap<RunicItemStatType, RunicItemStat> getStats() {
         return this.stats;
     }
@@ -89,7 +98,7 @@ public class RunicItemArmor extends RunicItem {
     }
 
     @Override
-    public void addSpecificItemToData(MongoDataSection section) {
+    public void addSpecificItemToData(Data section) {
         for (RunicItemStatType statType : this.stats.keySet()) {
             section.set("stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
         }

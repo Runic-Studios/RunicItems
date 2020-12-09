@@ -1,8 +1,9 @@
 package com.runicrealms.runicitems;
 
 import com.runicrealms.runicitems.config.ConfigUtil;
-import com.runicrealms.runicitems.config.SpellLoader;
+import com.runicrealms.runicitems.config.AbilityLoader;
 import com.runicrealms.runicitems.config.TemplateLoader;
+import com.runicrealms.runicitems.exception.InvalidTemplateException;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Plugin extends JavaPlugin {
@@ -13,8 +14,12 @@ public class Plugin extends JavaPlugin {
     public void onEnable() {
         instance = this;
         ConfigUtil.initDirs();
-        SpellLoader.loadSpells();
-        TemplateLoader.loadTemplates();
+        AbilityLoader.loadAbilities();
+        try {
+            TemplateLoader.loadTemplates();
+        } catch (InvalidTemplateException exception) {
+            exception.printStackTrace();
+        }
     }
 
     public static Plugin getInstance() {
