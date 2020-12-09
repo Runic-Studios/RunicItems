@@ -24,4 +24,13 @@ public enum RunicItemTag {
         return this.display;
     }
 
+    public static RunicItemTag getFromIdentifier(String identifier) {
+        for (RunicItemTag tag : RunicItemTag.values()) {
+            if (tag.getIdentifier().equalsIgnoreCase(identifier)) {
+                return tag;
+            }
+        }
+        return null;
+    }
+
 }

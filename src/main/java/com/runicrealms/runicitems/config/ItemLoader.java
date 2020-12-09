@@ -36,12 +36,7 @@ public class ItemLoader {
                 for (String gemKey : section.getSection("gems").getKeys()) {
                     LinkedHashMap<RunicItemStatType, Integer> gem = new LinkedHashMap<RunicItemStatType, Integer>();
                     for (String statKey : section.getSection("gems." + gemKey).getKeys()) {
-                        for (RunicItemStatType statType : RunicItemStatType.values()) {
-                            if (statType.getIdentifier().equalsIgnoreCase(statKey)) {
-                                gem.put(statType, section.get("gems." + gemKey + "." + statKey, Integer.class));
-                                break;
-                            }
-                        }
+                        gem.put(RunicItemStatType.getFromIdentifier(statKey), section.get("gems." + gemKey + "." + statKey, Integer.class));
                     }
                     gems.add(gem);
                 }
@@ -66,12 +61,8 @@ public class ItemLoader {
     private static LinkedHashMap<RunicItemStatType, RunicItemStat> loadStats(Data section, Map<RunicItemStatType, RunicItemStatRange> templateStats) {
         LinkedHashMap<RunicItemStatType, RunicItemStat> stats = new LinkedHashMap<RunicItemStatType, RunicItemStat>();
         for (String key : section.getSection("stats").getKeys()) {
-            for (RunicItemStatType statType : RunicItemStatType.values()) {
-                if (statType.getIdentifier().equalsIgnoreCase(key)) {
-                    stats.put(statType, new RunicItemStat(templateStats.get(statType), section.get("stats." + key, Float.class)));
-                    break;
-                }
-            }
+            RunicItemStatType statType = RunicItemStatType.getFromIdentifier(key);
+            stats.put(statType, new RunicItemStat(templateStats.get(statType), section.get("stats." + key, Float.class)));
         }
         return stats;
     }

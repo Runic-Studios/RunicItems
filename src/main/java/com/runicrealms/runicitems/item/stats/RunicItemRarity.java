@@ -26,4 +26,13 @@ public enum RunicItemRarity {
         return this.identifier;
     }
 
+    public static RunicItemRarity getFromIdentifier(String identifier) {
+        for (RunicItemRarity rarity : RunicItemRarity.values()) {
+            if (rarity.getIdentifier().equalsIgnoreCase(identifier)) {
+                return rarity;
+            }
+        }
+        return null;
+    }
+
 }

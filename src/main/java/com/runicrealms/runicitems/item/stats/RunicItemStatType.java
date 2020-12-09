@@ -40,4 +40,13 @@ public enum RunicItemStatType {
         return this.suffix;
     }
 
+    public static RunicItemStatType getFromIdentifier(String identifier) {
+        for (RunicItemStatType stat : RunicItemStatType.values()) {
+            if (stat.getIdentifier().equalsIgnoreCase(identifier)) {
+                return stat;
+            }
+        }
+        return null;
+    }
+
 }

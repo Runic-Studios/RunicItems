@@ -25,4 +25,13 @@ public enum RunicItemClass {
         return this.identifier;
     }
 
+    public static RunicItemClass getFromIdentifier(String identifier) {
+        for (RunicItemClass itemClass : RunicItemClass.values()) {
+            if (itemClass.getIdentifier().equalsIgnoreCase(identifier)) {
+                return itemClass;
+            }
+        }
+        return null;
+    }
+
 }

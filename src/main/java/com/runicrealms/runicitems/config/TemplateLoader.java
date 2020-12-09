@@ -54,12 +54,7 @@ public class TemplateLoader {
         List<RunicItemTag> tags = new ArrayList<RunicItemTag>();
         if (itemConfig.contains("tags")) {
             for (String tag : itemConfig.getStringList("tags")) {
-                for (RunicItemTag target : RunicItemTag.values()) {
-                    if (target.getIdentifier().equalsIgnoreCase(tag)) {
-                        tags.add(target);
-                        break;
-                    }
-                }
+                tags.add(RunicItemTag.getFromIdentifier(tag));
             }
         }
         DisplayableItem displayableItem = new DisplayableItem(
@@ -77,13 +72,13 @@ public class TemplateLoader {
             return new RunicItemArmorTemplate(
                     id, displayableItem, tags, data,
                     loadStats(itemConfig), itemConfig.getInt("max-gem-slots"),
-                    itemConfig.getInt("level"), loadRarity(itemConfig), loadClass(itemConfig)
+                    itemConfig.getInt("level"), RunicItemRarity.getFromIdentifier(itemConfig.getString("rarity")), RunicItemClass.getFromIdentifier(itemConfig.getString("class"))
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("artifact")) {
             return new RunicItemArtifactTemplate(
                     id, displayableItem, tags, data,
                     AbilityManager.getAbilityFromId(itemConfig.getString("ability")), loadDamage(itemConfig), loadStats(itemConfig),
-                    itemConfig.getInt("level"), loadRarity(itemConfig), loadClass(itemConfig)
+                    itemConfig.getInt("level"), RunicItemRarity.getFromIdentifier(itemConfig.getString("rarity")), RunicItemClass.getFromIdentifier(itemConfig.getString("class"))
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("generic")) {
             return new RunicItemGenericTemplate(
@@ -94,26 +89,17 @@ public class TemplateLoader {
             return new RunicItemOffhandTemplate(
                     id, displayableItem, tags, data,
                     loadStats(itemConfig),
-                    itemConfig.getInt("level"), loadRarity(itemConfig)
+                    itemConfig.getInt("level"), RunicItemRarity.getFromIdentifier(itemConfig.getString("rarity"))
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("weapon")) {
             return new RunicItemWeaponTemplate(
                     id, displayableItem, tags, data,
                     loadDamage(itemConfig), loadStats(itemConfig),
-                    itemConfig.getInt("level"), loadRarity(itemConfig), loadClass(itemConfig)
+                    itemConfig.getInt("level"), RunicItemRarity.getFromIdentifier(itemConfig.getString("rarity")), RunicItemClass.getFromIdentifier(itemConfig.getString("class"))
             );
         } else {
             return null;
         }
-    }
-
-    private static RunicItemRarity loadRarity(FileConfiguration itemConfig) {
-        for (RunicItemRarity target : RunicItemRarity.values()) {
-            if (target.getIdentifier().equalsIgnoreCase(itemConfig.getString("rarity"))) {
-                return target;
-            }
-        }
-        throw new NullPointerException();
     }
 
     private static RunicItemStatRange loadDamage(FileConfiguration itemConfig) {
@@ -123,47 +109,19 @@ public class TemplateLoader {
     private static LinkedHashMap<RunicItemStatType, RunicItemStatRange> loadStats(FileConfiguration itemConfig) {
         LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats = new LinkedHashMap<RunicItemStatType, RunicItemStatRange>();
         for (String key : itemConfig.getConfigurationSection("stats").getKeys(false)) {
-            for (RunicItemStatType target : RunicItemStatType.values()) {
-                if (target.getIdentifier().equalsIgnoreCase(key)) {
-                    stats.put(target, new RunicItemStatRange(
-                            itemConfig.getInt("stats." + key + ".min"),
-                            itemConfig.getInt("stats." + key + ".max")
-                    ));
-                    break;
-                }
-            }
+            stats.put(RunicItemStatType.getFromIdentifier(key), new RunicItemStatRange(
+                    itemConfig.getInt("stats." + key + ".min"),
+                    itemConfig.getInt("stats." + key + ".max")
+            ));
         }
         return stats;
-    }
-
-    private static ClickTrigger loadSpellClickTrigger(FileConfiguration itemConfig, String key) {
-        for (ClickTrigger target : ClickTrigger.values()) {
-            if (target.getIdentifier().equalsIgnoreCase(itemConfig.getString(key + ".click"))) {
-                return target;
-            }
-        }
-        throw new NullPointerException();
-    }
-
-    private static RunicItemClass loadClass(FileConfiguration itemConfig) {
-        for (RunicItemClass target : RunicItemClass.values()) {
-            if (target.getIdentifier().equalsIgnoreCase(itemConfig.getString("class"))) {
-                return target;
-            }
-        }
-        throw new NullPointerException();
     }
 
     private static Map<ClickTrigger, String> loadTriggers(FileConfiguration itemConfig) {
         Map<ClickTrigger, String> triggers = new HashMap<ClickTrigger, String>();
         if (itemConfig.contains("triggers")) {
             for (String key : itemConfig.getConfigurationSection("triggers").getKeys(false)) {
-                for (ClickTrigger target : ClickTrigger.values()) {
-                    if (target.getIdentifier().equalsIgnoreCase(key)) {
-                        triggers.put(target, itemConfig.getString("triggers." + key));
-                        break;
-                    }
-                }
+                triggers.put(ClickTrigger.getFromIdentifier(key), itemConfig.getString("triggers." + key));
             }
         }
         return triggers;

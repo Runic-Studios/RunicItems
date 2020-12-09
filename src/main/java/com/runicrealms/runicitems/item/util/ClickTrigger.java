@@ -25,4 +25,13 @@ public enum ClickTrigger {
         return this.display;
     }
 
+    public static ClickTrigger getFromIdentifier(String identifier) {
+        for (ClickTrigger trigger : ClickTrigger.values()) {
+            if (trigger.getIdentifier().equalsIgnoreCase(identifier)) {
+                return trigger;
+            }
+        }
+        return null;
+    }
+
 }
