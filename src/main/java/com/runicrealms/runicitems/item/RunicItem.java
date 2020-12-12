@@ -100,6 +100,7 @@ public abstract class RunicItem {
     public void addToData(MongoDataSection section) {
         section.set("id", this.id);
         section.set("count", this.count);
+        this.addSpecificItemToData(section);
     }
 
     protected abstract void addSpecificItemToData(Data section);

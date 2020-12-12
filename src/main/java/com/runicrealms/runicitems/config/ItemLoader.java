@@ -1,7 +1,6 @@
 package com.runicrealms.runicitems.config;
 
 import com.runicrealms.plugin.database.Data;
-import com.runicrealms.runicitems.AbilityManager;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.RunicItemArmor;

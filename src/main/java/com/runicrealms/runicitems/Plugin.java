@@ -7,6 +7,7 @@ import com.runicrealms.runicitems.config.ConfigUtil;
 import com.runicrealms.runicitems.config.AbilityLoader;
 import com.runicrealms.runicitems.config.TemplateLoader;
 import com.runicrealms.runicitems.exception.InvalidTemplateException;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,14 +19,22 @@ public class Plugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        // Setup base
         instance = this;
         ConfigUtil.initDirs();
+
+        // Load YML files
         AbilityLoader.loadAbilities();
         try {
             TemplateLoader.loadTemplates();
         } catch (InvalidTemplateException exception) {
             exception.printStackTrace();
         }
+
+        // Register Listeners
+        Bukkit.getPluginManager().registerEvents(new PlayerInventoryManager(), this);
+
+        // Register Commands
         commandManager = new PaperCommandManager(this);
         commandManager.getCommandConditions().addCondition("is-player", context -> {
             if (!(context.getIssuer().getIssuer() instanceof Player)) throw new ConditionFailedException("This command cannot be run from console!");
