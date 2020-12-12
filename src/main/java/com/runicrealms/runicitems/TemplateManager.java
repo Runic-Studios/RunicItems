@@ -10,6 +10,10 @@ public class TemplateManager {
 
     private static Map<String, RunicItemTemplate> templates = new HashMap<String, RunicItemTemplate>();
 
+    public static Map<String, RunicItemTemplate> getTemplates() {
+        return templates;
+    }
+
     public static void setTemplates(Map<String, RunicItemTemplate> templates) {
         TemplateManager.templates = templates;
     }

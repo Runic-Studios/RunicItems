@@ -8,6 +8,8 @@ import co.aikar.commands.annotation.Conditions;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
+import com.runicrealms.runicitems.Plugin;
+import com.runicrealms.runicitems.TemplateManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -16,6 +18,10 @@ import org.bukkit.entity.Player;
 public class RunicItemCommand extends BaseCommand {
 
     private static final String PREFIX = "&5[RunicItems] &6» &r";
+
+    public RunicItemCommand() {
+        Plugin.getCommandManager().getCommandCompletions().registerAsyncCompletion("item-ids", context -> TemplateManager.getTemplates().keySet());
+    }
 
     @Default
     @CatchUnknown
