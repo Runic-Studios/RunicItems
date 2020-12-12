@@ -5,6 +5,7 @@ import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.RunicItemArmor;
 import com.runicrealms.runicitems.item.RunicItemArtifact;
+import com.runicrealms.runicitems.item.RunicItemBook;
 import com.runicrealms.runicitems.item.RunicItemGeneric;
 import com.runicrealms.runicitems.item.RunicItemOffhand;
 import com.runicrealms.runicitems.item.RunicItemWeapon;
@@ -13,6 +14,7 @@ import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.runicitems.item.stats.RunicItemStatType;
 import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemArtifactTemplate;
+import com.runicrealms.runicitems.item.template.RunicItemBookTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemGenericTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemOffhandTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
@@ -54,6 +56,9 @@ public class ItemLoader {
         } else if (template instanceof RunicItemWeaponTemplate) {
             RunicItemWeaponTemplate weaponTemplate = (RunicItemWeaponTemplate) template;
             return new RunicItemWeapon(weaponTemplate, count, loadStats(section, weaponTemplate.getStats()));
+        } else if (template instanceof RunicItemBookTemplate) {
+            RunicItemBookTemplate bookTemplate = (RunicItemBookTemplate) template;
+            return new RunicItemBook(bookTemplate, count);
         }
         return null;
     }

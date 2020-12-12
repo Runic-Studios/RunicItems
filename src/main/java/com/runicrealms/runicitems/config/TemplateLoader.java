@@ -10,6 +10,7 @@ import com.runicrealms.runicitems.item.stats.RunicItemStatType;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemArtifactTemplate;
+import com.runicrealms.runicitems.item.template.RunicItemBookTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemGenericTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemOffhandTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
@@ -96,6 +97,11 @@ public class TemplateLoader {
                     id, displayableItem, tags, data,
                     loadDamage(itemConfig), loadStats(itemConfig),
                     itemConfig.getInt("level"), RunicItemRarity.getFromIdentifier(itemConfig.getString("rarity")), RunicItemClass.getFromIdentifier(itemConfig.getString("class"))
+            );
+        } else if (itemConfig.getString("type").equalsIgnoreCase("book")) {
+            return new RunicItemBookTemplate(
+                    id, displayableItem, tags, data,
+                    itemConfig.getStringList("lore"), itemConfig.getString("author"), itemConfig.getStringList("pages")
             );
         } else {
             return null;
