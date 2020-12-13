@@ -32,9 +32,9 @@ public class RunicItemWeapon extends RunicItem {
         super(id, displayableItem, tags, data, count, () -> {
             ItemLoreSection[] sections = new ItemLoreSection[2 + (stats.size() > 0 ? 1 : 0)];
             sections[0] = new ItemLoreSection(new String[]{
-                    rarity.getDisplay(),
                     ChatColor.GRAY + "Required Class: " + ChatColor.WHITE + runicClass.getDisplay(),
-                    ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level
+                    ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
+                    rarity.getDisplay()
             });
             sections[1] = new ItemLoreSection(new String[]{
                     ChatColor.RED + "+ " + damageRange.getMin() + "-" + damageRange.getMax() + ItemIcons.SWORD_ICON

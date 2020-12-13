@@ -10,11 +10,14 @@ import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
 import com.runicrealms.runicitems.Plugin;
 import com.runicrealms.runicitems.TemplateManager;
+import com.runicrealms.runicitems.item.RunicItem;
+import com.runicrealms.runicitems.item.template.RunicItemTemplate;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@CommandAlias("ri|runicitems")
+@CommandAlias("ri|runicitems|runicitem")
 public class RunicItemCommand extends BaseCommand {
 
     private static final String PREFIX = "&5[RunicItems] &6» &r";
@@ -25,35 +28,83 @@ public class RunicItemCommand extends BaseCommand {
 
     @Default
     @CatchUnknown
+    @Conditions("is-op")
     @Subcommand("help|h")
     public void onCommandHelp(CommandSender sender) {
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dAvailable commands: "));
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&7/runicitem help"));
-        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&7/runicitem get <item> [amount] [perfect-rolls]"));
-        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&7/runicitem give <player> <item> [amount] [perfect-rolls]"));
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&7/runicitem get <item> [amount]"));
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&7/runicitem give <player> <item> [amount]"));
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&7/runicitem clear <player> [item] [amount]"));
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&7/runicitem toggle-database &dWARNING - don't use if you don't know what this does!"));
     }
 
     @Subcommand("get")
-    @Conditions("is-player")
-    @Syntax("<item> [amount] [perfect-rolls]")
-    @CommandCompletion("@item-ids @nothing true|false")
-    public void onCommandGet(Player player) {
-        // TODO
+    @Conditions("is-player|is-op")
+    @Syntax("<item> [amount]")
+    @CommandCompletion("@item-ids @nothing")
+    public void onCommandGet(Player player, String[] args) {
+        if (args.length == 0) { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+        RunicItemTemplate template = TemplateManager.getTemplateFromId(args[0]);
+        int count = 1;
+        if (template == null) { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!")); return; }
+        if (args.length >= 2) {
+            if (isInt(args[1])) {
+                count = Integer.parseInt(args[1]);
+            } else { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+        }
+        RunicItem item = template.generateItem(count);
+        player.getInventory().addItem(item.getCurrentItem());
     }
 
     @Subcommand("give")
-    @Syntax("<player> <item> [amount] [perfect-rolls]")
-    @CommandCompletion("@players @item-ids @nothing true|false")
-    public void onCommandGive(CommandSender sender) {
-        // TODO
+    @Conditions("is-op")
+    @Syntax("<player> <item> [amount]")
+    @CommandCompletion("@players @item-ids @nothing")
+    public void onCommandGive(CommandSender sender, String[] args) {
+        if (args.length < 2) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+        Player target = Bukkit.getPlayerExact(args[0]);
+        if (target == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid player!")); return; }
+        RunicItemTemplate template = TemplateManager.getTemplateFromId(args[1]);
+        int count = 1;
+        if (template == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!")); return; }
+        if (args.length >= 3) {
+            if (isInt(args[2])) {
+                count = Integer.parseInt(args[2]);
+            } else { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+        }
+        RunicItem item = template.generateItem(count);
+        target.getInventory().addItem(item.getCurrentItem());
     }
 
     @Subcommand("clear|c")
+    @Conditions("is-op")
     @Syntax("<player> [item] [amount]")
     @CommandCompletion("@players @item-ids @nothing")
     public void onCommandClear(CommandSender sender) {
         // TODO
+    }
+
+    @Subcommand("toggle-database")
+    @Conditions("is-op")
+    public void onCommandDisableDatabase(CommandSender sender) {
+        Plugin.setDatabaseLoadingEnabled(!Plugin.isDatabaseLoadingEnabled());
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&d" +
+                (Plugin.isDatabaseLoadingEnabled() ? "Enabled" : "Disabled") +
+                " items loading from database/saving to database. This is for testing only."));
+    }
+
+    private static boolean isInt(String number) {
+        try {
+            Integer.parseInt(number);
+        } catch (Exception exception) {
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean isBoolean(String bool) {
+        return ("true".equalsIgnoreCase(bool) || "false".equalsIgnoreCase(bool));
     }
 
 }

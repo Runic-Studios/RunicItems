@@ -49,10 +49,10 @@ public class RunicItemArmor extends RunicItem {
             }
             return new ItemLoreSection[] {
                     new ItemLoreSection(new String[] {
-                            rarity.getDisplay(),
                             ChatColor.GRAY + "Required Class: " + ChatColor.WHITE + runicClass.getDisplay(),
                             ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
-                            ChatColor.GRAY + "[" + ChatColor.WHITE + gems.size() + ChatColor.GRAY + "/" + ChatColor.WHITE + maxGemSlots + ChatColor.GRAY + "] Gems"
+                            ChatColor.GRAY + "[" + ChatColor.WHITE + gems.size() + ChatColor.GRAY + "/" + ChatColor.WHITE + maxGemSlots + ChatColor.GRAY + "] Gems",
+                            rarity.getDisplay()
                     }),
                     new ItemLoreSection(lore)
             };

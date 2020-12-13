@@ -6,7 +6,7 @@
 
     <groupId>com.runicrealms.runicitems</groupId>
     <artifactId>RunicItems</artifactId>
-    <version>1.15.2</version>
+    <version>1.16.4</version>
 
     <name>RunicItems</name>
 
@@ -129,14 +129,6 @@
             <artifactId>spigot-api</artifactId>
             <version>1.16.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
-        </dependency>
-        <!-- CraftBukkit -->
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
-            <version>1.15.2</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/craftbukkit-1.15.2.jar</systemPath>
         </dependency>
         <!-- MongoDB -->
         <dependency>

@@ -16,16 +16,19 @@ public class PlayerInventoryManager implements Listener {
 
     @EventHandler
     public void onCharacterJoin(CharacterLoadEvent event) {
-        playerInventories.put(event.getPlayer(), new PlayerInventory(event.getPlayer().getUniqueId().toString(), event.getSlot()));
+        if (Plugin.isDatabaseLoadingEnabled()) {
+            playerInventories.put(event.getPlayer(), new PlayerInventory(event.getPlayer().getUniqueId().toString(), event.getSlot()));
+        }
     }
 
     @EventHandler
     public void onCharacterQuit(CharacterQuitEvent event) {
-        Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-            playerInventories.get(event.getPlayer()).save();
-            playerInventories.remove(event.getPlayer());
-        });
-
+        if (Plugin.isDatabaseLoadingEnabled()) {
+            Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+                playerInventories.get(event.getPlayer()).save();
+                playerInventories.remove(event.getPlayer());
+            });
+        }
     }
 
 }

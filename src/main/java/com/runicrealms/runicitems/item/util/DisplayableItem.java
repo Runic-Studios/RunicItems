@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item.util;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
@@ -39,7 +40,7 @@ public class DisplayableItem {
         if (meta instanceof Damageable) {
             ((Damageable) meta).setDamage(this.damage);
         }
-        meta.setDisplayName(this.displayName);
+        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&r" + this.displayName));
         item.setItemMeta(meta);
         return item;
     }

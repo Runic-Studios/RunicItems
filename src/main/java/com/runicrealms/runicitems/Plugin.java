@@ -6,7 +6,6 @@ import com.runicrealms.runicitems.command.RunicItemCommand;
 import com.runicrealms.runicitems.config.ConfigUtil;
 import com.runicrealms.runicitems.config.AbilityLoader;
 import com.runicrealms.runicitems.config.TemplateLoader;
-import com.runicrealms.runicitems.exception.InvalidTemplateException;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -16,6 +15,8 @@ public class Plugin extends JavaPlugin {
     private static Plugin instance;
 
     private static PaperCommandManager commandManager;
+
+    private static boolean databaseLoadingEnabled = true;
 
     @Override
     public void onEnable() {
@@ -27,7 +28,7 @@ public class Plugin extends JavaPlugin {
         AbilityLoader.loadAbilities();
         try {
             TemplateLoader.loadTemplates();
-        } catch (InvalidTemplateException exception) {
+        } catch (Exception exception) {
             exception.printStackTrace();
         }
 
@@ -51,6 +52,14 @@ public class Plugin extends JavaPlugin {
 
     public static PaperCommandManager getCommandManager() {
         return commandManager;
+    }
+
+    public static void setDatabaseLoadingEnabled(boolean enabled) {
+        databaseLoadingEnabled = enabled;
+    }
+
+    public static boolean isDatabaseLoadingEnabled() {
+        return databaseLoadingEnabled;
     }
 
 }
