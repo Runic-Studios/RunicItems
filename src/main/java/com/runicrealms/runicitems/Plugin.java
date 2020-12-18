@@ -33,7 +33,7 @@ public class Plugin extends JavaPlugin {
         }
 
         // Register Listeners
-        Bukkit.getPluginManager().registerEvents(new PlayerInventoryManager(), this);
+        Bukkit.getPluginManager().registerEvents(new ItemManager(), this);
 
         // Register Commands
         commandManager = new PaperCommandManager(this);
