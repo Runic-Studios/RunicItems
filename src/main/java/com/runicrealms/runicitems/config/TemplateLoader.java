@@ -71,7 +71,7 @@ public class TemplateLoader {
         if (itemConfig.getString("type").equalsIgnoreCase("armor")) {
             return new RunicItemArmorTemplate(
                     id, displayableItem, tags, data,
-                    loadStats(itemConfig), itemConfig.getInt("max-gem-slots"),
+                    itemConfig.getInt("health"), loadStats(itemConfig), itemConfig.getInt("max-gem-slots"),
                     itemConfig.getInt("level"), RunicItemRarity.getFromIdentifier(itemConfig.getString("rarity")), RunicItemClass.getFromIdentifier(itemConfig.getString("class"))
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("artifact")) {

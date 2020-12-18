@@ -18,16 +18,18 @@ public class RunicItemArmorTemplate extends RunicItemTemplate {
 
     private final int level;
     private final RunicItemRarity rarity;
+    private final int health;
     private final LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats;
     private final int maxGemSlots;
     private final RunicItemClass runicClass;
 
     public RunicItemArmorTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data,
-                                  LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats, int maxGemSlots,
+                                  int health, LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats, int maxGemSlots,
                                   int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(id, displayableItem, tags, data);
         this.level = level;
         this.rarity = rarity;
+        this.health = health;
         this.stats = stats;
         this.maxGemSlots = maxGemSlots;
         this.runicClass = runicClass;
@@ -41,7 +43,7 @@ public class RunicItemArmorTemplate extends RunicItemTemplate {
         }
         return new RunicItemArmor(
                 this.id, displayableItem, this.tags, this.data, count,
-                rolledStats, new ArrayList<LinkedHashMap<RunicItemStatType, Integer>>(), this.maxGemSlots,
+                this.health, rolledStats, new ArrayList<LinkedHashMap<RunicItemStatType, Integer>>(), this.maxGemSlots,
                 this.level, this.rarity, this.runicClass
         );
     }
@@ -52,6 +54,10 @@ public class RunicItemArmorTemplate extends RunicItemTemplate {
 
     public RunicItemRarity getRarity() {
         return this.rarity;
+    }
+
+    public int getHealth() {
+        return this.health;
     }
 
     public LinkedHashMap<RunicItemStatType, RunicItemStatRange> getStats() {
