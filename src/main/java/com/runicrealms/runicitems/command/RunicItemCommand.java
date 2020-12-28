@@ -53,8 +53,9 @@ public class RunicItemCommand extends BaseCommand {
                 count = Integer.parseInt(args[1]);
             } else { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
-        RunicItem item = template.generateItem(count);
-        player.getInventory().addItem(item.getCurrentItem());
+        // TODO
+        /*RunicItem item = template.generateItem(count);
+        player.getInventory().addItem(item.getCurrentItem());*/
     }
 
     @Subcommand("give")
@@ -73,8 +74,9 @@ public class RunicItemCommand extends BaseCommand {
                 count = Integer.parseInt(args[2]);
             } else { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
-        RunicItem item = template.generateItem(count);
-        target.getInventory().addItem(item.getCurrentItem());
+        // TODO
+        /*RunicItem item = template.generateItem(count);
+        target.getInventory().addItem(item.getCurrentItem());*/
     }
 
     @Subcommand("clear|c")

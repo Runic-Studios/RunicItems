@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item.template;
 
 import com.runicrealms.runicitems.item.RunicItemBook;
+import com.runicrealms.runicitems.item.inventory.RunicItemOwner;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 
@@ -23,9 +24,9 @@ public class RunicItemBookTemplate extends RunicItemTemplate {
     }
 
     @Override
-    public RunicItemBook generateItem(int count) {
+    public RunicItemBook generateItem(int count, long id, RunicItemOwner itemOwner) {
         return new RunicItemBook(
-                this.id, this.displayableItem, this.tags, this.data, count,
+                this.id, this.displayableItem, this.tags, this.data, count, id, itemOwner,
                 this.lore, this.author, this.pages
         );
     }

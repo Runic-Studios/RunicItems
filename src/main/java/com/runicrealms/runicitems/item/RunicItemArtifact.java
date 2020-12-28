@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
+import com.runicrealms.runicitems.item.inventory.RunicItemOwner;
 import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatType;
@@ -28,10 +29,10 @@ public class RunicItemArtifact extends RunicItem {
     private final RunicItemRarity rarity;
     private final RunicItemClass runicClass;
 
-    public RunicItemArtifact(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
+    public RunicItemArtifact(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count, long id, RunicItemOwner itemOwner,
                              RunicArtifactAbility ability, RunicItemStatRange damageRange, LinkedHashMap<RunicItemStatType, RunicItemStat> stats,
                              int level, RunicItemRarity rarity, RunicItemClass runicClass) {
-        super(id, displayableItem, tags, data, count, () -> {
+        super(templateId, displayableItem, tags, data, count, id, itemOwner, () -> {
             ItemLoreSection[] sections = new ItemLoreSection[3 + (stats.size() > 0 ? 1 : 0)];
             sections[0] = new ItemLoreSection(new String[] {
                     ChatColor.GRAY + "Required Class: " + ChatColor.WHITE + runicClass.getDisplay(),
@@ -67,9 +68,9 @@ public class RunicItemArtifact extends RunicItem {
         this.runicClass = runicClass;
     }
 
-    public RunicItemArtifact(RunicItemArtifactTemplate template, int count, LinkedHashMap<RunicItemStatType, RunicItemStat> stats) {
+    public RunicItemArtifact(RunicItemArtifactTemplate template, int count, long id, RunicItemOwner itemOwner, LinkedHashMap<RunicItemStatType, RunicItemStat> stats) {
         this(
-                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count,
+                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id, itemOwner,
                 template.getAbility(), template.getDamageRange(), stats,
                 template.getLevel(), template.getRarity(), template.getRunicClass()
         );

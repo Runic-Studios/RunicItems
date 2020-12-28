@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item.template;
 
 import com.runicrealms.runicitems.item.RunicItemOffhand;
+import com.runicrealms.runicitems.item.inventory.RunicItemOwner;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
@@ -28,13 +29,13 @@ public class RunicItemOffhandTemplate extends RunicItemTemplate {
     }
 
     @Override
-    public RunicItemOffhand generateItem(int count) {
+    public RunicItemOffhand generateItem(int count, long id, RunicItemOwner itemOwner) {
         LinkedHashMap<RunicItemStatType, RunicItemStat> rolledStats = new LinkedHashMap<RunicItemStatType, RunicItemStat>();
         for (Map.Entry<RunicItemStatType, RunicItemStatRange> stat : this.stats.entrySet()) {
             rolledStats.put(stat.getKey(), new RunicItemStat(stat.getValue()));
         }
         return new RunicItemOffhand(
-                this.id, this.displayableItem, this.tags, this.data, count,
+                this.id, this.displayableItem, this.tags, this.data, count, id, itemOwner,
                 rolledStats,
                 this.level, this.rarity
         );

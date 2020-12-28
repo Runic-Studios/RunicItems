@@ -9,6 +9,7 @@ import com.runicrealms.runicitems.item.RunicItemBook;
 import com.runicrealms.runicitems.item.RunicItemGeneric;
 import com.runicrealms.runicitems.item.RunicItemOffhand;
 import com.runicrealms.runicitems.item.RunicItemWeapon;
+import com.runicrealms.runicitems.item.inventory.*;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.runicitems.item.stats.RunicItemStatType;
@@ -29,36 +30,43 @@ import java.util.Set;
 public class ItemLoader {
 
     public static RunicItem loadItem(Data section) {
-        String id = section.get("item-id", String.class);
-        int count = section.get("count", Integer.class);
-        RunicItemTemplate template = TemplateManager.getTemplateFromId(id);
-        if (template instanceof RunicItemArmorTemplate) {
-            List<LinkedHashMap<RunicItemStatType, Integer>> gems = new ArrayList<LinkedHashMap<RunicItemStatType, Integer>>();
-            if (section.has("gems")) {
-                for (String gemKey : section.getSection("gems").getKeys()) {
-                    LinkedHashMap<RunicItemStatType, Integer> gem = new LinkedHashMap<RunicItemStatType, Integer>();
-                    for (String statKey : section.getSection("gems." + gemKey).getKeys()) {
-                        gem.put(RunicItemStatType.getFromIdentifier(statKey), section.get("gems." + gemKey + "." + statKey, Integer.class));
+        try {
+            String templateId = section.get("template-id", String.class);
+            int count = section.get("count", Integer.class);
+            long id = section.get("item-id", Long.class);
+            RunicItemOwner itemOwner = getItemOwnerFromSection(section.getSection("owner"));
+            RunicItemTemplate template = TemplateManager.getTemplateFromId(templateId);
+            if (template instanceof RunicItemArmorTemplate) {
+                List<LinkedHashMap<RunicItemStatType, Integer>> gems = new ArrayList<LinkedHashMap<RunicItemStatType, Integer>>();
+                if (section.has("gems")) {
+                    for (String gemKey : section.getSection("gems").getKeys()) {
+                        LinkedHashMap<RunicItemStatType, Integer> gem = new LinkedHashMap<RunicItemStatType, Integer>();
+                        for (String statKey : section.getSection("gems." + gemKey).getKeys()) {
+                            gem.put(RunicItemStatType.getFromIdentifier(statKey), section.get("gems." + gemKey + "." + statKey, Integer.class));
+                        }
+                        gems.add(gem);
                     }
-                    gems.add(gem);
                 }
+                RunicItemArmorTemplate armorTemplate = (RunicItemArmorTemplate) template;
+                return new RunicItemArmor(armorTemplate, count, id, itemOwner, loadStats(section, armorTemplate.getStats()), gems);
+            } else if (template instanceof RunicItemArtifactTemplate) {
+                RunicItemArtifactTemplate artifactTemplate = (RunicItemArtifactTemplate) template;
+                return new RunicItemArtifact(artifactTemplate, count, id, itemOwner, loadStats(section, artifactTemplate.getStats()));
+            } else if (template instanceof RunicItemBookTemplate) {
+                RunicItemBookTemplate bookTemplate = (RunicItemBookTemplate) template;
+                return new RunicItemBook(bookTemplate, count, id, itemOwner);
+            } else if (template instanceof RunicItemGenericTemplate) {
+                return new RunicItemGeneric((RunicItemGenericTemplate) template, count, id, itemOwner);
+            } else if (template instanceof RunicItemOffhandTemplate) {
+                RunicItemOffhandTemplate offhandTemplate = (RunicItemOffhandTemplate) template;
+                return new RunicItemOffhand(offhandTemplate, count, id, itemOwner, loadStats(section, offhandTemplate.getStats()));
+            } else if (template instanceof RunicItemWeaponTemplate) {
+                RunicItemWeaponTemplate weaponTemplate = (RunicItemWeaponTemplate) template;
+                return new RunicItemWeapon(weaponTemplate, count, id, itemOwner, loadStats(section, weaponTemplate.getStats()));
             }
-            RunicItemArmorTemplate armorTemplate = (RunicItemArmorTemplate) template;
-            return new RunicItemArmor(armorTemplate, count, loadStats(section, armorTemplate.getStats()), gems);
-        } else if (template instanceof RunicItemArtifactTemplate) {
-            RunicItemArtifactTemplate artifactTemplate = (RunicItemArtifactTemplate) template;
-            return new RunicItemArtifact(artifactTemplate, count, loadStats(section, artifactTemplate.getStats()));
-        } else if (template instanceof RunicItemGenericTemplate) {
-            return new RunicItemGeneric((RunicItemGenericTemplate) template, count);
-        } else if (template instanceof RunicItemOffhandTemplate) {
-            RunicItemOffhandTemplate offhandTemplate = (RunicItemOffhandTemplate) template;
-            return new RunicItemOffhand(offhandTemplate, count, loadStats(section, offhandTemplate.getStats()));
-        } else if (template instanceof RunicItemWeaponTemplate) {
-            RunicItemWeaponTemplate weaponTemplate = (RunicItemWeaponTemplate) template;
-            return new RunicItemWeapon(weaponTemplate, count, loadStats(section, weaponTemplate.getStats()));
-        } else if (template instanceof RunicItemBookTemplate) {
-            RunicItemBookTemplate bookTemplate = (RunicItemBookTemplate) template;
-            return new RunicItemBook(bookTemplate, count);
+        } catch (
+                Exception exception) {
+            return null;
         }
         return null;
     }
@@ -74,6 +82,23 @@ public class ItemLoader {
             }
         }
         return stats;
+    }
+
+    private static RunicItemOwner getItemOwnerFromSection(Data section) {
+        switch (RunicInventory.getFromIdentifier(section.get("inventory", String.class))) {
+            case PLAYER_INVENTORY:
+                return new RunicItemOwnerPlayerInventory(section.get("identifier", String.class));
+            case PLAYER_BANK:
+                return new RunicItemOwnerPlayerBank(section.get("identifier", String.class));
+            case GUILD_BANK:
+                return new RunicItemOwnerGuildBank(section.get("identifier", String.class));
+            case TRADE_MARKET:
+                return new RunicItemOwnerTradeMarket(section.get("identifier", String.class));
+            case DROPPED:
+                return new RunicItemOwnerDropped(section.get("identifier", String.class));
+            default:
+                return null;
+        }
     }
 
 }

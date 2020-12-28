@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
+import com.runicrealms.runicitems.item.inventory.RunicItemOwner;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.template.RunicItemBookTemplate;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
@@ -18,9 +19,9 @@ public class RunicItemBook extends RunicItem {
     private final String author;
     private final Collection<String> pages;
 
-    public RunicItemBook(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
+    public RunicItemBook(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count, long id, RunicItemOwner itemOwner,
                          List<String> lore, String author, Collection<String> pages) {
-        super(id, displayableItem, tags, data, count, () -> new ItemLoreSection[] {new ItemLoreSection(lore)});
+        super(templateId, displayableItem, tags, data, count, id, itemOwner, () -> new ItemLoreSection[] {new ItemLoreSection(lore)});
         this.lore = lore;
         this.author = author;
         this.pages = pages;
@@ -33,9 +34,9 @@ public class RunicItemBook extends RunicItem {
         }
     }
 
-    public RunicItemBook(RunicItemBookTemplate template, int count) {
+    public RunicItemBook(RunicItemBookTemplate template, int count, long id, RunicItemOwner itemOwner) {
         this(
-                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count,
+                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id, itemOwner,
                 template.getLore(), template.getAuthor(), template.getPages()
         );
     }

@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class ItemManager implements Listener {
 
-    private static Map<Long, RunicItem> cachedItems = new HashMap<Integer, RunicItem>();
+    private static Map<Long, RunicItem> cachedItems = new HashMap<Long, RunicItem>();
 
     @EventHandler
     public void onCharacterJoin(CharacterLoadEvent event) {
@@ -25,12 +25,17 @@ public class ItemManager implements Listener {
         }
     }
 
+    // TODO - switch to new runic core event
     @EventHandler
     public void onCharacterQuit(CharacterQuitEvent event) {
         if (Plugin.isDatabaseLoadingEnabled()) {
             Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-                for (ItemStack itemStack : event.getPlayer().getInventory()) {
-                    event.getPlayerCache().getMongoData().
+                ItemStack[] contents = event.getPlayer().getInventory().getContents();
+                for (int i = 0; i < contents.length; i++) {
+                    RunicItem runicItem = getItemFromItemStack(contents[i]);
+                    if (runicItem != null) {
+                        runicItem.addToData(event.getPlayerCache().getMongoData().getSection("character." + event.getSlot() + ".inventory." + i));
+                    }
                 }
             });
         }
@@ -38,15 +43,16 @@ public class ItemManager implements Listener {
 
     public static void loadItems(Data data) { // Guild Bank, Trade Market
         for (String key : data.getKeys()) {
-            cachedItems.put(Long.parseLong(key), ItemLoader.loadItem(data.getSection(key)));
+            RunicItem loadedItem = ItemLoader.loadItem(data.getSection(key)); // TODO - load id, itemOwner
+            cachedItems.put(loadedItem.getId(), loadedItem);
         }
     }
 
-    public RunicItem getItemFromId(Integer id) {
+    public static RunicItem getItemFromId(Long id) {
         return cachedItems.get(id);
     }
 
-    public RunicItem getItemFromItemStack(ItemStack itemStack) {
+    public static RunicItem getItemFromItemStack(ItemStack itemStack) {
         if (ItemNbtUtils.hasNbtLong(itemStack, "runic-item-id")) {
             return cachedItems.get(ItemNbtUtils.getNbtLong(itemStack, "runic-item-id"));
         }

@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems;
 
 import com.runicrealms.runicitems.item.RunicItem;
+import com.runicrealms.runicitems.item.inventory.RunicItemOwner;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 
 import java.util.HashMap;
@@ -22,12 +23,12 @@ public class TemplateManager {
         return templates.get(id);
     }
 
-    public static RunicItem generateItemFromId(String id) {
-        return templates.get(id).generateItem(1);
+    public static RunicItem generateItemFromTemplateId(String templateId, long id, RunicItemOwner itemOwner) {
+        return templates.get(templateId).generateItem(1, id, itemOwner);
     }
 
-    public static RunicItem generateItemFromId(String id, int count) {
-        return templates.get(id).generateItem(count);
+    public static RunicItem generateItemFromTemplateId(String templateId, int count, long id, RunicItemOwner itemOwner) {
+        return templates.get(templateId).generateItem(count, id, itemOwner);
     }
 
 }

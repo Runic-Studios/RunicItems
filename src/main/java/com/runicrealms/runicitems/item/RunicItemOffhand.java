@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
+import com.runicrealms.runicitems.item.inventory.RunicItemOwner;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatType;
@@ -21,10 +22,10 @@ public class RunicItemOffhand extends RunicItem {
     private final int level;
     private final RunicItemRarity rarity;
 
-    public RunicItemOffhand(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
+    public RunicItemOffhand(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count, long id, RunicItemOwner itemOwner,
                             LinkedHashMap<RunicItemStatType, RunicItemStat> stats,
                             int level, RunicItemRarity rarity) {
-        super(id, displayableItem, tags, data, count, () -> {
+        super(templateId, displayableItem, tags, data, count, id, itemOwner, () -> {
             List<String> lore = new ArrayList<String>();
             for (Map.Entry<RunicItemStatType, RunicItemStat> entry : stats.entrySet()) {
                 lore.add(
@@ -47,9 +48,9 @@ public class RunicItemOffhand extends RunicItem {
         this.rarity = rarity;
     }
 
-    public RunicItemOffhand(RunicItemOffhandTemplate template, int count, LinkedHashMap<RunicItemStatType, RunicItemStat> stats) {
+    public RunicItemOffhand(RunicItemOffhandTemplate template, int count, long id, RunicItemOwner itemOwner, LinkedHashMap<RunicItemStatType, RunicItemStat> stats) {
         this(
-                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count,
+                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id, itemOwner,
                 stats,
                 template.getLevel(), template.getRarity()
         );

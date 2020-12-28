@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item.template;
 
 import com.runicrealms.runicitems.item.RunicItemGeneric;
+import com.runicrealms.runicitems.item.inventory.RunicItemOwner;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.ClickTrigger;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
@@ -21,9 +22,9 @@ public class RunicItemGenericTemplate extends RunicItemTemplate {
     }
 
     @Override
-    public RunicItemGeneric generateItem(int count) {
+    public RunicItemGeneric generateItem(int count, long id, RunicItemOwner itemOwner) {
         return new RunicItemGeneric(
-                this.id, this.displayableItem, this.tags, this.data, count,
+                this.id, this.displayableItem, this.tags, this.data, count, id, itemOwner,
                 this.triggers, this.lore
         );
     }

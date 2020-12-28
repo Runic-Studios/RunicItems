@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
+import com.runicrealms.runicitems.item.inventory.RunicItemOwner;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.template.RunicItemGenericTemplate;
 import com.runicrealms.runicitems.item.util.ClickTrigger;
@@ -15,16 +16,16 @@ public class RunicItemGeneric extends RunicItem {
     private final List<String> lore;
     private final Map<ClickTrigger, String> triggers;
 
-    public RunicItemGeneric(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
+    public RunicItemGeneric(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count, long id, RunicItemOwner itemOwner,
                             Map<ClickTrigger, String> triggers, List<String> lore) {
-        super(id, displayableItem, tags, data, count, () -> new ItemLoreSection[] {new ItemLoreSection(lore)});
+        super(templateId, displayableItem, tags, data, count, id, itemOwner, () -> new ItemLoreSection[] {new ItemLoreSection(lore)});
         this.lore = lore;
         this.triggers = triggers;
     }
 
-    public RunicItemGeneric(RunicItemGenericTemplate template, int count) {
+    public RunicItemGeneric(RunicItemGenericTemplate template, int count, long id, RunicItemOwner itemOwner) {
         this(
-                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count,
+                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id, itemOwner,
                 template.getTriggers(), template.getLore()
         );
     }

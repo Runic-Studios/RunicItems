@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item.template;
 
 import com.runicrealms.runicitems.item.RunicItem;
+import com.runicrealms.runicitems.item.inventory.RunicItemOwner;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 
@@ -21,7 +22,7 @@ public abstract class RunicItemTemplate {
         this.data = data;
     }
 
-    public abstract RunicItem generateItem(int count);
+    public abstract RunicItem generateItem(int count, long id, RunicItemOwner itemOwner);
 
     public String getId() {
         return this.id;

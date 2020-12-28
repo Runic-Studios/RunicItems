@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item.template;
 
  import com.runicrealms.runicitems.item.RunicItemArtifact;
+ import com.runicrealms.runicitems.item.inventory.RunicItemOwner;
  import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
  import com.runicrealms.runicitems.item.stats.RunicItemRarity;
  import com.runicrealms.runicitems.item.stats.RunicItemStat;
@@ -36,13 +37,13 @@ public class RunicItemArtifactTemplate extends RunicItemTemplate {
     }
 
     @Override
-    public RunicItemArtifact generateItem(int count) {
+    public RunicItemArtifact generateItem(int count, long id, RunicItemOwner itemOwner) {
         LinkedHashMap<RunicItemStatType, RunicItemStat> rolledStats = new LinkedHashMap<RunicItemStatType, RunicItemStat>();
         for (Map.Entry<RunicItemStatType, RunicItemStatRange> stat : this.stats.entrySet()) {
             rolledStats.put(stat.getKey(), new RunicItemStat(stat.getValue()));
         }
         return new RunicItemArtifact(
-                this.id, this.displayableItem, this.tags, this.data, count,
+                this.id, this.displayableItem, this.tags, this.data, count, id, itemOwner,
                 this.ability, this.damageRange, rolledStats,
                 this.level, this.rarity, this.runicClass
         );
