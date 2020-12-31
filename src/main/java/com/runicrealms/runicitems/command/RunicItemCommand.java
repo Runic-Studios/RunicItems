@@ -8,14 +8,18 @@ import co.aikar.commands.annotation.Conditions;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
+import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.Plugin;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.RunicItem;
+import com.runicrealms.runicitems.item.inventory.RunicItemOwnerPlayerInventory;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 @CommandAlias("ri|runicitems|runicitem")
 public class RunicItemCommand extends BaseCommand {
@@ -53,9 +57,8 @@ public class RunicItemCommand extends BaseCommand {
                 count = Integer.parseInt(args[1]);
             } else { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
-        // TODO
-        /*RunicItem item = template.generateItem(count);
-        player.getInventory().addItem(item.getCurrentItem());*/
+        RunicItem item = template.generateItem(count, ItemManager.getNextItemId(), new RunicItemOwnerPlayerInventory(player.getUniqueId().toString()));
+        player.getInventory().addItem(item.getCurrentItem());
     }
 
     @Subcommand("give")
@@ -70,21 +73,62 @@ public class RunicItemCommand extends BaseCommand {
         int count = 1;
         if (template == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!")); return; }
         if (args.length >= 3) {
-            if (isInt(args[2])) {
-                count = Integer.parseInt(args[2]);
-            } else { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+            if (!isInt(args[2])) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+            count = Integer.parseInt(args[2]);
+            if (count < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
-        // TODO
-        /*RunicItem item = template.generateItem(count);
-        target.getInventory().addItem(item.getCurrentItem());*/
+        RunicItem item = template.generateItem(count, ItemManager.getNextItemId(), new RunicItemOwnerPlayerInventory(target.getUniqueId().toString()));
+        target.getInventory().addItem(item.getCurrentItem());
     }
 
     @Subcommand("clear|c")
     @Conditions("is-op")
     @Syntax("<player> [item] [amount]")
     @CommandCompletion("@players @item-ids @nothing")
-    public void onCommandClear(CommandSender sender) {
-        // TODO
+    public void onCommandClear(CommandSender sender, String[] args) {
+        if (args.length < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runciitem help")); return; }
+        Player target = Bukkit.getPlayerExact(args[0]);
+        if (target == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid player!")); return; }
+        RunicItemTemplate template = null;
+        if (args.length >= 2) {
+            template = TemplateManager.getTemplateFromId(args[1]);
+            if (template == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!")); return; }
+        }
+        int amount = -1;
+        if (args.length >= 3) {
+            if (!isInt(args[2])) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+            amount = Integer.parseInt(args[2]);
+            if (amount < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+        }
+        int amountRemoved = 0;
+        ItemStack[] contents = target.getInventory().getContents();
+        for (int i = 0; i < contents.length; i++) {
+            if (contents[i] != null && contents[i].getType() != Material.AIR) {
+                if (amount == -1 || amountRemoved < amount) {
+                    RunicItem item = ItemManager.getItemFromItemStack(contents[i]);
+                    if (item == null) {
+                        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dError remove items!"));
+                        return;
+                    }
+                    boolean removeItem = false;
+                    if (template == null) {
+                        removeItem = true;
+                    } else if (item.getTemplateId().equalsIgnoreCase(template.getId())) {
+                        removeItem = true;
+                    }
+                    if (removeItem) {
+                        if (contents[i].getAmount() <= amount - amountRemoved || amount == -1) {
+                            amountRemoved += contents[i].getAmount();
+                            target.getInventory().setItem(i, new ItemStack(Material.AIR));
+                        } else {
+                            amountRemoved += amount - amountRemoved;
+                            target.getInventory().getItem(i).setAmount(target.getInventory().getItem(i).getAmount() - (amount - amountRemoved));
+                        }
+                    }
+                }
+            }
+        }
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&dCleared items from player's inventory!"));
     }
 
     @Subcommand("toggle-database")

@@ -29,7 +29,7 @@ public class ItemManager implements Listener {
     private static File dataFile;
     private static FileConfiguration dataFileConfig;
 
-    private static Map<Long, RunicItem> cachedItems = new HashMap<Long, RunicItem>();
+    private static final Map<Long, RunicItem> cachedItems = new HashMap<Long, RunicItem>();
 
     public static void initializeDataFile() {
         dataFile = new File(Plugin.getInstance().getDataFolder(), "data.yml");
