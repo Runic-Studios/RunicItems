@@ -22,9 +22,9 @@ public class RunicItemGenericTemplate extends RunicItemTemplate {
     }
 
     @Override
-    public RunicItemGeneric generateItem(int count, long id, RunicItemOwner itemOwner) {
+    public RunicItemGeneric generateItem(int count) {
         return new RunicItemGeneric(
-                this.id, this.displayableItem, this.tags, this.data, count, id, itemOwner,
+                this.id, this.displayableItem, this.tags, this.data, count,
                 this.triggers, this.lore
         );
     }

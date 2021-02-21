@@ -27,10 +27,10 @@ public class RunicItemWeapon extends RunicItem {
     private final RunicItemRarity rarity;
     private final RunicItemClass runicClass;
 
-    public RunicItemWeapon(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count, long id, RunicItemOwner itemOwner,
+    public RunicItemWeapon(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
                            RunicItemStatRange damageRange, LinkedHashMap<RunicItemStatType, RunicItemStat> stats,
                            int level, RunicItemRarity rarity, RunicItemClass runicClass) {
-        super(templateId, displayableItem, tags, data, count, id, itemOwner, () -> {
+        super(templateId, displayableItem, tags, data, count, () -> {
             ItemLoreSection[] sections = new ItemLoreSection[2 + (stats.size() > 0 ? 1 : 0)];
             sections[0] = new ItemLoreSection(new String[]{
                     ChatColor.GRAY + "Required Class: " + ChatColor.WHITE + runicClass.getDisplay(),
@@ -61,9 +61,9 @@ public class RunicItemWeapon extends RunicItem {
         this.runicClass = runicClass;
     }
 
-    public RunicItemWeapon(RunicItemWeaponTemplate template, int count, long id, RunicItemOwner itemOwner, LinkedHashMap<RunicItemStatType, RunicItemStat> stats) {
+    public RunicItemWeapon(RunicItemWeaponTemplate template, int count, LinkedHashMap<RunicItemStatType, RunicItemStat> stats) {
         this(
-                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id, itemOwner,
+                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count,
                 template.getDamageRange(), stats,
                 template.getLevel(), template.getRarity(), template.getRunicClass()
         );

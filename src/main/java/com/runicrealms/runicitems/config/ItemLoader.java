@@ -33,7 +33,6 @@ public class ItemLoader {
         try {
             String templateId = section.get("template-id", String.class);
             int count = section.get("count", Integer.class);
-            long id = section.get("item-id", Long.class);
             RunicItemOwner itemOwner = getItemOwnerFromSection(section.getSection("owner"));
             RunicItemTemplate template = TemplateManager.getTemplateFromId(templateId);
             if (template instanceof RunicItemArmorTemplate) {
@@ -48,21 +47,21 @@ public class ItemLoader {
                     }
                 }
                 RunicItemArmorTemplate armorTemplate = (RunicItemArmorTemplate) template;
-                return new RunicItemArmor(armorTemplate, count, id, itemOwner, loadStats(section, armorTemplate.getStats()), gems);
+                return new RunicItemArmor(armorTemplate, count, loadStats(section, armorTemplate.getStats()), gems);
             } else if (template instanceof RunicItemArtifactTemplate) {
                 RunicItemArtifactTemplate artifactTemplate = (RunicItemArtifactTemplate) template;
-                return new RunicItemArtifact(artifactTemplate, count, id, itemOwner, loadStats(section, artifactTemplate.getStats()));
+                return new RunicItemArtifact(artifactTemplate, count, loadStats(section, artifactTemplate.getStats()));
             } else if (template instanceof RunicItemBookTemplate) {
                 RunicItemBookTemplate bookTemplate = (RunicItemBookTemplate) template;
-                return new RunicItemBook(bookTemplate, count, id, itemOwner);
+                return new RunicItemBook(bookTemplate, count);
             } else if (template instanceof RunicItemGenericTemplate) {
-                return new RunicItemGeneric((RunicItemGenericTemplate) template, count, id, itemOwner);
+                return new RunicItemGeneric((RunicItemGenericTemplate) template, count);
             } else if (template instanceof RunicItemOffhandTemplate) {
                 RunicItemOffhandTemplate offhandTemplate = (RunicItemOffhandTemplate) template;
-                return new RunicItemOffhand(offhandTemplate, count, id, itemOwner, loadStats(section, offhandTemplate.getStats()));
+                return new RunicItemOffhand(offhandTemplate, count, loadStats(section, offhandTemplate.getStats()));
             } else if (template instanceof RunicItemWeaponTemplate) {
                 RunicItemWeaponTemplate weaponTemplate = (RunicItemWeaponTemplate) template;
-                return new RunicItemWeapon(weaponTemplate, count, id, itemOwner, loadStats(section, weaponTemplate.getStats()));
+                return new RunicItemWeapon(weaponTemplate, count, loadStats(section, weaponTemplate.getStats()));
             }
         } catch (
                 Exception exception) {

@@ -37,13 +37,13 @@ public class RunicItemArmorTemplate extends RunicItemTemplate {
     }
 
     @Override
-    public RunicItemArmor generateItem(int count, long id, RunicItemOwner itemOwner) {
+    public RunicItemArmor generateItem(int count) {
         LinkedHashMap<RunicItemStatType, RunicItemStat> rolledStats = new LinkedHashMap<RunicItemStatType, RunicItemStat>();
         for (Map.Entry<RunicItemStatType, RunicItemStatRange> stat : this.stats.entrySet()) {
             rolledStats.put(stat.getKey(), new RunicItemStat(stat.getValue()));
         }
         return new RunicItemArmor(
-                this.id, displayableItem, this.tags, this.data, count, id, itemOwner,
+                this.id, displayableItem, this.tags, this.data, count,
                 this.health, rolledStats, new ArrayList<LinkedHashMap<RunicItemStatType, Integer>>(), this.maxGemSlots,
                 this.level, this.rarity, this.runicClass
         );

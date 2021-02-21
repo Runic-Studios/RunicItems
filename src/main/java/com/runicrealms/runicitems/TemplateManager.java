@@ -23,12 +23,12 @@ public class TemplateManager {
         return templates.get(id);
     }
 
-    public static RunicItem generateItemFromTemplateId(String templateId, long id, RunicItemOwner itemOwner) {
-        return templates.get(templateId).generateItem(1, id, itemOwner);
+    public static RunicItem generateItemFromTemplateId(String templateId) {
+        return templates.get(templateId).generateItem(1);
     }
 
-    public static RunicItem generateItemFromTemplateId(String templateId, int count, long id, RunicItemOwner itemOwner) {
-        return templates.get(templateId).generateItem(count, id, itemOwner);
+    public static RunicItem generateItemFromTemplateId(String templateId, int count) {
+        return templates.get(templateId).generateItem(count);
     }
 
 }

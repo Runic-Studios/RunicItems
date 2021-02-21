@@ -2,11 +2,9 @@ package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
 import com.runicrealms.plugin.database.MongoDataSection;
-import com.runicrealms.runicitems.item.inventory.RunicItemOwner;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
-import com.runicrealms.runicitems.item.inventory.RunicInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -17,8 +15,7 @@ import java.util.concurrent.Callable;
 
 public abstract class RunicItem {
 
-    protected long id;
-    protected RunicItemOwner itemOwner;
+    protected Long id;
 
     protected ItemStack currentItem; // ItemStack that we are currently displaying to the player
 
@@ -32,14 +29,12 @@ public abstract class RunicItem {
     protected List<ItemLoreSection> loreSections = new ArrayList<ItemLoreSection>();
 
     // TODO - initialize id and itemOwner
-    public RunicItem(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count, long id, RunicItemOwner itemOwner, Callable<ItemLoreSection[]> loreSectionGenerator) {
+    public RunicItem(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count, Callable<ItemLoreSection[]> loreSectionGenerator) {
         this.templateId = templateId;
         this.displayableItem = displayableItem;
         this.tags = tags;
         this.data = data;
         this.count = count;
-        this.id = id;
-        this.itemOwner = itemOwner;
         this.currentItem = this.displayableItem.generateItem();
         try {
             ItemLoreSection[] loreSections = loreSectionGenerator.call();
@@ -104,21 +99,22 @@ public abstract class RunicItem {
 
     public void addToData(MongoDataSection section) {
         section.set("template-id", this.templateId);
-        section.set("item-id", this.id);
         section.set("count", this.count);
-        section.set("owner.inventory", this.itemOwner.getInventory().getIdentifier());
-        section.set("owner.identifier", this.itemOwner.getIdentifier());
         this.addSpecificItemToData(section);
     }
 
     protected abstract void addSpecificItemToData(Data section);
 
-    public long getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public RunicItemOwner getItemOwner() {
-        return this.itemOwner;
+    public void assignId(Long id) {
+        this.id = id;
+    }
+
+    public boolean hasId() {
+        return this.id != null;
     }
 
 }

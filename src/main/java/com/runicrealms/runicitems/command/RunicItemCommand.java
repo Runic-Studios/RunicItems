@@ -57,7 +57,7 @@ public class RunicItemCommand extends BaseCommand {
                 count = Integer.parseInt(args[1]);
             } else { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
-        RunicItem item = template.generateItem(count, ItemManager.getNextItemId(), new RunicItemOwnerPlayerInventory(player.getUniqueId().toString()));
+        RunicItem item = template.generateItem(count);
         player.getInventory().addItem(item.getCurrentItem());
     }
 
@@ -77,7 +77,7 @@ public class RunicItemCommand extends BaseCommand {
             count = Integer.parseInt(args[2]);
             if (count < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
-        RunicItem item = template.generateItem(count, ItemManager.getNextItemId(), new RunicItemOwnerPlayerInventory(target.getUniqueId().toString()));
+        RunicItem item = template.generateItem(count);
         target.getInventory().addItem(item.getCurrentItem());
     }
 
