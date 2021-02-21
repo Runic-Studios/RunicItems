@@ -1,7 +1,6 @@
 package com.runicrealms.runicitems.item.template;
 
 import com.runicrealms.runicitems.item.RunicItemArmor;
-import com.runicrealms.runicitems.item.inventory.RunicItemOwner;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;

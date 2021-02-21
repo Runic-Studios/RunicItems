@@ -9,7 +9,6 @@ import com.runicrealms.runicitems.item.RunicItemBook;
 import com.runicrealms.runicitems.item.RunicItemGeneric;
 import com.runicrealms.runicitems.item.RunicItemOffhand;
 import com.runicrealms.runicitems.item.RunicItemWeapon;
-import com.runicrealms.runicitems.item.inventory.*;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.runicitems.item.stats.RunicItemStatType;
@@ -33,7 +32,6 @@ public class ItemLoader {
         try {
             String templateId = section.get("template-id", String.class);
             int count = section.get("count", Integer.class);
-            RunicItemOwner itemOwner = getItemOwnerFromSection(section.getSection("owner"));
             RunicItemTemplate template = TemplateManager.getTemplateFromId(templateId);
             if (template instanceof RunicItemArmorTemplate) {
                 List<LinkedHashMap<RunicItemStatType, Integer>> gems = new ArrayList<LinkedHashMap<RunicItemStatType, Integer>>();
@@ -81,23 +79,6 @@ public class ItemLoader {
             }
         }
         return stats;
-    }
-
-    private static RunicItemOwner getItemOwnerFromSection(Data section) {
-        switch (RunicInventory.getFromIdentifier(section.get("inventory", String.class))) {
-            case PLAYER_INVENTORY:
-                return new RunicItemOwnerPlayerInventory(section.get("identifier", String.class));
-            case PLAYER_BANK:
-                return new RunicItemOwnerPlayerBank(section.get("identifier", String.class));
-            case GUILD_BANK:
-                return new RunicItemOwnerGuildBank(section.get("identifier", String.class));
-            case TRADE_MARKET:
-                return new RunicItemOwnerTradeMarket(section.get("identifier", String.class));
-            case DROPPED:
-                return new RunicItemOwnerDropped(section.get("identifier", String.class));
-            default:
-                return null;
-        }
     }
 
 }

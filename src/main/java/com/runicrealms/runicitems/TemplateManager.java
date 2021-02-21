@@ -1,7 +1,6 @@
 package com.runicrealms.runicitems;
 
 import com.runicrealms.runicitems.item.RunicItem;
-import com.runicrealms.runicitems.item.inventory.RunicItemOwner;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 
 import java.util.HashMap;

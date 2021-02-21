@@ -12,7 +12,6 @@ import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.Plugin;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.RunicItem;
-import com.runicrealms.runicitems.item.inventory.RunicItemOwnerPlayerInventory;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
