@@ -8,7 +8,6 @@ import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.util.ItemNbtUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -28,7 +27,7 @@ public class ItemManager implements Listener {
     private static final Map<Long, RunicItem> cachedItems = new HashMap<Long, RunicItem>();
 
     public static void initializeDataFile() {
-        dataFile = new File(Plugin.getInstance().getDataFolder(), "data.yml");
+        dataFile = new File(RunicItems.getInstance().getDataFolder(), "data.yml");
         if (!dataFile.exists()) {
             try {
                 dataFile.createNewFile();
@@ -37,7 +36,7 @@ public class ItemManager implements Listener {
             }
         }
         // Nothing here now, might delete idk
-        Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), ItemManager::saveDataFile);
+        Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), ItemManager::saveDataFile);
     }
 
     private static void saveDataFile() { // Should not be called sync!
@@ -54,14 +53,14 @@ public class ItemManager implements Listener {
 
     @EventHandler
     public void onCharacterJoin(CharacterLoadEvent event) {
-        if (Plugin.isDatabaseLoadingEnabled()) {
+        if (RunicItems.isDatabaseLoadingEnabled()) {
             loadItems(event.getPlayerCache().getMongoData().getSection("character." + event.getSlot() + ".inventory"));
         }
     }
 
     @EventHandler
     public void onCacheSave(CacheSaveEvent event) {
-        if (Plugin.isDatabaseLoadingEnabled()) {
+        if (RunicItems.isDatabaseLoadingEnabled()) {
             ItemStack[] contents = event.getPlayer().getInventory().getContents();
             for (int i = 0; i < contents.length; i++) {
                 RunicItem runicItem = getItemFromItemStack(contents[i]);

@@ -1,6 +1,6 @@
 package com.runicrealms.runicitems.config;
 
-import com.runicrealms.runicitems.Plugin;
+import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.AbilityManager;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
@@ -32,7 +32,7 @@ import java.util.logging.Level;
 public class TemplateLoader {
 
     public static void loadTemplates() {
-        File folder = new File(Plugin.getInstance().getDataFolder(), "items");
+        File folder = new File(RunicItems.getInstance().getDataFolder(), "items");
         Map<String, RunicItemTemplate> templates = new HashMap<String, RunicItemTemplate>();
         for (File file : folder.listFiles()) {
             Bukkit.getLogger().log(Level.INFO, "[RunicItems] Loading template " + file.getName());

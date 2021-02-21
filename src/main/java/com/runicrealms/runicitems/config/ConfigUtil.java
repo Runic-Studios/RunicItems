@@ -1,6 +1,6 @@
 package com.runicrealms.runicitems.config;
 
-import com.runicrealms.runicitems.Plugin;
+import com.runicrealms.runicitems.RunicItems;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -34,12 +34,12 @@ public class ConfigUtil {
     }
 
     public static void initDirs() {
-        if (!Plugin.getInstance().getDataFolder().exists()) {
-            Plugin.getInstance().getDataFolder().mkdirs();
+        if (!RunicItems.getInstance().getDataFolder().exists()) {
+            RunicItems.getInstance().getDataFolder().mkdirs();
         }
-        File itemsFolder = getSubFolder(Plugin.getInstance().getDataFolder(), "items");
+        File itemsFolder = getSubFolder(RunicItems.getInstance().getDataFolder(), "items");
         if (itemsFolder == null) {
-            itemsFolder = new File(Plugin.getInstance().getDataFolder(), "items");
+            itemsFolder = new File(RunicItems.getInstance().getDataFolder(), "items");
             itemsFolder.mkdirs();
         }
     }

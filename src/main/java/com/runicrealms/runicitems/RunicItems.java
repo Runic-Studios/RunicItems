@@ -11,9 +11,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class Plugin extends JavaPlugin {
+public class RunicItems extends JavaPlugin {
 
-    private static Plugin instance;
+    private static RunicItems instance;
 
     private static PaperCommandManager commandManager;
 
@@ -48,7 +48,7 @@ public class Plugin extends JavaPlugin {
         commandManager.registerCommand(new RunicItemCommand());
     }
 
-    public static Plugin getInstance() {
+    public static RunicItems getInstance() {
         return instance;
     }
 

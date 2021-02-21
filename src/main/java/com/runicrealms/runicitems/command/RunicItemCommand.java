@@ -9,7 +9,7 @@ import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
 import com.runicrealms.runicitems.ItemManager;
-import com.runicrealms.runicitems.Plugin;
+import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
@@ -26,7 +26,7 @@ public class RunicItemCommand extends BaseCommand {
     private static final String PREFIX = "&5[RunicItems] &6» &r";
 
     public RunicItemCommand() {
-        Plugin.getCommandManager().getCommandCompletions().registerAsyncCompletion("item-ids", context -> TemplateManager.getTemplates().keySet());
+        RunicItems.getCommandManager().getCommandCompletions().registerAsyncCompletion("item-ids", context -> TemplateManager.getTemplates().keySet());
     }
 
     @Default
@@ -133,9 +133,9 @@ public class RunicItemCommand extends BaseCommand {
     @Subcommand("toggle-database")
     @Conditions("is-op")
     public void onCommandDisableDatabase(CommandSender sender) {
-        Plugin.setDatabaseLoadingEnabled(!Plugin.isDatabaseLoadingEnabled());
+        RunicItems.setDatabaseLoadingEnabled(!RunicItems.isDatabaseLoadingEnabled());
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&d" +
-                (Plugin.isDatabaseLoadingEnabled() ? "Enabled" : "Disabled") +
+                (RunicItems.isDatabaseLoadingEnabled() ? "Enabled" : "Disabled") +
                 " items loading from database/saving to database. This is for testing only."));
     }
 
