@@ -28,13 +28,13 @@ public class RunicItemOffhandTemplate extends RunicItemTemplate {
     }
 
     @Override
-    public RunicItemOffhand generateItem(int count) {
+    public RunicItemOffhand generateItem(int count, long id) {
         LinkedHashMap<RunicItemStatType, RunicItemStat> rolledStats = new LinkedHashMap<RunicItemStatType, RunicItemStat>();
         for (Map.Entry<RunicItemStatType, RunicItemStatRange> stat : this.stats.entrySet()) {
             rolledStats.put(stat.getKey(), new RunicItemStat(stat.getValue()));
         }
         return new RunicItemOffhand(
-                this.id, this.displayableItem, this.tags, this.data, count,
+                this.id, this.displayableItem, this.tags, this.data, count, id,
                 rolledStats,
                 this.level, this.rarity
         );

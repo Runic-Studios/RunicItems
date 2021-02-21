@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.config;
 
 import com.runicrealms.plugin.database.Data;
+import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.RunicItemArmor;
@@ -28,7 +29,7 @@ import java.util.Set;
 
 public class ItemLoader {
 
-    public static RunicItem loadItem(Data section) {
+    public static RunicItem loadItem(Data section, long id) {
         try {
             String templateId = section.get("template-id", String.class);
             int count = section.get("count", Integer.class);
@@ -45,21 +46,26 @@ public class ItemLoader {
                     }
                 }
                 RunicItemArmorTemplate armorTemplate = (RunicItemArmorTemplate) template;
-                return new RunicItemArmor(armorTemplate, count, loadStats(section, armorTemplate.getStats()), gems);
+                return new RunicItemArmor(armorTemplate, count, id, loadStats(section, armorTemplate.getStats()), gems);
             } else if (template instanceof RunicItemArtifactTemplate) {
                 RunicItemArtifactTemplate artifactTemplate = (RunicItemArtifactTemplate) template;
-                return new RunicItemArtifact(artifactTemplate, count, loadStats(section, artifactTemplate.getStats()));
+                RunicItemArtifact item = new RunicItemArtifact(artifactTemplate, count, id, loadStats(section, artifactTemplate.getStats()));
+                return item;
             } else if (template instanceof RunicItemBookTemplate) {
                 RunicItemBookTemplate bookTemplate = (RunicItemBookTemplate) template;
-                return new RunicItemBook(bookTemplate, count);
+                RunicItemBook item = new RunicItemBook(bookTemplate, count, id);
+                return item;
             } else if (template instanceof RunicItemGenericTemplate) {
-                return new RunicItemGeneric((RunicItemGenericTemplate) template, count);
+                RunicItemGeneric item = new RunicItemGeneric((RunicItemGenericTemplate) template, count, id);
+                return item;
             } else if (template instanceof RunicItemOffhandTemplate) {
                 RunicItemOffhandTemplate offhandTemplate = (RunicItemOffhandTemplate) template;
-                return new RunicItemOffhand(offhandTemplate, count, loadStats(section, offhandTemplate.getStats()));
+                RunicItemOffhand item = new RunicItemOffhand(offhandTemplate, count, id, loadStats(section, offhandTemplate.getStats()));
+                return item;
             } else if (template instanceof RunicItemWeaponTemplate) {
                 RunicItemWeaponTemplate weaponTemplate = (RunicItemWeaponTemplate) template;
-                return new RunicItemWeapon(weaponTemplate, count, loadStats(section, weaponTemplate.getStats()));
+                RunicItemWeapon item = new RunicItemWeapon(weaponTemplate, count, id, loadStats(section, weaponTemplate.getStats()));
+                return item;
             }
         } catch (
                 Exception exception) {

@@ -20,11 +20,7 @@ import java.util.Map;
 
 public class ItemManager implements Listener {
 
-    public static final int CACHED_IDS = 1024;
-    public static final int MIN_CACHED_IDS = 64;
-
-    private static long nextId;
-    private static long lastId;
+    private static long nextId = 0;
 
     private static File dataFile;
     private static FileConfiguration dataFileConfig;
@@ -40,13 +36,7 @@ public class ItemManager implements Listener {
                 exception.printStackTrace();
             }
         }
-        dataFileConfig = YamlConfiguration.loadConfiguration(dataFile);
-        if (!dataFileConfig.contains("next-id")) {
-            dataFileConfig.set("next-id", Long.MIN_VALUE);
-        }
-        nextId = dataFileConfig.getLong("next-id");
-        lastId = nextId + CACHED_IDS;
-        dataFileConfig.set("next-id", lastId);
+        // Nothing here now, might delete idk
         Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), ItemManager::saveDataFile);
     }
 
@@ -59,13 +49,7 @@ public class ItemManager implements Listener {
     }
 
     public static long getNextItemId() {
-        long nextItemId = nextId++;
-        if (lastId - MIN_CACHED_IDS <= nextItemId) {
-            lastId += CACHED_IDS;
-            dataFileConfig.set("next-id", lastId);
-            Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), ItemManager::saveDataFile);
-        }
-        return nextItemId;
+        return nextId++;
     }
 
     @EventHandler
@@ -90,7 +74,7 @@ public class ItemManager implements Listener {
 
     public static void loadItems(Data data) {
         for (String key : data.getKeys()) {
-            RunicItem loadedItem = ItemLoader.loadItem(data.getSection(key));
+            RunicItem loadedItem = ItemLoader.loadItem(data.getSection(key), ItemManager.getNextItemId());
             cachedItems.put(loadedItem.getId(), loadedItem);
         }
     }

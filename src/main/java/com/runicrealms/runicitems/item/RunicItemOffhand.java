@@ -21,10 +21,10 @@ public class RunicItemOffhand extends RunicItem {
     private final int level;
     private final RunicItemRarity rarity;
 
-    public RunicItemOffhand(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
+    public RunicItemOffhand(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count, long id,
                             LinkedHashMap<RunicItemStatType, RunicItemStat> stats,
                             int level, RunicItemRarity rarity) {
-        super(templateId, displayableItem, tags, data, count, () -> {
+        super(templateId, displayableItem, tags, data, count, id, () -> {
             List<String> lore = new ArrayList<String>();
             for (Map.Entry<RunicItemStatType, RunicItemStat> entry : stats.entrySet()) {
                 lore.add(
@@ -47,9 +47,9 @@ public class RunicItemOffhand extends RunicItem {
         this.rarity = rarity;
     }
 
-    public RunicItemOffhand(RunicItemOffhandTemplate template, int count, LinkedHashMap<RunicItemStatType, RunicItemStat> stats) {
+    public RunicItemOffhand(RunicItemOffhandTemplate template, int count, long id, LinkedHashMap<RunicItemStatType, RunicItemStat> stats) {
         this(
-                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count,
+                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id,
                 stats,
                 template.getLevel(), template.getRarity()
         );

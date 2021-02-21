@@ -29,12 +29,13 @@ public abstract class RunicItem {
     protected List<ItemLoreSection> loreSections = new ArrayList<ItemLoreSection>();
 
     // TODO - initialize id and itemOwner
-    public RunicItem(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count, Callable<ItemLoreSection[]> loreSectionGenerator) {
+    public RunicItem(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count, long id, Callable<ItemLoreSection[]> loreSectionGenerator) {
         this.templateId = templateId;
         this.displayableItem = displayableItem;
         this.tags = tags;
         this.data = data;
         this.count = count;
+        this.id = id;
         this.currentItem = this.displayableItem.generateItem();
         try {
             ItemLoreSection[] loreSections = loreSectionGenerator.call();

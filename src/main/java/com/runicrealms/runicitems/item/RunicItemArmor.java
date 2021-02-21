@@ -27,10 +27,10 @@ public class RunicItemArmor extends RunicItem {
     private final int maxGemSlots;
     private final RunicItemClass runicClass;
 
-    public RunicItemArmor(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
+    public RunicItemArmor(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count, long id,
                           int health, LinkedHashMap<RunicItemStatType, RunicItemStat> stats, List<LinkedHashMap<RunicItemStatType, Integer>> gems, int maxGemSlots,
                           int level, RunicItemRarity rarity, RunicItemClass runicClass) {
-        super(templateId, displayableItem, tags, data, count, () -> {
+        super(templateId, displayableItem, tags, data, count, id, () -> {
             List<String> lore = new ArrayList<String>();
             for (Map.Entry<RunicItemStatType, RunicItemStat> entry : stats.entrySet()) {
                 int finalValue = entry.getValue().getRoll();
@@ -71,9 +71,9 @@ public class RunicItemArmor extends RunicItem {
         this.runicClass = runicClass;
     }
 
-    public RunicItemArmor(RunicItemArmorTemplate template, int count, LinkedHashMap<RunicItemStatType, RunicItemStat> stats, List<LinkedHashMap<RunicItemStatType, Integer>> gems) {
+    public RunicItemArmor(RunicItemArmorTemplate template, int count, long id, LinkedHashMap<RunicItemStatType, RunicItemStat> stats, List<LinkedHashMap<RunicItemStatType, Integer>> gems) {
         this(
-                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count,
+                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id,
                 template.getHealth(), stats, gems, template.getMaxGemSlots(),
                 template.getLevel(), template.getRarity(), template.getRunicClass()
         );

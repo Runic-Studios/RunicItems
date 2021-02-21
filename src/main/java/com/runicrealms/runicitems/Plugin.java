@@ -6,6 +6,7 @@ import com.runicrealms.runicitems.command.RunicItemCommand;
 import com.runicrealms.runicitems.config.ConfigUtil;
 import com.runicrealms.runicitems.config.AbilityLoader;
 import com.runicrealms.runicitems.config.TemplateLoader;
+import com.runicrealms.runicitems.event.InventoryListener;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -34,6 +35,7 @@ public class Plugin extends JavaPlugin {
 
         // Register Listeners
         Bukkit.getPluginManager().registerEvents(new ItemManager(), this);
+        Bukkit.getPluginManager().registerEvents(new InventoryListener(), this);
 
         // Register Commands
         commandManager = new PaperCommandManager(this);

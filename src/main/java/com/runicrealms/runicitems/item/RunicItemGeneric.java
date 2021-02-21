@@ -15,16 +15,16 @@ public class RunicItemGeneric extends RunicItem {
     private final List<String> lore;
     private final Map<ClickTrigger, String> triggers;
 
-    public RunicItemGeneric(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
+    public RunicItemGeneric(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count, long id,
                             Map<ClickTrigger, String> triggers, List<String> lore) {
-        super(templateId, displayableItem, tags, data, count, () -> new ItemLoreSection[] {new ItemLoreSection(lore)});
+        super(templateId, displayableItem, tags, data, count, id, () -> new ItemLoreSection[] {new ItemLoreSection(lore)});
         this.lore = lore;
         this.triggers = triggers;
     }
 
-    public RunicItemGeneric(RunicItemGenericTemplate template, int count) {
+    public RunicItemGeneric(RunicItemGenericTemplate template, int count, long id) {
         this(
-                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count,
+                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id,
                 template.getTriggers(), template.getLore()
         );
     }

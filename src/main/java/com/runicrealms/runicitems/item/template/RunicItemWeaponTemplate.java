@@ -33,13 +33,13 @@ public class RunicItemWeaponTemplate extends RunicItemTemplate {
     }
 
     @Override
-    public RunicItemWeapon generateItem(int count) {
+    public RunicItemWeapon generateItem(int count, long id) {
         LinkedHashMap<RunicItemStatType, RunicItemStat> rolledStats = new LinkedHashMap<RunicItemStatType, RunicItemStat>();
         for (Map.Entry<RunicItemStatType, RunicItemStatRange> stat : this.stats.entrySet()) {
             rolledStats.put(stat.getKey(), new RunicItemStat(stat.getValue()));
         }
         return new RunicItemWeapon(
-                this.id, this.displayableItem, this.tags, this.data, count,
+                this.id, this.displayableItem, this.tags, this.data, count, id,
                 this.damageRange, rolledStats,
                 this.level, this.rarity, this.runicClass
         );

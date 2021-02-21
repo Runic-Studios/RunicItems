@@ -23,9 +23,9 @@ public class RunicItemBookTemplate extends RunicItemTemplate {
     }
 
     @Override
-    public RunicItemBook generateItem(int count) {
+    public RunicItemBook generateItem(int count, long id) {
         return new RunicItemBook(
-                this.id, this.displayableItem, this.tags, this.data, count,
+                this.id, this.displayableItem, this.tags, this.data, count, id,
                 this.lore, this.author, this.pages
         );
     }

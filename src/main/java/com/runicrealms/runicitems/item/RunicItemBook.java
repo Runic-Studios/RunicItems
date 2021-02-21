@@ -18,9 +18,9 @@ public class RunicItemBook extends RunicItem {
     private final String author;
     private final Collection<String> pages;
 
-    public RunicItemBook(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count,
+    public RunicItemBook(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count, long id,
                          List<String> lore, String author, Collection<String> pages) {
-        super(templateId, displayableItem, tags, data, count, () -> new ItemLoreSection[] {new ItemLoreSection(lore)});
+        super(templateId, displayableItem, tags, data, count, id, () -> new ItemLoreSection[] {new ItemLoreSection(lore)});
         this.lore = lore;
         this.author = author;
         this.pages = pages;
@@ -33,9 +33,9 @@ public class RunicItemBook extends RunicItem {
         }
     }
 
-    public RunicItemBook(RunicItemBookTemplate template, int count) {
+    public RunicItemBook(RunicItemBookTemplate template, int count, long id) {
         this(
-                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count,
+                template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id,
                 template.getLore(), template.getAuthor(), template.getPages()
         );
     }
