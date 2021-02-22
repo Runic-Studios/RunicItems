@@ -23,7 +23,7 @@ public class RunicItemArmorTemplate extends RunicItemTemplate {
     private final int maxGemSlots;
     private final RunicItemClass runicClass;
 
-    public RunicItemArmorTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data,
+    public RunicItemArmorTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data,
                                   int health, LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats, int maxGemSlots,
                                   int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(id, displayableItem, tags, data);
@@ -36,7 +36,7 @@ public class RunicItemArmorTemplate extends RunicItemTemplate {
     }
 
     @Override
-    public RunicItemArmor generateItem(int count, long id, List<RunicItemTag> tags, Map<String, Object> data) {
+    public RunicItemArmor generateItem(int count, long id, List<RunicItemTag> tags, Map<String, String> data) {
         LinkedHashMap<RunicItemStatType, RunicItemStat> rolledStats = new LinkedHashMap<RunicItemStatType, RunicItemStat>();
         for (Map.Entry<RunicItemStatType, RunicItemStatRange> stat : this.stats.entrySet()) {
             rolledStats.put(stat.getKey(), new RunicItemStat(stat.getValue()));

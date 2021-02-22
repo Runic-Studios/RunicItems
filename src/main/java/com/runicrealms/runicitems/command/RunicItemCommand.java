@@ -57,7 +57,7 @@ public class RunicItemCommand extends BaseCommand {
             } else { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
         RunicItem item = template.generateItem(count, ItemManager.getNextItemId(), null, null);
-        player.getInventory().addItem(item.getCurrentItem());
+        player.getInventory().addItem(item.generateItem());
     }
 
     @Subcommand("give")
@@ -77,7 +77,7 @@ public class RunicItemCommand extends BaseCommand {
             if (count < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
         RunicItem item = template.generateItem(count, ItemManager.getNextItemId(), null, null);
-        target.getInventory().addItem(item.getCurrentItem());
+        target.getInventory().addItem(item.generateItem());
     }
 
     @Subcommand("clear|c")
@@ -104,9 +104,9 @@ public class RunicItemCommand extends BaseCommand {
         for (int i = 0; i < contents.length; i++) {
             if (contents[i] != null && contents[i].getType() != Material.AIR) {
                 if (amount == -1 || amountRemoved < amount) {
-                    RunicItem item = ItemManager.getItemFromItemStack(contents[i]);
+                    RunicItem item = ItemManager.getRunicItemFromItemStack(contents[i]);
                     if (item == null) {
-                        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dError remove items!"));
+                        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dError removing items!"));
                         return;
                     }
                     boolean removeItem = false;

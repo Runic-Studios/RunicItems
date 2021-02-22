@@ -1,22 +1,24 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
+import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.runicitems.item.stats.RunicItemStatType;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
+import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemWeaponTemplate;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
+import com.runicrealms.runicitems.item.util.ItemNbtUtils;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
 import com.runicrealms.runicitems.util.ItemIcons;
+import javafx.util.Pair;
 import org.bukkit.ChatColor;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RunicItemWeapon extends RunicItem {
 
@@ -26,7 +28,7 @@ public class RunicItemWeapon extends RunicItem {
     private final RunicItemRarity rarity;
     private final RunicItemClass runicClass;
 
-    public RunicItemWeapon(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count, long id,
+    public RunicItemWeapon(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
                            RunicItemStatRange damageRange, LinkedHashMap<RunicItemStatType, RunicItemStat> stats,
                            int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(templateId, displayableItem, tags, data, count, id, () -> {
@@ -89,10 +91,49 @@ public class RunicItemWeapon extends RunicItem {
     }
 
     @Override
-    public void addSpecificItemToData(Data section) {
+    public void addToData(Data section) {
+        super.addToData(section);
         for (RunicItemStatType statType : this.stats.keySet()) {
             section.set("stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
         }
+    }
+
+    @Override
+    public ItemStack generateItem() {
+        ItemStack item = super.generateItem();
+        int count = 0;
+        for (RunicItemStatType statType : this.stats.keySet()) {
+            ItemNbtUtils.setNbt(item, "stat-" + count + "-" + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
+            count++;
+        }
+        return item;
+    }
+
+    public static RunicItemWeapon getFromItemStack(ItemStack item) {
+        RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(ItemNbtUtils.getNbtString(item, "template-id"));
+        if (!(uncastedTemplate instanceof RunicItemWeaponTemplate)) throw new IllegalArgumentException("ItemStack is not a weapon item!");
+        RunicItemWeaponTemplate template = (RunicItemWeaponTemplate) uncastedTemplate;
+        Set<String> keys = ItemNbtUtils.getKeys(item);
+        int amountOfStats = 0;
+        for (String key : keys) {
+            if (key.startsWith("stat")) {
+                amountOfStats++;
+            }
+        }
+        List<Pair<RunicItemStatType, RunicItemStat>> statsList = new ArrayList<>(amountOfStats);
+        for (String key : keys) {
+            String[] split = key.split("-");
+            if (split[0].equals("stat")) {
+                RunicItemStatType statType = RunicItemStatType.getFromIdentifier(split[2]);
+                RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), ItemNbtUtils.getNbtFloat(item, key));
+                statsList.set(Integer.parseInt(split[1]), new Pair<>(statType, stat));
+            }
+        }
+        LinkedHashMap<RunicItemStatType, RunicItemStat> stats = new LinkedHashMap<>();
+        for (Pair<RunicItemStatType, RunicItemStat> stat : statsList) {
+            stats.put(stat.getKey(), stat.getValue());
+        }
+        return new RunicItemWeapon(template, item.getAmount(), ItemNbtUtils.getNbtInteger(item, "id"), stats);
     }
 
 }

@@ -62,10 +62,10 @@ public class TemplateLoader {
                 Material.getMaterial(itemConfig.getString("display.material")),
                 itemConfig.contains("display.damage") ? (short) itemConfig.getInt("display.damage") : 0
         );
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, String> data = new HashMap<String, String>();
         if (itemConfig.contains("data")) {
             for (String key : itemConfig.getConfigurationSection("data").getKeys(false)) {
-                data.put(key, itemConfig.get("data." + key));
+                data.put(key, itemConfig.getString("data." + key));
             }
         }
         if (itemConfig.getString("type").equalsIgnoreCase("armor")) {

@@ -14,7 +14,7 @@ public class RunicItemBookTemplate extends RunicItemTemplate {
     private final String author;
     private final Collection<String> pages;
 
-    public RunicItemBookTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data,
+    public RunicItemBookTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data,
                                     List<String> lore, String author, Collection<String> pages) {
         super(id, displayableItem, tags, data);
         this.lore = lore;
@@ -23,7 +23,7 @@ public class RunicItemBookTemplate extends RunicItemTemplate {
     }
 
     @Override
-    public RunicItemBook generateItem(int count, long id, List<RunicItemTag> tags, Map<String, Object> data) {
+    public RunicItemBook generateItem(int count, long id, List<RunicItemTag> tags, Map<String, String> data) {
         if (tags == null) tags = this.tags;
         if (data == null) data = this.data;
         return new RunicItemBook(

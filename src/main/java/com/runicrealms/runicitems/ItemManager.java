@@ -4,7 +4,8 @@ import com.runicrealms.plugin.character.api.CharacterLoadEvent;
 import com.runicrealms.plugin.database.Data;
 import com.runicrealms.plugin.database.event.CacheSaveEvent;
 import com.runicrealms.runicitems.config.ItemLoader;
-import com.runicrealms.runicitems.item.RunicItem;
+import com.runicrealms.runicitems.item.*;
+import com.runicrealms.runicitems.item.template.*;
 import com.runicrealms.runicitems.item.util.ItemNbtUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -14,8 +15,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ItemManager implements Listener {
 
@@ -23,8 +22,6 @@ public class ItemManager implements Listener {
 
     private static File dataFile;
     private static FileConfiguration dataFileConfig;
-
-    private static final Map<Long, RunicItem> cachedItems = new HashMap<Long, RunicItem>();
 
     public static void initializeDataFile() {
         dataFile = new File(RunicItems.getInstance().getDataFolder(), "data.yml");
@@ -54,7 +51,10 @@ public class ItemManager implements Listener {
     @EventHandler
     public void onCharacterJoin(CharacterLoadEvent event) {
         if (RunicItems.isDatabaseLoadingEnabled()) {
-            loadItems(event.getPlayerCache().getMongoData().getSection("character." + event.getSlot() + ".inventory"));
+            Data data = event.getPlayerCache().getMongoData().getSection("character." + event.getSlot() + ".inventory");
+            for (String key : data.getKeys()) {
+                event.getPlayer().getInventory().setItem(Integer.parseInt(key), ItemLoader.loadItem(data.getSection(key), getNextItemId()).generateItem());
+            }
         }
     }
 
@@ -63,7 +63,7 @@ public class ItemManager implements Listener {
         if (RunicItems.isDatabaseLoadingEnabled()) {
             ItemStack[] contents = event.getPlayer().getInventory().getContents();
             for (int i = 0; i < contents.length; i++) {
-                RunicItem runicItem = getItemFromItemStack(contents[i]);
+                RunicItem runicItem = getRunicItemFromItemStack(contents[i]);
                 if (runicItem != null) {
                     runicItem.addToData(event.getMongoDataSection().getSection("inventory." + i));
                 }
@@ -71,20 +71,22 @@ public class ItemManager implements Listener {
         }
     }
 
-    public static void loadItems(Data data) {
-        for (String key : data.getKeys()) {
-            RunicItem loadedItem = ItemLoader.loadItem(data.getSection(key), ItemManager.getNextItemId());
-            cachedItems.put(loadedItem.getId(), loadedItem);
-        }
-    }
-
-    public static RunicItem getItemFromId(Long id) {
-        return cachedItems.get(id);
-    }
-
-    public static RunicItem getItemFromItemStack(ItemStack itemStack) {
-        if (ItemNbtUtils.hasNbtLong(itemStack, "runic-item-id")) {
-            return cachedItems.get(ItemNbtUtils.getNbtLong(itemStack, "runic-item-id"));
+    public static RunicItem getRunicItemFromItemStack(ItemStack itemStack) {
+        if (!ItemNbtUtils.hasNbtString(itemStack, "template-id")) return null;
+        RunicItemTemplate template = TemplateManager.getTemplateFromId(ItemNbtUtils.getNbtString(itemStack, "template-id"));
+        if (template == null) return null;
+        if (template instanceof RunicItemArmorTemplate) {
+            return RunicItemArmor.getFromItemStack(itemStack);
+        } else if (template instanceof RunicItemArtifactTemplate) {
+            return RunicItemArtifact.getFromItemStack(itemStack);
+        } else if (template instanceof RunicItemBookTemplate) {
+            return RunicItemBook.getFromItemStack(itemStack);
+        } else if (template instanceof RunicItemGenericTemplate) {
+            return RunicItemGeneric.getFromItemStack(itemStack);
+        } else if (template instanceof RunicItemOffhandTemplate) {
+            return RunicItemOffhand.getFromItemStack(itemStack);
+        } else if (template instanceof RunicItemWeaponTemplate) {
+            return RunicItemWeapon.getFromItemStack(itemStack);
         }
         return null;
     }

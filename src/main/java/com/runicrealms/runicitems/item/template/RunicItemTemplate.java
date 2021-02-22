@@ -12,16 +12,16 @@ public abstract class RunicItemTemplate {
     protected final String id;
     protected final DisplayableItem displayableItem;
     protected final List<RunicItemTag> tags;
-    protected final Map<String, Object> data;
+    protected final Map<String, String> data;
 
-    public RunicItemTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data) {
+    public RunicItemTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data) {
         this.id = id;
         this.displayableItem = displayableItem;
         this.tags = tags;
         this.data = data;
     }
 
-    public abstract RunicItem generateItem(int count, long id, List<RunicItemTag> tags, Map<String, Object> data);
+    public abstract RunicItem generateItem(int count, long id, List<RunicItemTag> tags, Map<String, String> data);
 
     public String getId() {
         return this.id;
@@ -35,7 +35,7 @@ public abstract class RunicItemTemplate {
         return this.tags;
     }
 
-    public Map<String, Object> getData() {
+    public Map<String, String> getData() {
         return this.data;
     }
 

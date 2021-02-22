@@ -7,6 +7,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class ItemNbtUtils {
 
     public static void setNbt(ItemStack item, String key, Byte value) {
@@ -163,5 +166,12 @@ public class ItemNbtUtils {
         return item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(RunicItems.getInstance(), key), PersistentDataType.TAG_CONTAINER);
     }
 
+    public static Set<String> getKeys(ItemStack item) {
+        Set<String> keys = new HashSet<String>();
+        for (NamespacedKey key : item.getItemMeta().getPersistentDataContainer().getKeys()) {
+            keys.add(key.getKey());
+        }
+        return keys;
+    }
 
 }

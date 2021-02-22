@@ -1,11 +1,14 @@
 package com.runicrealms.runicitems.item;
 
-import com.runicrealms.plugin.database.Data;
+import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.template.RunicItemBookTemplate;
+import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
+import com.runicrealms.runicitems.item.util.ItemNbtUtils;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 import java.util.Collection;
@@ -18,19 +21,13 @@ public class RunicItemBook extends RunicItem {
     private final String author;
     private final Collection<String> pages;
 
-    public RunicItemBook(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count, long id,
+    public RunicItemBook(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
                          List<String> lore, String author, Collection<String> pages) {
         super(templateId, displayableItem, tags, data, count, id, () -> new ItemLoreSection[] {new ItemLoreSection(lore)});
         this.lore = lore;
         this.author = author;
         this.pages = pages;
-        if (this.getDisplayableItem().getMaterial() == Material.WRITTEN_BOOK) {
-            BookMeta bookMeta = (BookMeta) this.currentItem.getItemMeta();
-            bookMeta.setAuthor(author);
-            for (String page : pages) {
-                bookMeta.addPage(page);
-            }
-        }
+
     }
 
     public RunicItemBook(RunicItemBookTemplate template, int count, long id) {
@@ -53,6 +50,23 @@ public class RunicItemBook extends RunicItem {
     }
 
     @Override
-    public void addSpecificItemToData(Data section) { }
+    public ItemStack generateItem() {
+        ItemStack item = super.generateItem();
+        if (this.getDisplayableItem().getMaterial() == Material.WRITTEN_BOOK) {
+            BookMeta bookMeta = (BookMeta) item.getItemMeta();
+            bookMeta.setAuthor(author);
+            for (String page : pages) {
+                bookMeta.addPage(page);
+            }
+        }
+        return item;
+    }
+
+    public static RunicItemBook getFromItemStack(ItemStack item) {
+        RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(ItemNbtUtils.getNbtString(item, "template-id"));
+        if (!(uncastedTemplate instanceof RunicItemBookTemplate)) throw new IllegalArgumentException("ItemStack is not a book item!");
+        RunicItemBookTemplate template = (RunicItemBookTemplate) uncastedTemplate;
+        return new RunicItemBook(template, item.getAmount(), ItemNbtUtils.getNbtInteger(item, "id"));
+    }
 
 }

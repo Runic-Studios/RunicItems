@@ -13,7 +13,7 @@ public class RunicItemGenericTemplate extends RunicItemTemplate {
     private final List<String> lore;
     private final Map<ClickTrigger, String> triggers;
 
-    public RunicItemGenericTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data,
+    public RunicItemGenericTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data,
                                     Map<ClickTrigger, String> triggers, List<String> lore) {
         super(id, displayableItem, tags, data);
         this.lore = lore;
@@ -21,7 +21,7 @@ public class RunicItemGenericTemplate extends RunicItemTemplate {
     }
 
     @Override
-    public RunicItemGeneric generateItem(int count, long id, List<RunicItemTag> tags, Map<String, Object> data) {
+    public RunicItemGeneric generateItem(int count, long id, List<RunicItemTag> tags, Map<String, String> data) {
         if (tags == null) tags = this.tags;
         if (data == null) data = this.data;
         return new RunicItemGeneric(

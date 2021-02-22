@@ -1,10 +1,10 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
-import com.runicrealms.plugin.database.MongoDataSection;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
+import com.runicrealms.runicitems.item.util.ItemNbtUtils;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -17,28 +17,31 @@ public abstract class RunicItem {
 
     protected Long id;
 
-    protected ItemStack currentItem; // ItemStack that we are currently displaying to the player
-
     protected final DisplayableItem displayableItem; // Base ItemStack information that we get from the template
     protected final String templateId; // Template ID
+    protected Callable<ItemLoreSection[]> loreSectionGenerator;
+
     protected final List<RunicItemTag> tags; // List of tags (soulbound, untradeable, etc.)
-    protected final Map<String, Object> data;
+    protected final Map<String, String> data;
 
     protected int count;
 
     protected List<ItemLoreSection> loreSections = new ArrayList<ItemLoreSection>();
 
-    // TODO - initialize id and itemOwner
-    public RunicItem(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count, long id, Callable<ItemLoreSection[]> loreSectionGenerator) {
+    public RunicItem(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id, Callable<ItemLoreSection[]> loreSectionGenerator) {
         this.templateId = templateId;
         this.displayableItem = displayableItem;
         this.tags = tags;
         this.data = data;
         this.count = count;
         this.id = id;
-        this.currentItem = this.displayableItem.generateItem();
+        this.loreSectionGenerator = loreSectionGenerator;
+    }
+
+    public ItemStack generateItem() {
+        ItemStack item = this.displayableItem.generateItem();
         try {
-            ItemLoreSection[] loreSections = loreSectionGenerator.call();
+            ItemLoreSection[] loreSections = this.loreSectionGenerator.call();
             if (loreSections != null && loreSections.length > 0) {
                 for (ItemLoreSection section : loreSections) {
                     if (section != null) {
@@ -49,7 +52,7 @@ public abstract class RunicItem {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        ItemMeta meta = this.currentItem.getItemMeta();
+        ItemMeta meta = item.getItemMeta();
         List<String> lore = new ArrayList<String>();
         for (ItemLoreSection section : this.loreSections) {
             lore.addAll(section.getLore());
@@ -61,17 +64,16 @@ public abstract class RunicItem {
             lore.add(tag.getDisplay());
         }
         meta.setLore(lore);
-        this.currentItem.setItemMeta(meta);
-        // TODO finish generating item, add data, count
-    }
-
-    public ItemStack getCurrentItem() {
-        return this.currentItem;
-    }
-
-    public ItemStack regenerateCurrentItem() {
-        // TODO generate item, add data, count
-        return null;
+        item.setItemMeta(meta);
+        ItemNbtUtils.setNbt(item, "id", this.id);
+        ItemNbtUtils.setNbt(item, "template-id", this.templateId);
+        for (RunicItemTag tag : this.tags) {
+            ItemNbtUtils.setNbt(item, tag.getIdentifier(), (byte) 1);
+        }
+        for (String dataKey : this.data.keySet()) {
+            ItemNbtUtils.setNbt(item, "data-" + dataKey, this.data.get(dataKey));
+        }
+        return item;
     }
 
     public DisplayableItem getDisplayableItem() {
@@ -94,11 +96,11 @@ public abstract class RunicItem {
         this.count = count;
     }
 
-    public Map<String, Object> getData() {
+    public Map<String, String> getData() {
         return this.data;
     }
 
-    public void addToData(MongoDataSection section) {
+    public void addToData(Data section) {
         section.set("template-id", this.templateId);
         section.set("count", this.count);
         int count = 0;
@@ -109,10 +111,7 @@ public abstract class RunicItem {
         for (String dataKey : this.data.keySet()) {
             section.set("data." + dataKey, this.data.get(dataKey));
         }
-        this.addSpecificItemToData(section);
     }
-
-    protected abstract void addSpecificItemToData(Data section);
 
     public Long getId() {
         return this.id;

@@ -1,21 +1,23 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
+import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatType;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
+import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
+import com.runicrealms.runicitems.item.util.ItemNbtUtils;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
 import com.runicrealms.runicitems.util.ItemIcons;
+import javafx.util.Pair;
 import org.bukkit.ChatColor;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RunicItemArmor extends RunicItem {
 
@@ -27,7 +29,7 @@ public class RunicItemArmor extends RunicItem {
     private final int maxGemSlots;
     private final RunicItemClass runicClass;
 
-    public RunicItemArmor(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, Object> data, int count, long id,
+    public RunicItemArmor(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
                           int health, LinkedHashMap<RunicItemStatType, RunicItemStat> stats, List<LinkedHashMap<RunicItemStatType, Integer>> gems, int maxGemSlots,
                           int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(templateId, displayableItem, tags, data, count, id, () -> {
@@ -108,7 +110,8 @@ public class RunicItemArmor extends RunicItem {
     }
 
     @Override
-    public void addSpecificItemToData(Data section) {
+    public void addToData(Data section) {
+        super.addToData(section);
         for (RunicItemStatType statType : this.stats.keySet()) {
             section.set("stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
         }
@@ -119,6 +122,86 @@ public class RunicItemArmor extends RunicItem {
             }
             count++;
         }
+    }
+
+    @Override
+    public ItemStack generateItem() {
+        ItemStack item = super.generateItem();
+        int count = 0;
+        for (RunicItemStatType statType : this.stats.keySet()) {
+            ItemNbtUtils.setNbt(item, "stat-" + count + "-" + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
+            count++;
+        }
+        count = 0;
+        for (LinkedHashMap<RunicItemStatType, Integer> gem : this.gems) {
+            int count2 = 0;
+            for (RunicItemStatType statType : this.stats.keySet()) {
+                ItemNbtUtils.setNbt(item, "gem-" + count + "-" + count2 + "-" + statType.getIdentifier(), gem.get(statType));
+                count2++;
+            }
+            count++;
+        }
+        return item;
+    }
+
+    public static RunicItemArmor getFromItemStack(ItemStack item) {
+        RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(ItemNbtUtils.getNbtString(item, "template-id"));
+        if (!(uncastedTemplate instanceof RunicItemArmorTemplate)) throw new IllegalArgumentException("ItemStack is not an armor item!");
+        RunicItemArmorTemplate template = (RunicItemArmorTemplate) uncastedTemplate;
+        Set<String> keys = ItemNbtUtils.getKeys(item);
+        int amountOfStats = 0;
+        for (String key : keys) {
+            if (key.startsWith("stat")) {
+                amountOfStats++;
+            }
+        }
+        List<Pair<RunicItemStatType, RunicItemStat>> statsList = new ArrayList<>(amountOfStats);
+        for (String key : keys) {
+            String[] split = key.split("-");
+            if (split[0].equals("stat")) {
+                RunicItemStatType statType = RunicItemStatType.getFromIdentifier(split[2]);
+                RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), ItemNbtUtils.getNbtFloat(item, key));
+                statsList.set(Integer.parseInt(split[1]), new Pair<>(statType, stat));
+            }
+        }
+        LinkedHashMap<RunicItemStatType, RunicItemStat> stats = new LinkedHashMap<>();
+        for (Pair<RunicItemStatType, RunicItemStat> stat : statsList) {
+            stats.put(stat.getKey(), stat.getValue());
+        }
+        int amountOfGems = 0;
+        for (String key : keys) {
+            if (key.startsWith("gem")) {
+                amountOfGems++;
+            }
+        }
+        List<List<Pair<RunicItemStatType, Integer>>> gemsList = new ArrayList<>(amountOfGems);
+        for (String key : keys) {
+            String[] split = key.split("-");
+            if (split[0].equals("gem")) {;
+                int gemNumber = Integer.parseInt(split[1]);
+                RunicItemStatType statType = RunicItemStatType.getFromIdentifier(split[3]);
+                if (gemsList.get(gemNumber) == null) {
+                    int amountOfGemStats = 0;
+                    for (String gemKey : keys) {
+                        String[] splitGem = gemKey.split("-");
+                        if (splitGem[0].equals("gem") && splitGem[1].equals(split[1])) {
+                            amountOfGemStats++;
+                        }
+                    }
+                    gemsList.set(gemNumber, new ArrayList<>(amountOfGemStats));
+                }
+                gemsList.get(gemNumber).set(Integer.parseInt(split[2]), new Pair<>(RunicItemStatType.getFromIdentifier(split[3]), ItemNbtUtils.getNbtInteger(item, key)));
+            }
+        }
+        List<LinkedHashMap<RunicItemStatType, Integer>> gems = new ArrayList<>();
+        for (List<Pair<RunicItemStatType, Integer>> gem : gemsList) {
+            LinkedHashMap<RunicItemStatType, Integer> newGem = new LinkedHashMap<>();
+            for (Pair<RunicItemStatType, Integer> gemStat : gem) {
+                newGem.put(gemStat.getKey(), gemStat.getValue());
+            }
+            gems.add(newGem);
+        }
+        return new RunicItemArmor(template, item.getAmount(), ItemNbtUtils.getNbtInteger(item, "id"), stats, gems);
     }
 
 }
