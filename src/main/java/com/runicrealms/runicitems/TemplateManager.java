@@ -23,11 +23,11 @@ public class TemplateManager {
     }
 
     public static RunicItem generateItemFromTemplateId(String templateId) {
-        return templates.get(templateId).generateItem(1, ItemManager.getNextItemId());
+        return templates.get(templateId).generateItem(1, ItemManager.getNextItemId(), null, null);
     }
 
     public static RunicItem generateItemFromTemplateId(String templateId, int count) {
-        return templates.get(templateId).generateItem(count, ItemManager.getNextItemId());
+        return templates.get(templateId).generateItem(count, ItemManager.getNextItemId(), null, null);
     }
 
 }

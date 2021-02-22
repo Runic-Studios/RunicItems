@@ -21,9 +21,11 @@ public class RunicItemGenericTemplate extends RunicItemTemplate {
     }
 
     @Override
-    public RunicItemGeneric generateItem(int count, long id) {
+    public RunicItemGeneric generateItem(int count, long id, List<RunicItemTag> tags, Map<String, Object> data) {
+        if (tags == null) tags = this.tags;
+        if (data == null) data = this.data;
         return new RunicItemGeneric(
-                this.id, this.displayableItem, this.tags, this.data, count, id,
+                this.id, this.displayableItem, tags, data, count, id,
                 this.triggers, this.lore
         );
     }

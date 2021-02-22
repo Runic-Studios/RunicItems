@@ -21,7 +21,7 @@ public abstract class RunicItemTemplate {
         this.data = data;
     }
 
-    public abstract RunicItem generateItem(int count, long id);
+    public abstract RunicItem generateItem(int count, long id, List<RunicItemTag> tags, Map<String, Object> data);
 
     public String getId() {
         return this.id;

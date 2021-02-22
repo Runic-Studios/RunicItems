@@ -46,8 +46,8 @@ public abstract class RunicItem {
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
         ItemMeta meta = this.currentItem.getItemMeta();
         List<String> lore = new ArrayList<String>();
@@ -101,6 +101,14 @@ public abstract class RunicItem {
     public void addToData(MongoDataSection section) {
         section.set("template-id", this.templateId);
         section.set("count", this.count);
+        int count = 0;
+        for (RunicItemTag tag : this.tags) {
+            section.set("tags." + count, tag.getIdentifier());
+            count++;
+        }
+        for (String dataKey : this.data.keySet()) {
+            section.set("data." + dataKey, this.data.get(dataKey));
+        }
         this.addSpecificItemToData(section);
     }
 
