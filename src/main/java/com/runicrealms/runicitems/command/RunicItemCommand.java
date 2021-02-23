@@ -8,6 +8,7 @@ import co.aikar.commands.annotation.Conditions;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
+import com.runicrealms.runicitems.DupeManager;
 import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.TemplateManager;
@@ -56,7 +57,7 @@ public class RunicItemCommand extends BaseCommand {
                 count = Integer.parseInt(args[1]);
             } else { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
-        RunicItem item = template.generateItem(count, ItemManager.getNextItemId(), null, null);
+        RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
         player.getInventory().addItem(item.generateItem());
     }
 
@@ -76,7 +77,7 @@ public class RunicItemCommand extends BaseCommand {
             count = Integer.parseInt(args[2]);
             if (count < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
-        RunicItem item = template.generateItem(count, ItemManager.getNextItemId(), null, null);
+        RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
         target.getInventory().addItem(item.generateItem());
     }
 

@@ -67,6 +67,7 @@ public abstract class RunicItem {
         item.setItemMeta(meta);
         ItemNbtUtils.setNbt(item, "id", this.id);
         ItemNbtUtils.setNbt(item, "template-id", this.templateId);
+        ItemNbtUtils.setNbt(item, "last-count", this.count);
         for (RunicItemTag tag : this.tags) {
             ItemNbtUtils.setNbt(item, tag.getIdentifier(), (byte) 1);
         }

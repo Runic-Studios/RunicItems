@@ -36,6 +36,7 @@ public class RunicItems extends JavaPlugin {
         // Register Listeners
         Bukkit.getPluginManager().registerEvents(new ItemManager(), this);
         Bukkit.getPluginManager().registerEvents(new InventoryListener(), this);
+        Bukkit.getPluginManager().registerEvents(new DupeManager(), this);
 
         // Register Commands
         commandManager = new PaperCommandManager(this);
