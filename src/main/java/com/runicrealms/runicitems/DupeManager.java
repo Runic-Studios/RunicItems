@@ -1,6 +1,8 @@
 package com.runicrealms.runicitems;
 
 import com.runicrealms.runicitems.item.util.ItemNbtUtils;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,6 +13,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.awt.*;
+import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -19,9 +23,18 @@ public class DupeManager implements Listener {
 
     public static final int MAX_ITEMS_CLICKED_CACHE_LENGTH = 50;
 
+    public static final long TEXT_CHANNEL_ID = 813580198133628928L;
+    public static final Color EMBED_COLOR = new Color(36, 138, 38);
+
     private static final Map<Player, ConcurrentLinkedQueue<ItemStack>> itemsClicked = new ConcurrentHashMap<>();
 
+    private static TextChannel channel;
+
     private static long nextId = Long.MIN_VALUE;
+
+    public static void setupJda() {
+        channel = RunicItems.getJda().getTextChannelById(TEXT_CHANNEL_ID);
+    }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
@@ -32,7 +45,18 @@ public class DupeManager implements Listener {
                     for (ItemStack itemOne : itemsClicked.get(player)) {
                         if (checkItemsDuped(itemOne, event.getCurrentItem())) {
                             player.getInventory().remove(event.getCurrentItem());
-                            // TODO JDA
+                            channel.sendMessage(new EmbedBuilder()
+                            .setColor(EMBED_COLOR)
+                            .setTitle("Dupe Notification")
+                            .setDescription("Player `"
+                                    + player.getName()
+                                    + "` has attempted to dupe `"
+                                    + event.getCurrentItem().getAmount()
+                                    + "x "
+                                    + getItemName(event.getCurrentItem())
+                                    + "` at "
+                                    + new SimpleDateFormat("dd:MM:yy:HH:mm:ss").format(System.currentTimeMillis()))
+                            .build()).queue();
                         }
                     }
                     if (!itemsClicked.get(player).contains(event.getCurrentItem())) {
@@ -86,6 +110,13 @@ public class DupeManager implements Listener {
     }
     public static long getNextItemId() {
         return nextId++;
+    }
+
+    private static String getItemName(ItemStack item) {
+        if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
+            return item.getItemMeta().getDisplayName();
+        }
+        return item.getType().toString().toLowerCase();
     }
 
 }

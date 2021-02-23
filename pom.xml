@@ -120,6 +120,12 @@
             <id>aikar</id>
             <url>https://repo.aikar.co/content/groups/aikar/</url>
         </repository>
+        <!-- JDA -->
+        <repository>
+            <id>jcenter</id>
+            <name>jcenter-bintray</name>
+            <url>https://jcenter.bintray.com</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -168,6 +174,12 @@
             <version>1.15.2</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/RunicCore-1.16.4.jar</systemPath>
+        </dependency>
+        <!-- JDA -->
+        <dependency>
+            <groupId>net.dv8tion</groupId>
+            <artifactId>JDA</artifactId>
+            <version>4.2.0_228</version>
         </dependency>
     </dependencies>
 </project>
