@@ -1,6 +1,8 @@
 package com.runicrealms.runicitems.item.util;
 
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 
 public enum ClickTrigger {
 
@@ -30,6 +32,23 @@ public enum ClickTrigger {
             if (trigger.getIdentifier().equalsIgnoreCase(identifier)) {
                 return trigger;
             }
+        }
+        return null;
+    }
+
+    public static ClickTrigger getFromInteractAction(Action action, Player player) {
+        if (action == Action.RIGHT_CLICK_AIR
+                || action == Action.RIGHT_CLICK_BLOCK) {
+            if (player.isSneaking()) {
+                return ClickTrigger.SHIFT_RIGHT_CLICK;
+            }
+            return ClickTrigger.RIGHT_CLICK;
+        } else if (action == Action.LEFT_CLICK_AIR
+                || action == Action.LEFT_CLICK_BLOCK) {
+            if (player.isSneaking()) {
+                return ClickTrigger.SHIFT_LEFT_CLICK;
+            }
+            return ClickTrigger.LEFT_CLICK;
         }
         return null;
     }

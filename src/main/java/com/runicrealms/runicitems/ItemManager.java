@@ -5,10 +5,17 @@ import com.runicrealms.plugin.database.Data;
 import com.runicrealms.plugin.database.event.CacheSaveEvent;
 import com.runicrealms.runicitems.config.ItemLoader;
 import com.runicrealms.runicitems.item.*;
+import com.runicrealms.runicitems.item.event.RunicItemGenericTriggerEvent;
 import com.runicrealms.runicitems.item.template.*;
+import com.runicrealms.runicitems.item.util.ClickTrigger;
 import de.tr7zw.nbtapi.NBTItem;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 
@@ -36,6 +43,32 @@ public class ItemManager implements Listener {
                     if (runicItem != null) {
                         runicItem.addToData(event.getMongoDataSection().getSection("inventory." + i));
                     }
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (!event.isCancelled()) {
+            if (event.getAction() == Action.LEFT_CLICK_AIR
+                    || event.getAction() == Action.LEFT_CLICK_BLOCK
+                    || event.getAction() == Action.RIGHT_CLICK_AIR
+                    || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                if (event.getPlayer().getInventory().getItemInMainHand() != null
+                        && event.getPlayer().getInventory().getItemInMainHand().getType() != Material.AIR) {
+                    Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
+                        RunicItem item = getRunicItemFromItemStack(event.getPlayer().getInventory().getItemInMainHand());
+                        if (item == null) return;
+                        if (!(item instanceof RunicItemGeneric)) return;
+                        RunicItemGeneric generic = (RunicItemGeneric) item;
+                        ClickTrigger clickTrigger = ClickTrigger.getFromInteractAction(event.getAction(), event.getPlayer());
+                        if (generic.getTriggers().containsKey(clickTrigger)) {
+                            Bukkit.getScheduler().runTask(RunicItems.getInstance(), () -> {
+                                Bukkit.getPluginManager().callEvent(new RunicItemGenericTriggerEvent(event.getPlayer(), generic, clickTrigger, generic.getTriggers().get(clickTrigger)));
+                            });
+                        }
+                    });
                 }
             }
         }
