@@ -10,9 +10,9 @@ import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
-import com.runicrealms.runicitems.item.util.ItemNbtUtils;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
 import com.runicrealms.runicitems.util.ItemIcons;
+import de.tr7zw.nbtapi.NBTItem;
 import javafx.util.Pair;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
@@ -127,16 +127,17 @@ public class RunicItemArmor extends RunicItem {
     @Override
     public ItemStack generateItem() {
         ItemStack item = super.generateItem();
+        NBTItem nbtItem = new NBTItem(item);
         int count = 0;
         for (RunicItemStatType statType : this.stats.keySet()) {
-            ItemNbtUtils.setNbt(item, "stat-" + count + "-" + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
+            nbtItem.setFloat("stat-" + count + "-" + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
             count++;
         }
         count = 0;
         for (LinkedHashMap<RunicItemStatType, Integer> gem : this.gems) {
             int count2 = 0;
             for (RunicItemStatType statType : this.stats.keySet()) {
-                ItemNbtUtils.setNbt(item, "gem-" + count + "-" + count2 + "-" + statType.getIdentifier(), gem.get(statType));
+                nbtItem.setInteger("gem-" + count + "-" + count2 + "-" + statType.getIdentifier(), gem.get(statType));
                 count2++;
             }
             count++;
@@ -145,10 +146,11 @@ public class RunicItemArmor extends RunicItem {
     }
 
     public static RunicItemArmor getFromItemStack(ItemStack item) {
-        RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(ItemNbtUtils.getNbtString(item, "template-id"));
+        NBTItem nbtItem = new NBTItem(item);
+        RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
         if (!(uncastedTemplate instanceof RunicItemArmorTemplate)) throw new IllegalArgumentException("ItemStack is not an armor item!");
         RunicItemArmorTemplate template = (RunicItemArmorTemplate) uncastedTemplate;
-        Set<String> keys = ItemNbtUtils.getKeys(item);
+        Set<String> keys = nbtItem.getKeys();
         int amountOfStats = 0;
         for (String key : keys) {
             if (key.startsWith("stat")) {
@@ -160,7 +162,7 @@ public class RunicItemArmor extends RunicItem {
             String[] split = key.split("-");
             if (split[0].equals("stat")) {
                 RunicItemStatType statType = RunicItemStatType.getFromIdentifier(split[2]);
-                RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), ItemNbtUtils.getNbtFloat(item, key));
+                RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), nbtItem.getFloat(key));
                 statsList.set(Integer.parseInt(split[1]), new Pair<>(statType, stat));
             }
         }
@@ -190,7 +192,7 @@ public class RunicItemArmor extends RunicItem {
                     }
                     gemsList.set(gemNumber, new ArrayList<>(amountOfGemStats));
                 }
-                gemsList.get(gemNumber).set(Integer.parseInt(split[2]), new Pair<>(RunicItemStatType.getFromIdentifier(split[3]), ItemNbtUtils.getNbtInteger(item, key)));
+                gemsList.get(gemNumber).set(Integer.parseInt(split[2]), new Pair<>(RunicItemStatType.getFromIdentifier(split[3]), nbtItem.getInteger(key)));
             }
         }
         List<LinkedHashMap<RunicItemStatType, Integer>> gems = new ArrayList<>();
@@ -201,7 +203,7 @@ public class RunicItemArmor extends RunicItem {
             }
             gems.add(newGem);
         }
-        return new RunicItemArmor(template, item.getAmount(), ItemNbtUtils.getNbtInteger(item, "id"), stats, gems);
+        return new RunicItemArmor(template, item.getAmount(), nbtItem.getInteger("id"), stats, gems);
     }
 
 }

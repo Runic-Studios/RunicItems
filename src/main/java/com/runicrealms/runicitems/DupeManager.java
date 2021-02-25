@@ -1,6 +1,6 @@
 package com.runicrealms.runicitems;
 
-import com.runicrealms.runicitems.item.util.ItemNbtUtils;
+import de.tr7zw.nbtapi.NBTItem;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.bukkit.Bukkit;
@@ -81,32 +81,33 @@ public class DupeManager implements Listener {
     }
 
     public static boolean checkItemsDuped(ItemStack itemOne, ItemStack itemTwo) {
-        if (!ItemNbtUtils.hasNbtLong(itemOne, "id")) {
-            if (ItemNbtUtils.hasNbtString(itemOne, "template-id")) {
-                ItemNbtUtils.setNbt(itemOne, "id", getNextItemId());
+        NBTItem nbtItemOne = new NBTItem(itemOne);
+        NBTItem nbtItemTwo = new NBTItem(itemTwo);
+        if (!nbtItemOne.hasNBTData()) return false;
+        if (!nbtItemOne.hasKey("id")) {
+            if (nbtItemOne.hasKey("template-id")) {
+                nbtItemOne.setLong("id", getNextItemId());
             }
             return false;
         }
-        if (!ItemNbtUtils.hasNbtInteger(itemOne, "count")) return false;
-        if (ItemNbtUtils.getNbtInteger(itemOne, "count") != itemOne.getAmount()) {
-            ItemNbtUtils.setNbt(itemOne, "count", itemOne.getAmount());
+        if (!nbtItemOne.hasKey("last-count")) return false;
+        if (nbtItemOne.getInteger("last-count") != itemOne.getAmount()) {
+            nbtItemOne.setInteger("last-count", itemOne.getAmount());
             return false;
         }
-        if (!ItemNbtUtils.hasNbtLong(itemTwo, "id")) {
-            if (ItemNbtUtils.hasNbtString(itemTwo, "template-id")) {
-                ItemNbtUtils.setNbt(itemTwo, "id", getNextItemId());
+        if (!nbtItemTwo.hasNBTData()) return false;
+        if (!nbtItemTwo.hasKey("id")) {
+            if (nbtItemTwo.hasKey("template-id")) {
+                nbtItemTwo.setLong("id", getNextItemId());
             }
             return false;
         }
-        if (!ItemNbtUtils.hasNbtInteger(itemTwo, "count")) return false;
-        if (ItemNbtUtils.getNbtInteger(itemTwo, "count") != itemTwo.getAmount()) {
-            ItemNbtUtils.setNbt(itemTwo, "count", itemTwo.getAmount());
+        if (!nbtItemTwo.hasKey("last-count")) return false;
+        if (nbtItemTwo.getInteger("last-count") != itemTwo.getAmount()) {
+            nbtItemTwo.setInteger("last-count", itemTwo.getAmount());
             return false;
         }
-        if (ItemNbtUtils.getNbtLong(itemOne, "id") == ItemNbtUtils.getNbtLong(itemTwo, "id")) {
-            return true;
-        }
-        return false;
+        return nbtItemOne.getLong("id").equals(nbtItemTwo.getLong("id"));
     }
     public static long getNextItemId() {
         return nextId++;

@@ -6,7 +6,7 @@ import com.runicrealms.runicitems.item.template.RunicItemBookTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
-import com.runicrealms.runicitems.item.util.ItemNbtUtils;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
@@ -63,10 +63,11 @@ public class RunicItemBook extends RunicItem {
     }
 
     public static RunicItemBook getFromItemStack(ItemStack item) {
-        RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(ItemNbtUtils.getNbtString(item, "template-id"));
+        NBTItem nbtItem = new NBTItem(item);
+        RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
         if (!(uncastedTemplate instanceof RunicItemBookTemplate)) throw new IllegalArgumentException("ItemStack is not a book item!");
         RunicItemBookTemplate template = (RunicItemBookTemplate) uncastedTemplate;
-        return new RunicItemBook(template, item.getAmount(), ItemNbtUtils.getNbtInteger(item, "id"));
+        return new RunicItemBook(template, item.getAmount(), nbtItem.getInteger("id"));
     }
 
 }

@@ -4,7 +4,7 @@ import com.runicrealms.plugin.database.Data;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
-import com.runicrealms.runicitems.item.util.ItemNbtUtils;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -65,14 +65,15 @@ public abstract class RunicItem {
         }
         meta.setLore(lore);
         item.setItemMeta(meta);
-        ItemNbtUtils.setNbt(item, "id", this.id);
-        ItemNbtUtils.setNbt(item, "template-id", this.templateId);
-        ItemNbtUtils.setNbt(item, "last-count", this.count);
+        NBTItem nbtItem = new NBTItem(item);
+        nbtItem.setLong("id", this.id);
+        nbtItem.setString("template-id", this.templateId);
+        nbtItem.setInteger("last-count", this.count);
         for (RunicItemTag tag : this.tags) {
-            ItemNbtUtils.setNbt(item, tag.getIdentifier(), (byte) 1);
+            nbtItem.setByte(tag.getIdentifier(), (byte) 1);
         }
         for (String dataKey : this.data.keySet()) {
-            ItemNbtUtils.setNbt(item, "data-" + dataKey, this.data.get(dataKey));
+            nbtItem.setString("data-" + dataKey, this.data.get(dataKey));
         }
         return item;
     }

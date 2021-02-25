@@ -7,7 +7,7 @@ import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.runicitems.item.util.ClickTrigger;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
-import com.runicrealms.runicitems.item.util.ItemNbtUtils;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -41,10 +41,11 @@ public class RunicItemGeneric extends RunicItem {
     }
 
     public static RunicItemGeneric getFromItemStack(ItemStack item) {
-        RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(ItemNbtUtils.getNbtString(item, "template-id"));
+        NBTItem nbtItem = new NBTItem(item);
+        RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
         if (!(uncastedTemplate instanceof RunicItemGenericTemplate)) throw new IllegalArgumentException("ItemStack is not a generic item!");
         RunicItemGenericTemplate template = (RunicItemGenericTemplate) uncastedTemplate;
-        return new RunicItemGeneric(template, item.getAmount(), ItemNbtUtils.getNbtInteger(item, "id"));
+        return new RunicItemGeneric(template, item.getAmount(), nbtItem.getInteger("id"));
     }
 
     // TODO on click check for generic item then check for triggers

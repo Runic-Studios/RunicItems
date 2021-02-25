@@ -14,6 +14,7 @@ import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -138,6 +139,25 @@ public class RunicItemCommand extends BaseCommand {
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&d" +
                 (RunicItems.isDatabaseLoadingEnabled() ? "Enabled" : "Disabled") +
                 " items loading from database/saving to database. This is for testing only."));
+    }
+
+    @Subcommand("get-nbt")
+    @Conditions("is-op")
+    public void onCommandGetNbt(Player player) {
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (item == null || item.getType() == Material.AIR) {
+            player.sendMessage(ChatColor.RED + "You are not holding an item!");
+            return;
+        }
+        NBTItem nbtItem = new NBTItem(item);
+        if (!nbtItem.hasNBTData()) {
+            player.sendMessage(ChatColor.RED + "The item you are holding doesn't have any NBT data.");
+            return;
+        }
+        player.sendMessage(ChatColor.GREEN + "Item NBT Data: ");
+        for (String key : nbtItem.getKeys()) {
+            player.sendMessage("- " + key + " : " + nbtItem.getObject(key, Object.class).toString());
+        }
     }
 
     private static boolean isInt(String number) {

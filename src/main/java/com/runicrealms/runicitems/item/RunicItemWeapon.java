@@ -11,9 +11,9 @@ import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemWeaponTemplate;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
-import com.runicrealms.runicitems.item.util.ItemNbtUtils;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
 import com.runicrealms.runicitems.util.ItemIcons;
+import de.tr7zw.nbtapi.NBTItem;
 import javafx.util.Pair;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
@@ -101,19 +101,21 @@ public class RunicItemWeapon extends RunicItem {
     @Override
     public ItemStack generateItem() {
         ItemStack item = super.generateItem();
+        NBTItem nbtItem = new NBTItem(item);
         int count = 0;
         for (RunicItemStatType statType : this.stats.keySet()) {
-            ItemNbtUtils.setNbt(item, "stat-" + count + "-" + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
+            nbtItem.setFloat("stat-" + count + "-" + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
             count++;
         }
         return item;
     }
 
     public static RunicItemWeapon getFromItemStack(ItemStack item) {
-        RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(ItemNbtUtils.getNbtString(item, "template-id"));
+        NBTItem nbtItem = new NBTItem(item);
+        RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
         if (!(uncastedTemplate instanceof RunicItemWeaponTemplate)) throw new IllegalArgumentException("ItemStack is not a weapon item!");
         RunicItemWeaponTemplate template = (RunicItemWeaponTemplate) uncastedTemplate;
-        Set<String> keys = ItemNbtUtils.getKeys(item);
+        Set<String> keys = nbtItem.getKeys();
         int amountOfStats = 0;
         for (String key : keys) {
             if (key.startsWith("stat")) {
@@ -125,7 +127,7 @@ public class RunicItemWeapon extends RunicItem {
             String[] split = key.split("-");
             if (split[0].equals("stat")) {
                 RunicItemStatType statType = RunicItemStatType.getFromIdentifier(split[2]);
-                RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), ItemNbtUtils.getNbtFloat(item, key));
+                RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), nbtItem.getFloat(key));
                 statsList.set(Integer.parseInt(split[1]), new Pair<>(statType, stat));
             }
         }
@@ -133,7 +135,7 @@ public class RunicItemWeapon extends RunicItem {
         for (Pair<RunicItemStatType, RunicItemStat> stat : statsList) {
             stats.put(stat.getKey(), stat.getValue());
         }
-        return new RunicItemWeapon(template, item.getAmount(), ItemNbtUtils.getNbtInteger(item, "id"), stats);
+        return new RunicItemWeapon(template, item.getAmount(), nbtItem.getInteger("id"), stats);
     }
 
 }

@@ -6,7 +6,6 @@ import com.runicrealms.runicitems.command.RunicItemCommand;
 import com.runicrealms.runicitems.config.ConfigUtil;
 import com.runicrealms.runicitems.config.AbilityLoader;
 import com.runicrealms.runicitems.config.TemplateLoader;
-import com.runicrealms.runicitems.event.InventoryListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -40,7 +39,6 @@ public class RunicItems extends JavaPlugin {
 
         // Register Listeners
         Bukkit.getPluginManager().registerEvents(new ItemManager(), this);
-        Bukkit.getPluginManager().registerEvents(new InventoryListener(), this);
         Bukkit.getPluginManager().registerEvents(new DupeManager(), this);
 
         // Register Commands
