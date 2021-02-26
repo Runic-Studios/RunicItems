@@ -36,12 +36,16 @@ public class ItemManager implements Listener {
     @EventHandler
     public void onCacheSave(CacheSaveEvent event) {
         if (RunicItems.isDatabaseLoadingEnabled()) {
+            if (!event.getMongoDataSection().has("inventory")) {
+                event.getMongoDataSection().set("inventory.type", "runicitems");
+                event.getMongoDataSection().save();
+            }
             ItemStack[] contents = event.getPlayer().getInventory().getContents();
             for (int i = 0; i < contents.length; i++) {
                 if (contents[i] != null) {
                     RunicItem runicItem = getRunicItemFromItemStack(contents[i]);
                     if (runicItem != null) {
-                        runicItem.addToData(event.getMongoDataSection().getSection("inventory." + i));
+                        runicItem.addToData(event.getMongoDataSection().getSection("inventory"), i + "");
                     }
                 }
             }

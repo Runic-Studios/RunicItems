@@ -106,13 +106,14 @@ public class RunicItemArtifact extends RunicItem {
     }
 
     @Override
-    public void addToData(Data section) {
-        super.addToData(section);
+    public void addToData(Data section, String root) {
+        super.addToData(section, root);
+        String dataPrefix = root.equals("") ? "" : root + ".";
         for (RunicItemStatType statType : this.stats.keySet()) {
-            section.set("stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
+            section.set(dataPrefix + "stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
         }
-        section.set("damage.min", damageRange.getMin());
-        section.set("damage.max", damageRange.getMax());
+        section.set(dataPrefix + "damage.min", damageRange.getMin());
+        section.set(dataPrefix + "damage.max", damageRange.getMax());
     }
 
     @Override

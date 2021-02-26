@@ -110,15 +110,16 @@ public class RunicItemArmor extends RunicItem {
     }
 
     @Override
-    public void addToData(Data section) {
-        super.addToData(section);
+    public void addToData(Data section, String root) {
+        super.addToData(section, root);
+        String dataPrefix = root.equals("") ? "" : root + ".";
         for (RunicItemStatType statType : this.stats.keySet()) {
-            section.set("stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
+            section.set(dataPrefix + "stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
         }
         int count = 0;
         for (LinkedHashMap<RunicItemStatType, Integer> gem : this.gems) {
             for (RunicItemStatType statType : gem.keySet()) {
-                section.set("gems." + count + "." + statType, gem.get(statType));
+                section.set(dataPrefix + "gems." + count + "." + statType, gem.get(statType));
             }
             count++;
         }

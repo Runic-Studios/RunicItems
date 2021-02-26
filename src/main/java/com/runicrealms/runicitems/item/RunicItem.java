@@ -102,16 +102,17 @@ public abstract class RunicItem {
         return this.data;
     }
 
-    public void addToData(Data section) {
-        section.set("template-id", this.templateId);
-        section.set("count", this.count);
+    public void addToData(Data section, String root) {
+        String dataPrefix = root.equals("") ? "" : root + ".";
+        section.set(dataPrefix + "template-id", this.templateId);
+        section.set(dataPrefix + "count", this.count);
         int count = 0;
         for (RunicItemTag tag : this.tags) {
-            section.set("tags." + count, tag.getIdentifier());
+            section.set(dataPrefix + "tags." + count, tag.getIdentifier());
             count++;
         }
         for (String dataKey : this.data.keySet()) {
-            section.set("data." + dataKey, this.data.get(dataKey));
+            section.set(dataPrefix + "data." + dataKey, this.data.get(dataKey));
         }
     }
 
