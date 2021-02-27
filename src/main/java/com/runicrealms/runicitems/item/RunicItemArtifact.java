@@ -21,19 +21,14 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class RunicItemArtifact extends RunicItem {
+public class RunicItemArtifact extends RunicItemWeapon {
 
     private final RunicArtifactAbility ability;
-    private final RunicItemStatRange damageRange;
-    private final LinkedHashMap<RunicItemStatType, RunicItemStat> stats;
-    private final int level;
-    private final RunicItemRarity rarity;
-    private final RunicItemClass runicClass;
 
     public RunicItemArtifact(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
                              RunicArtifactAbility ability, RunicItemStatRange damageRange, LinkedHashMap<RunicItemStatType, RunicItemStat> stats,
                              int level, RunicItemRarity rarity, RunicItemClass runicClass) {
-        super(templateId, displayableItem, tags, data, count, id, () -> {
+        super(templateId, displayableItem, tags, data, count, id, damageRange, stats, level, rarity, runicClass, () -> {
             ItemLoreSection[] sections = new ItemLoreSection[3 + (stats.size() > 0 ? 1 : 0)];
             sections[0] = new ItemLoreSection(new String[] {
                     ChatColor.GRAY + "Required Class: " + ChatColor.WHITE + runicClass.getDisplay(),
@@ -62,11 +57,6 @@ public class RunicItemArtifact extends RunicItem {
             return sections;
         });
         this.ability = ability;
-        this.damageRange = damageRange;
-        this.stats = stats;
-        this.level = level;
-        this.rarity = rarity;
-        this.runicClass = runicClass;
     }
 
     public RunicItemArtifact(RunicItemArtifactTemplate template, int count, long id, LinkedHashMap<RunicItemStatType, RunicItemStat> stats) {
@@ -81,50 +71,12 @@ public class RunicItemArtifact extends RunicItem {
         return this.ability;
     }
 
-    public RunicItemStatRange getDamageRange() {
-        return this.damageRange;
-    }
-
-    public LinkedHashMap<RunicItemStatType, RunicItemStat> getStats() {
-        return stats;
-    }
-
-    public int getRandomDamage() {
-        return this.damageRange.getRandomValue();
-    }
-
-    public int getLevel() {
-        return this.level;
-    }
-
-    public RunicItemRarity getRarity() {
-        return this.rarity;
-    }
-
-    public RunicItemClass getRunicClass() {
-        return this.runicClass;
-    }
-
-    @Override
-    public void addToData(Data section, String root) {
-        super.addToData(section, root);
-        String dataPrefix = root.equals("") ? "" : root + ".";
-        for (RunicItemStatType statType : this.stats.keySet()) {
-            section.set(dataPrefix + "stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
-        }
-        section.set(dataPrefix + "damage.min", damageRange.getMin());
-        section.set(dataPrefix + "damage.max", damageRange.getMax());
-    }
-
     @Override
     public ItemStack generateItem() {
         ItemStack item = super.generateItem();
         NBTItem nbtItem = new NBTItem(item);
-        int count = 0;
-        for (RunicItemStatType statType : this.stats.keySet()) {
-            nbtItem .setFloat("stat-" + count + "-" + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
-            count++;
-        }
+        nbtItem.setString("ability-id", this.ability.getIdentifier());
+        nbtItem.setString("ability-trigger", this.ability.getTrigger().getIdentifier());
         return item;
     }
 

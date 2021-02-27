@@ -19,14 +19,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+import java.util.concurrent.Callable;
 
 public class RunicItemWeapon extends RunicItem {
 
-    private final RunicItemStatRange damageRange;
-    private final LinkedHashMap<RunicItemStatType, RunicItemStat> stats;
-    private final int level;
-    private final RunicItemRarity rarity;
-    private final RunicItemClass runicClass;
+    protected final RunicItemStatRange damageRange;
+    protected final LinkedHashMap<RunicItemStatType, RunicItemStat> stats;
+    protected final int level;
+    protected final RunicItemRarity rarity;
+    protected final RunicItemClass runicClass;
 
     public RunicItemWeapon(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
                            RunicItemStatRange damageRange, LinkedHashMap<RunicItemStatType, RunicItemStat> stats,
@@ -55,6 +56,17 @@ public class RunicItemWeapon extends RunicItem {
             }
             return sections;
         });
+        this.damageRange = damageRange;
+        this.stats = stats;
+        this.level = level;
+        this.rarity = rarity;
+        this.runicClass = runicClass;
+    }
+
+    public RunicItemWeapon(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
+                           RunicItemStatRange damageRange, LinkedHashMap<RunicItemStatType, RunicItemStat> stats,
+                           int level, RunicItemRarity rarity, RunicItemClass runicClass, Callable<ItemLoreSection[]> loreSectionGenerator) {
+        super(templateId, displayableItem, tags, data, count, id, loreSectionGenerator);
         this.damageRange = damageRange;
         this.stats = stats;
         this.level = level;
