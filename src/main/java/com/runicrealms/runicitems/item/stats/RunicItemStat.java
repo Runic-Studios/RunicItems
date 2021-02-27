@@ -6,7 +6,7 @@ public class RunicItemStat {
 
     private final RunicItemStatRange range;
     private final float rollPercentage;
-    private final int roll;
+    private final int value;
 
     public RunicItemStat(RunicItemStatRange range, float rollPercentage) {
         this(range, rollPercentage, range.getMin() + (int) Math.floor(rollPercentage * (range.getMax() - range.getMin())));
@@ -15,7 +15,7 @@ public class RunicItemStat {
     public RunicItemStat(RunicItemStatRange range, float rollPercentage, int roll) {
         this.range = range;
         this.rollPercentage = rollPercentage;
-        this.roll = roll;
+        this.value = roll;
     }
 
     public RunicItemStat(RunicItemStatRange range) {
@@ -30,8 +30,8 @@ public class RunicItemStat {
         return this.rollPercentage;
     }
 
-    public int getRoll() {
-        return this.roll;
+    public int getValue() {
+        return this.value;
     }
 
 }

@@ -31,8 +31,8 @@ public class RunicItemOffhand extends RunicItem {
             for (Map.Entry<RunicItemStatType, RunicItemStat> entry : stats.entrySet()) {
                 lore.add(
                         entry.getKey().getColor()
-                                + (entry.getValue().getRoll() < 0 ? "-" : "+")
-                                + entry.getValue().getRoll()
+                                + (entry.getValue().getValue() < 0 ? "-" : "+")
+                                + entry.getValue().getValue()
                                 + entry.getKey().getSuffix()
                 );
             }

@@ -4,6 +4,9 @@ import com.runicrealms.plugin.database.Data;
 import com.runicrealms.runicitems.config.ItemLoader;
 import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
+import com.runicrealms.runicitems.player.AddedPlayerStats;
+import com.runicrealms.runicitems.player.PlayerStatHolder;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -87,6 +90,24 @@ public class RunicItemsAPI {
      */
     public static RunicArtifactAbility getAbilityFromId(String id) {
         return AbilityManager.getAbilityFromId(id);
+    }
+
+    /**
+     * Gets the (cached) added stats from a players armor, weapon and offhand.
+     * @param player - Player to check
+     * @return AddedPlayerStats
+     */
+    public static AddedPlayerStats getAddedPlayerStats(Player player) {
+        return PlayerManager.getCachedPlayerStats().get(player).getTotalStats();
+    }
+
+    /**
+     * Gets a list of the cached items (armor, weapon and offhand) that a player is using
+     * @param player - Player to check
+     * @return PlayerStatHolder
+     */
+    public static PlayerStatHolder getCachedPlayerItems(Player player) {
+        return PlayerManager.getCachedPlayerStats().get(player);
     }
 
 }

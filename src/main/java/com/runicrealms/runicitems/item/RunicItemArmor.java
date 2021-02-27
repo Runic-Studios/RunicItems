@@ -35,7 +35,7 @@ public class RunicItemArmor extends RunicItem {
         super(templateId, displayableItem, tags, data, count, id, () -> {
             List<String> lore = new ArrayList<String>();
             for (Map.Entry<RunicItemStatType, RunicItemStat> entry : stats.entrySet()) {
-                int finalValue = entry.getValue().getRoll();
+                int finalValue = entry.getValue().getValue();
                 for (LinkedHashMap<RunicItemStatType, Integer> gem : gems) {
                     if (gem.containsKey(entry.getKey())) {
                         finalValue += gem.get(entry.getKey());
@@ -44,10 +44,10 @@ public class RunicItemArmor extends RunicItem {
                 lore.add(
                         entry.getKey().getColor()
                                 + (finalValue < 0 ? "-" : "+")
-                                + (finalValue != entry.getValue().getRoll() ?
-                                ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + entry.getValue().getRoll() + ChatColor.RESET + "" + entry.getKey().getColor()
+                                + (finalValue != entry.getValue().getValue() ?
+                                ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + entry.getValue().getValue() + ChatColor.RESET + "" + entry.getKey().getColor()
                                 : "")
-                                + entry.getValue().getRoll()
+                                + entry.getValue().getValue()
                                 + entry.getKey().getSuffix()
                 );
             }

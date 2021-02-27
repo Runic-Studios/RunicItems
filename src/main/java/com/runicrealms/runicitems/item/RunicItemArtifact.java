@@ -1,6 +1,5 @@
 package com.runicrealms.runicitems.item;
 
-import com.runicrealms.plugin.database.Data;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
@@ -46,8 +45,8 @@ public class RunicItemArtifact extends RunicItemWeapon {
             for (Map.Entry<RunicItemStatType, RunicItemStat> entry : stats.entrySet()) {
                 lore.add(
                         entry.getKey().getColor()
-                                + (entry.getValue().getRoll() < 0 ? "-" : "+")
-                                + entry.getValue().getRoll()
+                                + (entry.getValue().getValue() < 0 ? "-" : "+")
+                                + entry.getValue().getValue()
                                 + entry.getKey().getSuffix()
                 );
             }
