@@ -20,12 +20,14 @@ import com.runicrealms.runicitems.item.template.RunicItemGenericTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemOffhandTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemWeaponTemplate;
+import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 public class ItemLoader {
 
@@ -69,6 +71,9 @@ public class ItemLoader {
             }
         } catch (
                 Exception exception) {
+            // TODO remove
+            Bukkit.getLogger().log(Level.INFO, "[RunicItems] Error loading item!");
+            exception.printStackTrace();
             return null;
         }
         return null;
@@ -76,12 +81,14 @@ public class ItemLoader {
 
     private static LinkedHashMap<RunicItemStatType, RunicItemStat> loadStats(Data section, Map<RunicItemStatType, RunicItemStatRange> templateStats) {
         LinkedHashMap<RunicItemStatType, RunicItemStat> stats = new LinkedHashMap<RunicItemStatType, RunicItemStat>();
-        Set<String> sectionKeys = section.getSection("stats").getKeys();
-        for (RunicItemStatType templateStatType : templateStats.keySet()) {
-            if (sectionKeys.contains(templateStatType.getIdentifier())) { // Item has stat and has already been rolled (stored in database)
-                stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType), section.get("stats." + templateStatType.getIdentifier(), Float.class)));
-            } else { // Item has recently been added this stat and the roll does not exist in database, so make a new roll
-                stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType)));
+        if (section.has("stats")) {
+            Set<String> sectionKeys = section.getSection("stats").getKeys();
+            for (RunicItemStatType templateStatType : templateStats.keySet()) {
+                if (sectionKeys.contains(templateStatType.getIdentifier())) { // Item has stat and has already been rolled (stored in database)
+                    stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType), section.get("stats." + templateStatType.getIdentifier(), Float.class)));
+                } else { // Item has recently been added this stat and the roll does not exist in database, so make a new roll
+                    stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType)));
+                }
             }
         }
         return stats;

@@ -75,7 +75,7 @@ public abstract class RunicItem {
         for (String dataKey : this.data.keySet()) {
             nbtItem.setString("data-" + dataKey, this.data.get(dataKey));
         }
-        return item;
+        return nbtItem.getItem();
     }
 
     public DisplayableItem getDisplayableItem() {

@@ -87,7 +87,7 @@ public class RunicItemOffhand extends RunicItem {
             nbtItem.setFloat("stat-" + count + "-" + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
             count++;
         }
-        return item;
+        return nbtItem.getItem();
     }
 
     public static RunicItemOffhand getFromItemStack(ItemStack item) {

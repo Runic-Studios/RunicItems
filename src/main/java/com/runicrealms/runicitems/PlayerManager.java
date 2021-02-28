@@ -31,9 +31,10 @@ public class PlayerManager implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!event.isCancelled()) {
-            if (event.getWhoClicked() instanceof Player) {
-                Player player = (Player) event.getWhoClicked();
+        if (event.getWhoClicked() instanceof Player) {
+            Player player = (Player) event.getWhoClicked();
+            if (!cachedPlayerStats.containsKey(player)) return;
+            if (!event.isCancelled()) {
                 if (event.getInventory().getType() == InventoryType.PLAYER) {
                     if (event.getSlotType() == InventoryType.SlotType.ARMOR) {
                         if (event.getSlot() == 39) { // Helmet
@@ -57,6 +58,7 @@ public class PlayerManager implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerItemHeld(PlayerItemHeldEvent event) {
+        if (!cachedPlayerStats.containsKey(event.getPlayer())) return;
         if (!event.isCancelled()) {
             cachedPlayerStats.get(event.getPlayer()).updateWeapon();
         }

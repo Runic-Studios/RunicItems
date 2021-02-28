@@ -15,12 +15,15 @@ import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBTType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Arrays;
 
 @CommandAlias("ri|runicitems|runicitem")
 public class RunicItemCommand extends BaseCommand {
@@ -87,7 +90,7 @@ public class RunicItemCommand extends BaseCommand {
     @Syntax("<player> [item] [amount]")
     @CommandCompletion("@players @item-ids @nothing")
     public void onCommandClear(CommandSender sender, String[] args) {
-        if (args.length < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runciitem help")); return; }
+        if (args.length < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
         Player target = Bukkit.getPlayerExact(args[0]);
         if (target == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid player!")); return; }
         RunicItemTemplate template = null;
@@ -156,7 +159,44 @@ public class RunicItemCommand extends BaseCommand {
         }
         player.sendMessage(ChatColor.GREEN + "Item NBT Data: ");
         for (String key : nbtItem.getKeys()) {
-            player.sendMessage("- " + key + " : " + nbtItem.getObject(key, Object.class).toString());
+            switch (nbtItem.getType(key)) {
+                case NBTTagByte:
+                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getByte(key));
+                    break;
+                case NBTTagByteArray:
+                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + Arrays.toString(nbtItem.getByteArray(key)));
+                    break;
+                case NBTTagCompound:
+                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getCompound(key).toString());
+                    break;
+                case NBTTagDouble:
+                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getDouble(key));
+                    break;
+                case NBTTagFloat:
+                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getFloat(key));
+                    break;
+                case NBTTagInt:
+                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getInteger(key));
+                    break;
+                case NBTTagIntArray:
+                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + Arrays.toString(nbtItem.getIntArray(key)));
+                    break;
+                case NBTTagList:
+                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getStringList(key));
+                    break;
+                case NBTTagLong:
+                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getLong(key));
+                    break;
+                case NBTTagShort:
+                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getShort(key));
+                    break;
+                case NBTTagString:
+                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getString(key));
+                    break;
+                default: {
+                    player.sendMessage(ChatColor.GREEN + "- " + key + " : unknown type");
+                }
+            }
         }
     }
 

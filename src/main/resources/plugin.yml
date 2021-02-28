@@ -3,4 +3,4 @@ description: Runic Realms Items Plugin, by Excel
 version: 1.0
 main: com.runicrealms.runicitems.RunicItems
 api-version: 1.13
-depend: [RunicCore]
+depend: [RunicCore, NBTAPI]

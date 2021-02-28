@@ -27,7 +27,9 @@ public class ItemManager implements Listener {
             if (event.getPlayerCache().getMongoData().has("character." + event.getSlot() + ".inventory")) {
                 Data data = event.getPlayerCache().getMongoData().getSection("character." + event.getSlot() + ".inventory");
                 for (String key : data.getKeys()) {
-                    event.getPlayer().getInventory().setItem(Integer.parseInt(key), ItemLoader.loadItem(data.getSection(key), DupeManager.getNextItemId()).generateItem());
+                    if (!key.equalsIgnoreCase("type")) {
+                        event.getPlayer().getInventory().setItem(Integer.parseInt(key), ItemLoader.loadItem(data.getSection(key), DupeManager.getNextItemId()).generateItem());
+                    }
                 }
             }
         }
@@ -42,7 +44,7 @@ public class ItemManager implements Listener {
             }
             ItemStack[] contents = event.getPlayer().getInventory().getContents();
             for (int i = 0; i < contents.length; i++) {
-                if (contents[i] != null) {
+                if (contents[i] != null) { // TODO remove on null
                     RunicItem runicItem = getRunicItemFromItemStack(contents[i]);
                     if (runicItem != null) {
                         runicItem.addToData(event.getMongoDataSection().getSection("inventory"), i + "");
@@ -80,7 +82,7 @@ public class ItemManager implements Listener {
 
     public static RunicItem getRunicItemFromItemStack(ItemStack itemStack) {
         NBTItem nbtItem = new NBTItem(itemStack);
-        if ((!nbtItem.hasNBTData()) || (nbtItem.hasKey("template-id"))) return null;
+        if ((!nbtItem.hasNBTData()) || (!nbtItem.hasKey("template-id"))) return null;
         RunicItemTemplate template = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
         if (template == null) return null;
         if (template instanceof RunicItemArmorTemplate) {

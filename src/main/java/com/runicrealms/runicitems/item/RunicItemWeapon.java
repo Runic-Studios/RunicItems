@@ -120,7 +120,7 @@ public class RunicItemWeapon extends RunicItem {
             nbtItem.setFloat("stat-" + count + "-" + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
             count++;
         }
-        return item;
+        return nbtItem.getItem();
     }
 
     public static RunicItemWeapon getFromItemStack(ItemStack item) {

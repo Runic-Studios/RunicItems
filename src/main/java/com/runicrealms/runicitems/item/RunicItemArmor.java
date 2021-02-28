@@ -143,7 +143,7 @@ public class RunicItemArmor extends RunicItem {
             }
             count++;
         }
-        return item;
+        return nbtItem.getItem();
     }
 
     public static RunicItemArmor getFromItemStack(ItemStack item) {
