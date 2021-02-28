@@ -2,6 +2,7 @@ package com.runicrealms.runicitems;
 
 import com.runicrealms.plugin.character.api.CharacterLoadEvent;
 import com.runicrealms.plugin.database.Data;
+import com.runicrealms.plugin.database.MongoDataSection;
 import com.runicrealms.plugin.database.event.CacheSaveEvent;
 import com.runicrealms.runicitems.config.ItemLoader;
 import com.runicrealms.runicitems.item.*;
@@ -42,15 +43,18 @@ public class ItemManager implements Listener {
                 event.getMongoDataSection().set("inventory.type", "runicitems");
                 event.getMongoDataSection().save();
             }
+            MongoDataSection inventorySection = event.getMongoDataSection().getSection("inventory");
+            for (String key : inventorySection.getKeys()) {
+                inventorySection.remove(key);
+            }
+            event.getMongoDataSection().save();
             ItemStack[] contents = event.getPlayer().getInventory().getContents();
             for (int i = 0; i < contents.length; i++) {
-                if (contents[i] != null) { // TODO remove on null
+                if (contents[i] != null) {
                     RunicItem runicItem = getRunicItemFromItemStack(contents[i]);
                     if (runicItem != null) {
-                        runicItem.addToData(event.getMongoDataSection().getSection("inventory"), i + "");
+                        runicItem.addToData(inventorySection, i + "");
                     }
-                } else if (event.getMongoDataSection().has("inventory." + i)) {
-                    event.getMongoDataSection().remove("inventory." + i);
                 }
             }
         }
