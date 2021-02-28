@@ -49,6 +49,8 @@ public class ItemManager implements Listener {
                     if (runicItem != null) {
                         runicItem.addToData(event.getMongoDataSection().getSection("inventory"), i + "");
                     }
+                } else if (event.getMongoDataSection().has("inventory." + i)) {
+                    event.getMongoDataSection().remove("inventory." + i);
                 }
             }
         }

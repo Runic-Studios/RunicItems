@@ -69,9 +69,7 @@ public class ItemLoader {
                 RunicItemWeapon item = new RunicItemWeapon(weaponTemplate, count, id, loadStats(section, weaponTemplate.getStats()));
                 return item;
             }
-        } catch (
-                Exception exception) {
-            // TODO remove
+        } catch (Exception exception) {
             Bukkit.getLogger().log(Level.INFO, "[RunicItems] Error loading item!");
             exception.printStackTrace();
             return null;
