@@ -65,7 +65,7 @@ public abstract class RunicItem {
         }
         meta.setLore(lore);
         item.setItemMeta(meta);
-        NBTItem nbtItem = new NBTItem(item);
+        NBTItem nbtItem = new NBTItem(item, true);
         nbtItem.setLong("id", this.id);
         nbtItem.setString("template-id", this.templateId);
         nbtItem.setInteger("last-count", this.count);
@@ -75,7 +75,7 @@ public abstract class RunicItem {
         for (String dataKey : this.data.keySet()) {
             nbtItem.setString("data-" + dataKey, this.data.get(dataKey));
         }
-        return nbtItem.getItem();
+        return item;
     }
 
     public DisplayableItem getDisplayableItem() {

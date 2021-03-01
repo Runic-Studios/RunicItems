@@ -81,13 +81,13 @@ public class RunicItemOffhand extends RunicItem {
     @Override
     public ItemStack generateItem() {
         ItemStack item = super.generateItem();
-        NBTItem nbtItem = new NBTItem(item);
+        NBTItem nbtItem = new NBTItem(item, true);
         int count = 0;
         for (RunicItemStatType statType : this.stats.keySet()) {
             nbtItem.setFloat("stat-" + count + "-" + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
             count++;
         }
-        return nbtItem.getItem();
+        return item;
     }
 
     public static RunicItemOffhand getFromItemStack(ItemStack item) {

@@ -73,10 +73,10 @@ public class RunicItemArtifact extends RunicItemWeapon {
     @Override
     public ItemStack generateItem() {
         ItemStack item = super.generateItem();
-        NBTItem nbtItem = new NBTItem(item);
+        NBTItem nbtItem = new NBTItem(item, true);
         nbtItem.setString("ability-id", this.ability.getIdentifier());
         nbtItem.setString("ability-trigger", this.ability.getTrigger().getIdentifier());
-        return nbtItem.getItem();
+        return item;
     }
 
     public static RunicItemArtifact getFromItemStack(ItemStack item) {
