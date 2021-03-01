@@ -4,6 +4,8 @@ import de.tr7zw.nbtapi.NBTItem;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -15,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -23,8 +26,8 @@ public class DupeManager implements Listener {
 
     public static final int MAX_ITEMS_CLICKED_CACHE_LENGTH = 50;
 
-    public static final long TEXT_CHANNEL_ID = 813580198133628928L;
-    public static final Color EMBED_COLOR = new Color(36, 138, 38);
+    public static final String TEXT_CHANNEL_ID = "813580198133628928";
+    public static final Color EMBED_COLOR = new Color(204, 35, 184);
 
     private static final Map<Player, ConcurrentLinkedQueue<ItemStack>> itemsClicked = new ConcurrentHashMap<>();
 
@@ -40,33 +43,64 @@ public class DupeManager implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getWhoClicked() instanceof Player) {
             final Player player = (Player) event.getWhoClicked();
-            if (event.getCurrentItem() != null) {
-                Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
-                    for (ItemStack itemOne : itemsClicked.get(player)) {
-                        if (checkItemsDuped(itemOne, event.getCurrentItem())) {
-                            player.getInventory().remove(event.getCurrentItem());
-                            channel.sendMessage(new EmbedBuilder()
-                            .setColor(EMBED_COLOR)
-                            .setTitle("Dupe Notification")
-                            .setDescription("Player `"
-                                    + player.getName()
-                                    + "` has attempted to dupe `"
-                                    + event.getCurrentItem().getAmount()
-                                    + "x "
-                                    + getItemName(event.getCurrentItem())
-                                    + "` at "
-                                    + new SimpleDateFormat("dd:MM:yy:HH:mm:ss").format(System.currentTimeMillis()))
-                            .build()).queue();
+            Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
+                final ItemStack currentItem;
+                if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
+                    currentItem = event.getCurrentItem();
+                } else if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
+                    currentItem = event.getCursor();
+                } else {
+                    return;
+                }
+                for (ItemStack itemOne : itemsClicked.get(player)) {
+                    if (itemOne != null && itemOne.getType() != Material.AIR) {
+                        if (checkItemsDuped(itemOne, currentItem)) {
+                            if (channel != null) {
+                                channel.sendMessage(new EmbedBuilder()
+                                        .setColor(EMBED_COLOR)
+                                        .setTitle("Dupe Notification")
+                                        .setDescription("Player `"
+                                                + player.getName()
+                                                + "` has attempted to dupe `"
+                                                + currentItem.getAmount()
+                                                + "x "
+                                                + getItemName(currentItem)
+                                                + "` at "
+                                                + new SimpleDateFormat("MM/dd/yy HH:mm:ss").format(System.currentTimeMillis()))
+                                        .build()).queue();
+                            }
+                            player.getInventory().remove(currentItem);
+                            itemsClicked.get(player).clear();
+                            return;
                         }
                     }
-                    if (!itemsClicked.get(player).contains(event.getCurrentItem())) {
+                }
+                NBTItem nbtCurrentItem = new NBTItem(currentItem);
+                if (nbtCurrentItem.hasNBTData() && nbtCurrentItem.hasKey("id")) {
+                    boolean contains = false;
+                    Iterator<ItemStack> iterator = itemsClicked.get(player).iterator();
+                    while (iterator.hasNext()) {
+                        ItemStack item = iterator.next();
+                        if (item != null && item.getType() != Material.AIR) {
+                            NBTItem nbtItem = new NBTItem(item);
+                            if (nbtItem.hasNBTData()
+                                    && nbtItem.hasKey("id")
+                                    && nbtItem.getInteger("id").equals(nbtCurrentItem.getInteger("id"))) {
+                                contains = true;
+                                break;
+                            }
+                        } else {
+                            itemsClicked.get(player).remove(item);
+                        }
+                    }
+                    if (!contains) {
                         while (itemsClicked.get(player).size() >= MAX_ITEMS_CLICKED_CACHE_LENGTH) {
                             itemsClicked.get(player).remove();
                         }
-                        itemsClicked.get(player).add(event.getCurrentItem());
+                        itemsClicked.get(player).add(currentItem);
                     }
-                });
-            }
+                }
+            });
         }
     }
 
@@ -81,8 +115,8 @@ public class DupeManager implements Listener {
     }
 
     public static boolean checkItemsDuped(ItemStack itemOne, ItemStack itemTwo) {
-        NBTItem nbtItemOne = new NBTItem(itemOne);
-        NBTItem nbtItemTwo = new NBTItem(itemTwo);
+        NBTItem nbtItemOne = new NBTItem(itemOne, true);
+        NBTItem nbtItemTwo = new NBTItem(itemTwo, true);
         if (!nbtItemOne.hasNBTData()) return false;
         if (!nbtItemOne.hasKey("id")) {
             if (nbtItemOne.hasKey("template-id")) {
@@ -115,7 +149,7 @@ public class DupeManager implements Listener {
 
     private static String getItemName(ItemStack item) {
         if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-            return item.getItemMeta().getDisplayName();
+            return ChatColor.stripColor(item.getItemMeta().getDisplayName());
         }
         return item.getType().toString().toLowerCase();
     }

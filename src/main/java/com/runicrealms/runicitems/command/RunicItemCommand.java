@@ -15,7 +15,6 @@ import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import de.tr7zw.nbtapi.NBTItem;
-import de.tr7zw.nbtapi.NBTType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -63,6 +62,7 @@ public class RunicItemCommand extends BaseCommand {
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
         player.getInventory().addItem(item.generateItem());
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dGiven you &5" + count + "x &r" + item.getDisplayableItem().getDisplayName()));
     }
 
     @Subcommand("give")
@@ -83,6 +83,7 @@ public class RunicItemCommand extends BaseCommand {
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
         target.getInventory().addItem(item.generateItem());
+        target.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dGiven you &5" + count + "x &r" + item.getDisplayableItem().getDisplayName()));
     }
 
     @Subcommand("clear|c")
@@ -149,16 +150,17 @@ public class RunicItemCommand extends BaseCommand {
     public void onCommandGetNbt(Player player) {
         ItemStack item = player.getInventory().getItemInMainHand();
         if (item == null || item.getType() == Material.AIR) {
-            player.sendMessage(ChatColor.RED + "You are not holding an item!");
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dYou are not holding an item!"));
             return;
         }
         NBTItem nbtItem = new NBTItem(item);
         if (!nbtItem.hasNBTData()) {
-            player.sendMessage(ChatColor.RED + "The item you are holding doesn't have any NBT data.");
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThe item you are holding doesn't have any NBT data."));
             return;
         }
-        player.sendMessage(ChatColor.GREEN + "Item NBT Data: ");
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dItem NBT Data: "));
         for (String key : nbtItem.getKeys()) {
+            if (!key.equals("displya"))
             switch (nbtItem.getType(key)) {
                 case NBTTagByte:
                     player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getByte(key));
@@ -197,6 +199,30 @@ public class RunicItemCommand extends BaseCommand {
                     player.sendMessage(ChatColor.GREEN + "- " + key + " : unknown type");
                 }
             }
+        }
+    }
+
+    @Subcommand("dupe-item")
+    @Conditions("is-op")
+    public void onCommandDupeItem(Player player) {
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (item == null || item.getType() == Material.AIR) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dYou are not holding an item!"));
+            return;
+        }
+        int slot = -1;
+        for (int i = 0; i < 35; i++) {
+            ItemStack slotItem = player.getInventory().getItem(i);
+            if (slotItem == null || slotItem.getType() == Material.AIR) {
+                slot = i;
+                break;
+            }
+        }
+        if (slot != -1) {
+            player.getInventory().setItem(slot, item);
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dAdded duped item to your inventory!"));
+        } else {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dYou do not have space in your inventory!"));
         }
     }
 

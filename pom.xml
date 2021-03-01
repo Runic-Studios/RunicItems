@@ -160,12 +160,6 @@
             <artifactId>mongodb-driver-sync</artifactId>
             <version>3.12.2</version>
         </dependency>
-        <!-- NBT Api -->
-        <dependency>
-            <groupId>com.github.tr7zw</groupId>
-            <artifactId>Item-NBT-API</artifactId>
-            <version>2.2.0</version>
-        </dependency>
         <!-- Paper API -->
         <dependency>
             <groupId>com.destroystokyo.paper</groupId>
@@ -204,6 +198,14 @@
             <groupId>de.tr7zw</groupId>
             <artifactId>item-nbt-api-plugin</artifactId>
             <version>2.7.1</version>
+        </dependency>
+        <!-- CraftBukkit -->
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>craftbukkit</artifactId>
+            <version>1.16.4</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/craftbukkit-1.16.4.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

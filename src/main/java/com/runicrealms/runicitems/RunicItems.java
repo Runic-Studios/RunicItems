@@ -57,11 +57,11 @@ public class RunicItems extends JavaPlugin {
             JDABuilder builder = JDABuilder.createDefault("ODEzNTc2Nzg4MjI2ODY3MjIx.YDRUbQ.qm2ri55Jj62J0R06MBElc_rm_1M");
             builder.setStatus(OnlineStatus.ONLINE);
             builder.setActivity(Activity.watching("over Runic Realms"));
+            builder.addEventListeners(new RunicItemsJDAListener());
             jda = builder.build();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-
     }
 
     public static RunicItems getInstance() {
