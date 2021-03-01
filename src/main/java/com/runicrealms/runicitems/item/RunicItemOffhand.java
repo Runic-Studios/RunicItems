@@ -103,6 +103,9 @@ public class RunicItemOffhand extends RunicItem {
             }
         }
         List<Pair<RunicItemStatType, RunicItemStat>> statsList = new ArrayList<>(amountOfStats);
+        for (int i = 0; i < amountOfStats; i++) {
+            statsList.add(null);
+        }
         for (String key : keys) {
             String[] split = key.split("-");
             if (split[0].equals("stat")) {

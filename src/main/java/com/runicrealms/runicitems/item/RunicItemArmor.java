@@ -14,6 +14,7 @@ import com.runicrealms.runicitems.item.util.RunicItemClass;
 import com.runicrealms.runicitems.util.ItemIcons;
 import de.tr7zw.nbtapi.NBTItem;
 import javafx.util.Pair;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
@@ -53,13 +54,13 @@ public class RunicItemArmor extends RunicItem {
             }
             return new ItemLoreSection[] {
                     new ItemLoreSection(new String[] {
-                            ChatColor.GRAY + "Required Class: " + ChatColor.WHITE + runicClass.getDisplay(),
+                            ChatColor.GRAY + "Req Class " + ChatColor.WHITE + runicClass.getDisplay(),
                             ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
                             ChatColor.GRAY + "[" + ChatColor.WHITE + gems.size() + ChatColor.GRAY + "/" + ChatColor.WHITE + maxGemSlots + ChatColor.GRAY + "] Gems",
                             rarity.getDisplay()
                     }),
                     new ItemLoreSection(new String[] {
-                            ChatColor.RED + "" + health + ItemIcons.HEART_ICON + " Health"
+                            ChatColor.RED + "" + health + " Health"
                     }),
                     new ItemLoreSection(lore)
             };
@@ -158,10 +159,15 @@ public class RunicItemArmor extends RunicItem {
                 amountOfStats++;
             }
         }
+        Bukkit.broadcastMessage("amount: " + amountOfStats);
         List<Pair<RunicItemStatType, RunicItemStat>> statsList = new ArrayList<>(amountOfStats);
+        for (int i = 0; i < amountOfStats; i++) {
+            statsList.add(null);
+        }
         for (String key : keys) {
             String[] split = key.split("-");
             if (split[0].equals("stat")) {
+                Bukkit.broadcastMessage(Arrays.toString(split) + ", " + split.length);
                 RunicItemStatType statType = RunicItemStatType.getFromIdentifier(split[2]);
                 RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), nbtItem.getFloat(key));
                 statsList.set(Integer.parseInt(split[1]), new Pair<>(statType, stat));
@@ -178,6 +184,9 @@ public class RunicItemArmor extends RunicItem {
             }
         }
         List<List<Pair<RunicItemStatType, Integer>>> gemsList = new ArrayList<>(amountOfGems);
+        for (int i = 0; i < amountOfGems; i++) {
+            gemsList.add(null);
+        }
         for (String key : keys) {
             String[] split = key.split("-");
             if (split[0].equals("gem")) {;

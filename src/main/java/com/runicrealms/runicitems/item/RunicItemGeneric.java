@@ -48,6 +48,4 @@ public class RunicItemGeneric extends RunicItem {
         return new RunicItemGeneric(template, item.getAmount(), nbtItem.getInteger("id"));
     }
 
-    // TODO on click check for generic item then check for triggers
-
 }

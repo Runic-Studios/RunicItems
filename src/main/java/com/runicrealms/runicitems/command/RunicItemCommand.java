@@ -160,7 +160,7 @@ public class RunicItemCommand extends BaseCommand {
         }
         player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dItem NBT Data: "));
         for (String key : nbtItem.getKeys()) {
-            if (!key.equals("displya"))
+            if (!key.equals("display"))
             switch (nbtItem.getType(key)) {
                 case NBTTagByte:
                     player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getByte(key));

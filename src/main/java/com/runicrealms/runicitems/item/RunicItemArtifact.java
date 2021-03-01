@@ -30,7 +30,7 @@ public class RunicItemArtifact extends RunicItemWeapon {
         super(templateId, displayableItem, tags, data, count, id, damageRange, stats, level, rarity, runicClass, () -> {
             ItemLoreSection[] sections = new ItemLoreSection[3 + (stats.size() > 0 ? 1 : 0)];
             sections[0] = new ItemLoreSection(new String[] {
-                    ChatColor.GRAY + "Required Class: " + ChatColor.WHITE + runicClass.getDisplay(),
+                    ChatColor.GRAY + "Req Class " + ChatColor.WHITE + runicClass.getDisplay(),
                     ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
                     rarity.getDisplay()
             });
@@ -92,6 +92,9 @@ public class RunicItemArtifact extends RunicItemWeapon {
             }
         }
         List<Pair<RunicItemStatType, RunicItemStat>> statsList = new ArrayList<>(amountOfStats);
+        for (int i = 0; i < amountOfStats; i++) {
+            statsList.add(null);
+        }
         for (String key : keys) {
             String[] split = key.split("-");
             if (split[0].equals("stat")) {
