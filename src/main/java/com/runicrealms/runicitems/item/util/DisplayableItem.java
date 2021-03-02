@@ -31,7 +31,7 @@ public class DisplayableItem {
         return this.damage;
     }
 
-    public ItemStack generateItem() {
+    public ItemStack generateItem(int count) {
         ItemStack item = new ItemStack(this.material);
         ItemMeta meta = item.getItemMeta();
         if (meta == null) {
@@ -42,6 +42,7 @@ public class DisplayableItem {
         }
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&r" + this.displayName));
         item.setItemMeta(meta);
+        item.setAmount(count);
         return item;
     }
 

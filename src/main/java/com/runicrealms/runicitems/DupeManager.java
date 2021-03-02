@@ -1,5 +1,6 @@
 package com.runicrealms.runicitems;
 
+import com.runicrealms.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -46,32 +47,41 @@ public class DupeManager implements Listener {
             Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
                 final ItemStack currentItem;
                 if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
+                    Bukkit.broadcastMessage("current");
                     currentItem = event.getCurrentItem();
                 } else if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
+                    Bukkit.broadcastMessage("cursor");
                     currentItem = event.getCursor();
                 } else {
                     return;
                 }
                 for (ItemStack itemOne : itemsClicked.get(player)) {
                     if (itemOne != null && itemOne.getType() != Material.AIR) {
-                        if (checkItemsDuped(itemOne, currentItem)) {
-                            if (channel != null) {
-                                channel.sendMessage(new EmbedBuilder()
-                                        .setColor(EMBED_COLOR)
-                                        .setTitle("Dupe Notification")
-                                        .setDescription("Player `"
-                                                + player.getName()
-                                                + "` has attempted to dupe `"
-                                                + currentItem.getAmount()
-                                                + "x "
-                                                + getItemName(currentItem)
-                                                + "` at "
-                                                + new SimpleDateFormat("MM/dd/yy HH:mm:ss").format(System.currentTimeMillis()))
-                                        .build()).queue();
+                        if (itemOne != currentItem) {
+                            if (!NBTUtil.isSimilar(itemOne, currentItem, true, true)) {
+                                if (checkItemsDuped(itemOne, currentItem)) {
+                                    NBTItem nbtItemOne = new NBTItem(itemOne);
+                                    NBTItem nbtItemTwo = new NBTItem(currentItem);
+                                    Bukkit.broadcastMessage("1: " + nbtItemOne.getLong("id") + "," + nbtItemOne.getInteger("last-count") + " 2: " + nbtItemTwo.getLong("id") + "," + nbtItemTwo.getInteger("last-count"));
+                                    if (channel != null) {
+                                        channel.sendMessage(new EmbedBuilder()
+                                                .setColor(EMBED_COLOR)
+                                                .setTitle("Dupe Notification")
+                                                .setDescription("Player `"
+                                                        + player.getName()
+                                                        + "` has attempted to dupe `"
+                                                        + currentItem.getAmount()
+                                                        + "x "
+                                                        + getItemName(currentItem)
+                                                        + "` at "
+                                                        + new SimpleDateFormat("MM/dd/yy HH:mm:ss").format(System.currentTimeMillis())
+                                                ).build()).queue();
+                                    }
+                                    player.getInventory().remove(currentItem);
+                                    itemsClicked.get(player).clear();
+                                    return;
+                                }
                             }
-                            player.getInventory().remove(currentItem);
-                            itemsClicked.get(player).clear();
-                            return;
                         }
                     }
                 }
@@ -82,18 +92,32 @@ public class DupeManager implements Listener {
                     while (iterator.hasNext()) {
                         ItemStack item = iterator.next();
                         if (item != null && item.getType() != Material.AIR) {
-                            NBTItem nbtItem = new NBTItem(item);
-                            if (nbtItem.hasNBTData()
-                                    && nbtItem.hasKey("id")
-                                    && nbtItem.getInteger("id").equals(nbtCurrentItem.getInteger("id"))) {
+                            if ((!contains) && NBTUtil.isSimilar(currentItem, item, true, true)) {
                                 contains = true;
-                                break;
+                                Bukkit.broadcastMessage("contains");
                             }
                         } else {
                             itemsClicked.get(player).remove(item);
                         }
                     }
+//                    boolean contains = false;
+//                    Iterator<ItemStack> iterator = itemsClicked.get(player).iterator();
+//                    while (iterator.hasNext()) {
+//                        ItemStack item = iterator.next();
+//                        if (item != null && item.getType() != Material.AIR) {
+//                            NBTItem nbtItem = new NBTItem(item);
+//                            if (nbtItem.hasNBTData()
+//                                    && nbtItem.hasKey("id")
+//                                    && nbtItem.getInteger("id").equals(nbtCurrentItem.getInteger("id"))) {
+//                                contains = true;
+//                                break;
+//                            }
+//                        } else {
+//                            itemsClicked.get(player).remove(item);
+//                        }
+//                    }
                     if (!contains) {
+                        Bukkit.broadcastMessage("doesn't contain");
                         while (itemsClicked.get(player).size() >= MAX_ITEMS_CLICKED_CACHE_LENGTH) {
                             itemsClicked.get(player).remove();
                         }
@@ -127,6 +151,7 @@ public class DupeManager implements Listener {
         if (!nbtItemOne.hasKey("last-count")) return false;
         if (nbtItemOne.getInteger("last-count") != itemOne.getAmount()) {
             nbtItemOne.setInteger("last-count", itemOne.getAmount());
+            nbtItemOne.setLong("id", getNextItemId());
             return false;
         }
         if (!nbtItemTwo.hasNBTData()) return false;
@@ -139,6 +164,7 @@ public class DupeManager implements Listener {
         if (!nbtItemTwo.hasKey("last-count")) return false;
         if (nbtItemTwo.getInteger("last-count") != itemTwo.getAmount()) {
             nbtItemTwo.setInteger("last-count", itemTwo.getAmount());
+            nbtItemTwo.setLong("id", getNextItemId());
             return false;
         }
         return nbtItemOne.getLong("id").equals(nbtItemTwo.getLong("id"));

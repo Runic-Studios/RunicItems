@@ -74,7 +74,7 @@ public class RunicItemsAPI {
     /**
      * Creates a RunicItem from an ItemStack
      * WARNING: Modifying the RunicItem WILL NOT change the ItemStack! For that you must use RunicItem#generateItem.
-     * WARNING: This method is NOT very efficient (running many NBT checks), if run frequently it should not be on the main thread.
+     * WARNING: This method is NOT very efficient (running many NBT checks), if runs frequently it should not be on the main thread.
      * @param itemStack - ItemStack to read from
      * @return RunicItem
      */

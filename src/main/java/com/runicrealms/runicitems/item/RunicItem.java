@@ -39,7 +39,7 @@ public abstract class RunicItem {
     }
 
     public ItemStack generateItem() {
-        ItemStack item = this.displayableItem.generateItem();
+        ItemStack item = this.displayableItem.generateItem(this.count);
         try {
             ItemLoreSection[] loreSections = this.loreSectionGenerator.call();
             if (loreSections != null && loreSections.length > 0) {
