@@ -4,7 +4,7 @@ import com.runicrealms.runicitems.item.RunicItemArmor;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
-import com.runicrealms.runicitems.item.stats.RunicItemStatType;
+import com.runicrealms.plugin.player.stat.PlayerStatEnum;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
@@ -19,12 +19,12 @@ public class RunicItemArmorTemplate extends RunicItemTemplate {
     private final int level;
     private final RunicItemRarity rarity;
     private final int health;
-    private final LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats;
+    private final LinkedHashMap<PlayerStatEnum, RunicItemStatRange> stats;
     private final int maxGemSlots;
     private final RunicItemClass runicClass;
 
     public RunicItemArmorTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data,
-                                  int health, LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats, int maxGemSlots,
+                                  int health, LinkedHashMap<PlayerStatEnum, RunicItemStatRange> stats, int maxGemSlots,
                                   int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(id, displayableItem, tags, data);
         this.level = level;
@@ -37,15 +37,15 @@ public class RunicItemArmorTemplate extends RunicItemTemplate {
 
     @Override
     public RunicItemArmor generateItem(int count, long id, List<RunicItemTag> tags, Map<String, String> data) {
-        LinkedHashMap<RunicItemStatType, RunicItemStat> rolledStats = new LinkedHashMap<RunicItemStatType, RunicItemStat>();
-        for (Map.Entry<RunicItemStatType, RunicItemStatRange> stat : this.stats.entrySet()) {
+        LinkedHashMap<PlayerStatEnum, RunicItemStat> rolledStats = new LinkedHashMap<PlayerStatEnum, RunicItemStat>();
+        for (Map.Entry<PlayerStatEnum, RunicItemStatRange> stat : this.stats.entrySet()) {
             rolledStats.put(stat.getKey(), new RunicItemStat(stat.getValue()));
         }
         if (tags == null) tags = this.tags;
         if (data == null) data = this.data;
         return new RunicItemArmor(
                 this.id, displayableItem, tags, data, count, id,
-                this.health, rolledStats, new ArrayList<LinkedHashMap<RunicItemStatType, Integer>>(), this.maxGemSlots,
+                this.health, rolledStats, new ArrayList<LinkedHashMap<PlayerStatEnum, Integer>>(), this.maxGemSlots,
                 this.level, this.rarity, this.runicClass
         );
     }
@@ -62,7 +62,7 @@ public class RunicItemArmorTemplate extends RunicItemTemplate {
         return this.health;
     }
 
-    public LinkedHashMap<RunicItemStatType, RunicItemStatRange> getStats() {
+    public LinkedHashMap<PlayerStatEnum, RunicItemStatRange> getStats() {
         return this.stats;
     }
 

@@ -1,7 +1,6 @@
 package com.runicrealms.runicitems.config;
 
 import com.runicrealms.plugin.database.Data;
-import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.RunicItemArmor;
@@ -12,7 +11,7 @@ import com.runicrealms.runicitems.item.RunicItemOffhand;
 import com.runicrealms.runicitems.item.RunicItemWeapon;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
-import com.runicrealms.runicitems.item.stats.RunicItemStatType;
+import com.runicrealms.plugin.player.stat.PlayerStatEnum;
 import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemArtifactTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemBookTemplate;
@@ -37,12 +36,12 @@ public class ItemLoader {
             int count = section.get("count", Integer.class);
             RunicItemTemplate template = TemplateManager.getTemplateFromId(templateId);
             if (template instanceof RunicItemArmorTemplate) {
-                List<LinkedHashMap<RunicItemStatType, Integer>> gems = new ArrayList<LinkedHashMap<RunicItemStatType, Integer>>();
+                List<LinkedHashMap<PlayerStatEnum, Integer>> gems = new ArrayList<>();
                 if (section.has("gems")) {
                     for (String gemKey : section.getSection("gems").getKeys()) {
-                        LinkedHashMap<RunicItemStatType, Integer> gem = new LinkedHashMap<RunicItemStatType, Integer>();
+                        LinkedHashMap<PlayerStatEnum, Integer> gem = new LinkedHashMap<PlayerStatEnum, Integer>();
                         for (String statKey : section.getSection("gems." + gemKey).getKeys()) {
-                            gem.put(RunicItemStatType.getFromIdentifier(statKey), section.get("gems." + gemKey + "." + statKey, Integer.class));
+                            gem.put(PlayerStatEnum.getFromName(statKey), section.get("gems." + gemKey + "." + statKey, Integer.class));
                         }
                         gems.add(gem);
                     }
@@ -51,23 +50,18 @@ public class ItemLoader {
                 return new RunicItemArmor(armorTemplate, count, id, loadStats(section, armorTemplate.getStats()), gems);
             } else if (template instanceof RunicItemArtifactTemplate) {
                 RunicItemArtifactTemplate artifactTemplate = (RunicItemArtifactTemplate) template;
-                RunicItemArtifact item = new RunicItemArtifact(artifactTemplate, count, id, loadStats(section, artifactTemplate.getStats()));
-                return item;
+                return new RunicItemArtifact(artifactTemplate, count, id, loadStats(section, artifactTemplate.getStats()));
             } else if (template instanceof RunicItemBookTemplate) {
                 RunicItemBookTemplate bookTemplate = (RunicItemBookTemplate) template;
-                RunicItemBook item = new RunicItemBook(bookTemplate, count, id);
-                return item;
+                return new RunicItemBook(bookTemplate, count, id);
             } else if (template instanceof RunicItemGenericTemplate) {
-                RunicItemGeneric item = new RunicItemGeneric((RunicItemGenericTemplate) template, count, id);
-                return item;
+                return new RunicItemGeneric((RunicItemGenericTemplate) template, count, id);
             } else if (template instanceof RunicItemOffhandTemplate) {
                 RunicItemOffhandTemplate offhandTemplate = (RunicItemOffhandTemplate) template;
-                RunicItemOffhand item = new RunicItemOffhand(offhandTemplate, count, id, loadStats(section, offhandTemplate.getStats()));
-                return item;
+                return new RunicItemOffhand(offhandTemplate, count, id, loadStats(section, offhandTemplate.getStats()));
             } else if (template instanceof RunicItemWeaponTemplate) {
                 RunicItemWeaponTemplate weaponTemplate = (RunicItemWeaponTemplate) template;
-                RunicItemWeapon item = new RunicItemWeapon(weaponTemplate, count, id, loadStats(section, weaponTemplate.getStats()));
-                return item;
+                return new RunicItemWeapon(weaponTemplate, count, id, loadStats(section, weaponTemplate.getStats()));
             }
         } catch (Exception exception) {
             Bukkit.getLogger().log(Level.INFO, "[RunicItems] Error loading item!");
@@ -77,13 +71,13 @@ public class ItemLoader {
         return null;
     }
 
-    private static LinkedHashMap<RunicItemStatType, RunicItemStat> loadStats(Data section, Map<RunicItemStatType, RunicItemStatRange> templateStats) {
-        LinkedHashMap<RunicItemStatType, RunicItemStat> stats = new LinkedHashMap<RunicItemStatType, RunicItemStat>();
+    private static LinkedHashMap<PlayerStatEnum, RunicItemStat> loadStats(Data section, Map<PlayerStatEnum, RunicItemStatRange> templateStats) {
+        LinkedHashMap<PlayerStatEnum, RunicItemStat> stats = new LinkedHashMap<PlayerStatEnum, RunicItemStat>();
         if (section.has("stats")) {
             Set<String> sectionKeys = section.getSection("stats").getKeys();
-            for (RunicItemStatType templateStatType : templateStats.keySet()) {
-                if (sectionKeys.contains(templateStatType.getIdentifier())) { // Item has stat and has already been rolled (stored in database)
-                    stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType), section.get("stats." + templateStatType.getIdentifier(), Float.class)));
+            for (PlayerStatEnum templateStatType : templateStats.keySet()) {
+                if (sectionKeys.contains(templateStatType.getName())) { // Item has stat and has already been rolled (stored in database)
+                    stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType), section.get("stats." + templateStatType.getName(), Float.class)));
                 } else { // Item has recently been added this stat and the roll does not exist in database, so make a new roll
                     stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType)));
                 }

@@ -4,7 +4,7 @@ import com.runicrealms.plugin.database.Data;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
-import com.runicrealms.runicitems.item.stats.RunicItemStatType;
+import com.runicrealms.plugin.player.stat.PlayerStatEnum;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.template.RunicItemOffhandTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
@@ -19,21 +19,21 @@ import java.util.*;
 
 public class RunicItemOffhand extends RunicItem {
 
-    private final LinkedHashMap<RunicItemStatType, RunicItemStat> stats;
+    private final LinkedHashMap<PlayerStatEnum, RunicItemStat> stats;
     private final int level;
     private final RunicItemRarity rarity;
 
     public RunicItemOffhand(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
-                            LinkedHashMap<RunicItemStatType, RunicItemStat> stats,
+                            LinkedHashMap<PlayerStatEnum, RunicItemStat> stats,
                             int level, RunicItemRarity rarity) {
         super(templateId, displayableItem, tags, data, count, id, () -> {
             List<String> lore = new ArrayList<String>();
-            for (Map.Entry<RunicItemStatType, RunicItemStat> entry : stats.entrySet()) {
+            for (Map.Entry<PlayerStatEnum, RunicItemStat> entry : stats.entrySet()) {
                 lore.add(
-                        entry.getKey().getColor()
+                        entry.getKey().getChatColor()
                                 + (entry.getValue().getValue() < 0 ? "-" : "+")
                                 + entry.getValue().getValue()
-                                + entry.getKey().getSuffix()
+                                + entry.getKey().getName()
                 );
             }
             return new ItemLoreSection[] {
@@ -49,7 +49,7 @@ public class RunicItemOffhand extends RunicItem {
         this.rarity = rarity;
     }
 
-    public RunicItemOffhand(RunicItemOffhandTemplate template, int count, long id, LinkedHashMap<RunicItemStatType, RunicItemStat> stats) {
+    public RunicItemOffhand(RunicItemOffhandTemplate template, int count, long id, LinkedHashMap<PlayerStatEnum, RunicItemStat> stats) {
         this(
                 template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id,
                 stats,
@@ -57,7 +57,7 @@ public class RunicItemOffhand extends RunicItem {
         );
     }
 
-    public LinkedHashMap<RunicItemStatType, RunicItemStat> getStats() {
+    public LinkedHashMap<PlayerStatEnum, RunicItemStat> getStats() {
         return this.stats;
     }
 
@@ -73,8 +73,8 @@ public class RunicItemOffhand extends RunicItem {
     public void addToData(Data section, String root) {
         super.addToData(section, root);
         String dataPrefix = root.equals("") ? "" : root + ".";
-        for (RunicItemStatType statType : this.stats.keySet()) {
-            section.set(dataPrefix + "stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
+        for (PlayerStatEnum statType : this.stats.keySet()) {
+            section.set(dataPrefix + "stats." + statType.getName(), this.stats.get(statType).getRollPercentage());
         }
     }
 
@@ -83,8 +83,8 @@ public class RunicItemOffhand extends RunicItem {
         ItemStack item = super.generateItem();
         NBTItem nbtItem = new NBTItem(item, true);
         int count = 0;
-        for (RunicItemStatType statType : this.stats.keySet()) {
-            nbtItem.setFloat("stat-" + count + "-" + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
+        for (PlayerStatEnum statType : this.stats.keySet()) {
+            nbtItem.setFloat("stat-" + count + "-" + statType.getName(), this.stats.get(statType).getRollPercentage());
             count++;
         }
         return item;
@@ -102,20 +102,20 @@ public class RunicItemOffhand extends RunicItem {
                 amountOfStats++;
             }
         }
-        List<Pair<RunicItemStatType, RunicItemStat>> statsList = new ArrayList<>(amountOfStats);
+        List<Pair<PlayerStatEnum, RunicItemStat>> statsList = new ArrayList<>(amountOfStats);
         for (int i = 0; i < amountOfStats; i++) {
             statsList.add(null);
         }
         for (String key : keys) {
             String[] split = key.split("-");
             if (split[0].equals("stat")) {
-                RunicItemStatType statType = RunicItemStatType.getFromIdentifier(split[2]);
+                PlayerStatEnum statType = PlayerStatEnum.getFromName(split[2]);
                 RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), nbtItem.getFloat(key));
                 statsList.set(Integer.parseInt(split[1]), new Pair<>(statType, stat));
             }
         }
-        LinkedHashMap<RunicItemStatType, RunicItemStat> stats = new LinkedHashMap<>();
-        for (Pair<RunicItemStatType, RunicItemStat> stat : statsList) {
+        LinkedHashMap<PlayerStatEnum, RunicItemStat> stats = new LinkedHashMap<>();
+        for (Pair<PlayerStatEnum, RunicItemStat> stat : statsList) {
             stats.put(stat.getKey(), stat.getValue());
         }
         return new RunicItemOffhand(template, item.getAmount(), nbtItem.getInteger("id"), stats);

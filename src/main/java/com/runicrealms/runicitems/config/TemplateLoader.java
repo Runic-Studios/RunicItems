@@ -5,7 +5,7 @@ import com.runicrealms.runicitems.AbilityManager;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
-import com.runicrealms.runicitems.item.stats.RunicItemStatType;
+import com.runicrealms.plugin.player.stat.PlayerStatEnum;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemArtifactTemplate;
@@ -33,7 +33,7 @@ public class TemplateLoader {
 
     public static void loadTemplates() {
         File folder = new File(RunicItems.getInstance().getDataFolder(), "items");
-        Map<String, RunicItemTemplate> templates = new HashMap<String, RunicItemTemplate>();
+        Map<String, RunicItemTemplate> templates = new HashMap<>();
         for (File file : folder.listFiles()) {
             Bukkit.getLogger().log(Level.INFO, "[RunicItems] Loading template " + file.getName());
             FileConfiguration itemConfig;
@@ -62,7 +62,7 @@ public class TemplateLoader {
                 Material.getMaterial(itemConfig.getString("display.material")),
                 itemConfig.contains("display.damage") ? (short) itemConfig.getInt("display.damage") : 0
         );
-        Map<String, String> data = new HashMap<String, String>();
+        Map<String, String> data = new HashMap<>();
         if (itemConfig.contains("data")) {
             for (String key : itemConfig.getConfigurationSection("data").getKeys(false)) {
                 data.put(key, itemConfig.getString("data." + key));
@@ -111,18 +111,18 @@ public class TemplateLoader {
         return new RunicItemStatRange(itemConfig.getInt("damage.min"), itemConfig.getInt("damage.max"));
     }
 
-    private static LinkedHashMap<RunicItemStatType, RunicItemStatRange> loadStats(FileConfiguration itemConfig) {
+    private static LinkedHashMap<PlayerStatEnum, RunicItemStatRange> loadStats(FileConfiguration itemConfig) {
         if (itemConfig.contains("stats")) {
-            LinkedHashMap<RunicItemStatType, RunicItemStatRange> stats = new LinkedHashMap<RunicItemStatType, RunicItemStatRange>();
+            LinkedHashMap<PlayerStatEnum, RunicItemStatRange> stats = new LinkedHashMap<>();
             for (String key : itemConfig.getConfigurationSection("stats").getKeys(false)) {
-                stats.put(RunicItemStatType.getFromIdentifier(key), new RunicItemStatRange(
+                stats.put(PlayerStatEnum.getFromName(key), new RunicItemStatRange(
                         itemConfig.getInt("stats." + key + ".min"),
                         itemConfig.getInt("stats." + key + ".max")
                 ));
             }
             return stats;
         }
-        return new LinkedHashMap<RunicItemStatType, RunicItemStatRange>();
+        return new LinkedHashMap<PlayerStatEnum, RunicItemStatRange>();
     }
 
     private static Map<ClickTrigger, String> loadTriggers(FileConfiguration itemConfig) {
