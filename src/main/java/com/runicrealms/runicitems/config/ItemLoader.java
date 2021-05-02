@@ -39,7 +39,7 @@ public class ItemLoader {
                 List<LinkedHashMap<PlayerStatEnum, Integer>> gems = new ArrayList<>();
                 if (section.has("gems")) {
                     for (String gemKey : section.getSection("gems").getKeys()) {
-                        LinkedHashMap<PlayerStatEnum, Integer> gem = new LinkedHashMap<PlayerStatEnum, Integer>();
+                        LinkedHashMap<PlayerStatEnum, Integer> gem = new LinkedHashMap<>();
                         for (String statKey : section.getSection("gems." + gemKey).getKeys()) {
                             gem.put(PlayerStatEnum.getFromName(statKey), section.get("gems." + gemKey + "." + statKey, Integer.class));
                         }
@@ -72,7 +72,7 @@ public class ItemLoader {
     }
 
     private static LinkedHashMap<PlayerStatEnum, RunicItemStat> loadStats(Data section, Map<PlayerStatEnum, RunicItemStatRange> templateStats) {
-        LinkedHashMap<PlayerStatEnum, RunicItemStat> stats = new LinkedHashMap<PlayerStatEnum, RunicItemStat>();
+        LinkedHashMap<PlayerStatEnum, RunicItemStat> stats = new LinkedHashMap<>();
         if (section.has("stats")) {
             Set<String> sectionKeys = section.getSection("stats").getKeys();
             for (PlayerStatEnum templateStatType : templateStats.keySet()) {

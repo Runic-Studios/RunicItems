@@ -27,7 +27,7 @@ public class RunicItemOffhand extends RunicItem {
                             LinkedHashMap<PlayerStatEnum, RunicItemStat> stats,
                             int level, RunicItemRarity rarity) {
         super(templateId, displayableItem, tags, data, count, id, () -> {
-            List<String> lore = new ArrayList<String>();
+            List<String> lore = new ArrayList<>();
             for (Map.Entry<PlayerStatEnum, RunicItemStat> entry : stats.entrySet()) {
                 lore.add(
                         entry.getKey().getChatColor()
