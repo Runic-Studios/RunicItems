@@ -27,7 +27,7 @@ public abstract class RunicItem {
 
     protected int count;
 
-    protected List<ItemLoreSection> loreSections = new ArrayList<ItemLoreSection>();
+    protected List<ItemLoreSection> loreSections = new ArrayList<>();
 
     public RunicItem(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id, Callable<ItemLoreSection[]> loreSectionGenerator) {
         this.templateId = templateId;
@@ -57,7 +57,7 @@ public abstract class RunicItem {
         List<String> lore = new ArrayList<>();
         for (ItemLoreSection section : this.loreSections) {
             lore.addAll(section.getLore());
-            if (!section.isEmpty()) {
+            if (!section.isEmpty() && !section.equals(this.loreSections.get(this.loreSections.size() - 1))) { // no space for last section
                 lore.add("");
             }
         }

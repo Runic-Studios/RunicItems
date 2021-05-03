@@ -17,8 +17,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.*;
 
 public class RunicItemArmor extends RunicItem {
@@ -64,10 +62,7 @@ public class RunicItemArmor extends RunicItem {
                             ChatColor.RED + "" + health + "❤"
                     }),
                     new ItemLoreSection(lore),
-                    new ItemLoreSection(new String[]{
-                            "",
-                            rarity.getDisplay()
-                    }),
+                    new ItemLoreSection(Collections.singletonList(rarity.getDisplay())),
             };
         });
         this.rarity = rarity;
@@ -164,7 +159,6 @@ public class RunicItemArmor extends RunicItem {
                 amountOfStats++;
             }
         }
-        Bukkit.broadcastMessage("amount: " + amountOfStats);
         List<Pair<PlayerStatEnum, RunicItemStat>> statsList = new ArrayList<>(amountOfStats);
         for (int i = 0; i < amountOfStats; i++) {
             statsList.add(null);
@@ -174,9 +168,6 @@ public class RunicItemArmor extends RunicItem {
             if (split[0].equals("stat")) {
                 Bukkit.broadcastMessage(Arrays.toString(split) + ", " + split.length);
                 PlayerStatEnum statType = PlayerStatEnum.getFromName(split[2]);
-                DecimalFormat df = new DecimalFormat("#.#");
-                df.setRoundingMode(RoundingMode.CEILING);
-//                Bukkit.broadcastMessage(Double.parseDouble(df.format(nbtItem.getDouble(key))) + "");
                 RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), nbtItem.getDouble(key));
                 statsList.set(Integer.parseInt(split[1]), new Pair<>(statType, stat));
             }
