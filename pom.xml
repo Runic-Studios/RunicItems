@@ -147,6 +147,12 @@
     </repositories>
 
     <dependencies>
+        <!-- ArmorEquip API -->
+        <dependency>
+            <groupId>com.github.Arnuh</groupId>
+            <artifactId>ArmorEquipEvent</artifactId>
+            <version>1.7.1</version>
+        </dependency>
         <!-- Spigot API -->
         <dependency>
             <groupId>org.spigotmc</groupId>

@@ -60,16 +60,16 @@ public class RunicItemsAPI {
         data.save();
     }
 
-    /**
-     * Deserializes an inventory stored in a Data section and applies it to an existing inventory
-     * @param inventory - Inventory to modify
-     * @param data - Data to read from
-     */
-    public static void applyDataToInventory(Inventory inventory, Data data) {
-        for (String key : data.getKeys()) {
-            inventory.setItem(Integer.parseInt(key), ItemLoader.loadItem(data.getSection(key), DupeManager.getNextItemId()).generateItem());
-        }
-    }
+//    /**
+//     * Deserializes an inventory stored in a Data section and applies it to an existing inventory
+//     * @param inventory - Inventory to modify
+//     * @param data - Data to read from
+//     */
+//    public static void applyDataToInventory(Inventory inventory, Data data) {
+//        for (String key : data.getKeys()) {
+//            inventory.setItem(Integer.parseInt(key), ItemLoader.loadItem(data.getSection(key), DupeManager.getNextItemId()).generateItem());
+//        }
+//    }
 
     /**
      * Creates a RunicItem from an ItemStack
