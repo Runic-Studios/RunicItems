@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.UUID;
+
 public class RunicItemsAPI {
 
     /**
@@ -94,20 +96,20 @@ public class RunicItemsAPI {
 
     /**
      * Gets the (cached) added stats from a players armor, weapon and offhand.
-     * @param player - Player to check
+     * @param uuid - UUID of player to check
      * @return AddedPlayerStats
      */
-    public static AddedPlayerStats getAddedPlayerStats(Player player) {
-        return PlayerManager.getCachedPlayerStats().get(player).getTotalStats();
+    public static AddedPlayerStats getAddedPlayerStats(UUID uuid) {
+        return PlayerManager.getCachedPlayerStats().get(uuid).getTotalStats();
     }
 
     /**
      * Gets a list of the cached items (armor, weapon and offhand) that a player is using
-     * @param player - Player to check
+     * @param uuid - UUID of player to check
      * @return PlayerStatHolder
      */
-    public static PlayerStatHolder getCachedPlayerItems(Player player) {
-        return PlayerManager.getCachedPlayerStats().get(player);
+    public static PlayerStatHolder getCachedPlayerItems(UUID uuid) {
+        return PlayerManager.getCachedPlayerStats().get(uuid);
     }
 
 }

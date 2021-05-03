@@ -23,7 +23,7 @@ public class RunicItemStat {
 //    }
 
     public RunicItemStat(RunicItemStatRange range) {
-        this(range, new Random().nextFloat());
+        this(range, new Random().nextDouble());
     }
 
     public RunicItemStatRange getRange() {
