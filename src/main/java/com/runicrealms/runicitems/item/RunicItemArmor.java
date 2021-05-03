@@ -17,6 +17,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.*;
 
 public class RunicItemArmor extends RunicItem {
@@ -36,6 +38,7 @@ public class RunicItemArmor extends RunicItem {
             List<String> lore = new ArrayList<>();
             for (Map.Entry<PlayerStatEnum, RunicItemStat> entry : stats.entrySet()) {
                 int finalValue = entry.getValue().getValue();
+                if (finalValue == 0) continue;
                 for (LinkedHashMap<PlayerStatEnum, Integer> gem : gems) {
                     if (gem.containsKey(entry.getKey())) {
                         finalValue += gem.get(entry.getKey());
@@ -56,12 +59,15 @@ public class RunicItemArmor extends RunicItem {
                             ChatColor.GRAY + "Req Class " + ChatColor.WHITE + runicClass.getDisplay(),
                             ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
                             ChatColor.GRAY + "[" + ChatColor.WHITE + gems.size() + ChatColor.GRAY + "/" + ChatColor.WHITE + maxGemSlots + ChatColor.GRAY + "] Gems",
-                            rarity.getDisplay()
                     }),
                     new ItemLoreSection(new String[] {
-                            ChatColor.RED + "" + health + " Health"
+                            ChatColor.RED + "" + health + "❤"
                     }),
-                    new ItemLoreSection(lore)
+                    new ItemLoreSection(lore),
+                    new ItemLoreSection(new String[]{
+                            "",
+                            rarity.getDisplay()
+                    }),
             };
         });
         this.rarity = rarity;
@@ -131,7 +137,7 @@ public class RunicItemArmor extends RunicItem {
         NBTItem nbtItem = new NBTItem(item, true);
         int count = 0;
         for (PlayerStatEnum statType : this.stats.keySet()) {
-            nbtItem.setFloat("stat-" + count + "-" + statType.getName(), this.stats.get(statType).getRollPercentage());
+            nbtItem.setDouble("stat-" + count + "-" + statType.getName(), this.stats.get(statType).getRollPercentage());
             count++;
         }
         count = 0;
@@ -168,7 +174,10 @@ public class RunicItemArmor extends RunicItem {
             if (split[0].equals("stat")) {
                 Bukkit.broadcastMessage(Arrays.toString(split) + ", " + split.length);
                 PlayerStatEnum statType = PlayerStatEnum.getFromName(split[2]);
-                RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), nbtItem.getFloat(key));
+                DecimalFormat df = new DecimalFormat("#.#");
+                df.setRoundingMode(RoundingMode.CEILING);
+//                Bukkit.broadcastMessage(Double.parseDouble(df.format(nbtItem.getDouble(key))) + "");
+                RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), nbtItem.getDouble(key));
                 statsList.set(Integer.parseInt(split[1]), new Pair<>(statType, stat));
             }
         }

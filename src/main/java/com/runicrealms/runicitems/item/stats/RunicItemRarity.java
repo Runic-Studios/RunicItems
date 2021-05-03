@@ -8,6 +8,8 @@ public enum RunicItemRarity {
     UNCOMMON("uncommon", ChatColor.GREEN + "Uncommmon"),
     RARE("rare", ChatColor.AQUA + "Rare"),
     EPIC("epic", ChatColor.LIGHT_PURPLE + "Epic"),
+    LEGENDARY("legendary", ChatColor.GOLD + "Legendary"),
+    UNIQUE("unique", ChatColor.YELLOW + "Unique"),
     CRAFTED("crafted", ChatColor.WHITE + "Crafted");
 
     private final String identifier;

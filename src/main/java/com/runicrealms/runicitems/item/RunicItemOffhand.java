@@ -84,7 +84,7 @@ public class RunicItemOffhand extends RunicItem {
         NBTItem nbtItem = new NBTItem(item, true);
         int count = 0;
         for (PlayerStatEnum statType : this.stats.keySet()) {
-            nbtItem.setFloat("stat-" + count + "-" + statType.getName(), this.stats.get(statType).getRollPercentage());
+            nbtItem.setDouble("stat-" + count + "-" + statType.getName(), this.stats.get(statType).getRollPercentage());
             count++;
         }
         return item;

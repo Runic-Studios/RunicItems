@@ -6,7 +6,7 @@ import java.util.List;
 
 public class ItemLoreSection {
 
-    private List<String> lore = new ArrayList<String>();
+    private List<String> lore = new ArrayList<>();
 
     public ItemLoreSection(String[] lore) {
         Collections.addAll(this.lore, lore);
@@ -31,7 +31,7 @@ public class ItemLoreSection {
     }
 
     public static ItemLoreSection combine(String separator, ItemLoreSection... loreSections) {
-        List<String> newLore = new ArrayList<String>();
+        List<String> newLore = new ArrayList<>();
         for (ItemLoreSection section : loreSections) {
             newLore.add(separator);
             newLore.addAll(section.getLore());

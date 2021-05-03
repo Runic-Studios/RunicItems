@@ -5,6 +5,7 @@ import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import de.tr7zw.nbtapi.NBTItem;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -53,7 +54,7 @@ public abstract class RunicItem {
             exception.printStackTrace();
         }
         ItemMeta meta = item.getItemMeta();
-        List<String> lore = new ArrayList<String>();
+        List<String> lore = new ArrayList<>();
         for (ItemLoreSection section : this.loreSections) {
             lore.addAll(section.getLore());
             if (!section.isEmpty()) {
@@ -63,6 +64,10 @@ public abstract class RunicItem {
         for (RunicItemTag tag : this.tags) {
             lore.add(tag.getDisplay());
         }
+        // set other flags
+        meta.setUnbreakable(true);
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         meta.setLore(lore);
         item.setItemMeta(meta);
         NBTItem nbtItem = new NBTItem(item, true);

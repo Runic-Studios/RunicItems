@@ -122,11 +122,11 @@ public class TemplateLoader {
             }
             return stats;
         }
-        return new LinkedHashMap<PlayerStatEnum, RunicItemStatRange>();
+        return new LinkedHashMap<>();
     }
 
     private static Map<ClickTrigger, String> loadTriggers(FileConfiguration itemConfig) {
-        Map<ClickTrigger, String> triggers = new HashMap<ClickTrigger, String>();
+        Map<ClickTrigger, String> triggers = new HashMap<>();
         if (itemConfig.contains("triggers")) {
             for (String key : itemConfig.getConfigurationSection("triggers").getKeys(false)) {
                 triggers.put(ClickTrigger.getFromIdentifier(key), itemConfig.getString("triggers." + key));
