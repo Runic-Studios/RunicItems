@@ -1,12 +1,10 @@
 package com.runicrealms.runicitems;
 
 import com.runicrealms.plugin.database.Data;
-import com.runicrealms.runicitems.config.ItemLoader;
 import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
 import com.runicrealms.runicitems.player.AddedPlayerStats;
 import com.runicrealms.runicitems.player.PlayerStatHolder;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 

@@ -1,7 +1,6 @@
 package com.runicrealms.runicitems.item.stats;
 
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class RunicItemStat {
 
@@ -10,17 +9,14 @@ public class RunicItemStat {
     private final int value;
 
     public RunicItemStat(RunicItemStatRange range, double rollPercentage) {
-        this.range = range;
-        this.rollPercentage = rollPercentage;
-        this.value = ThreadLocalRandom.current().nextInt(range.getMin(), range.getMax() + 1);
-        // this(range, rollPercentage, (int) (range.getMin() + (rollPercentage * (range.getMax() - range.getMin()))));
+        this(range, rollPercentage, (int) (range.getMin() + (rollPercentage * (range.getMax() - range.getMin() + 1))));
     }
 
-//    public RunicItemStat(RunicItemStatRange range, double rollPercentage, int roll) {
-//        this.range = range;
-//        this.rollPercentage = rollPercentage;
-//        this.value = roll;
-//    }
+    public RunicItemStat(RunicItemStatRange range, double rollPercentage, int roll) {
+        this.range = range;
+        this.rollPercentage = rollPercentage;
+        this.value = roll;
+    }
 
     public RunicItemStat(RunicItemStatRange range) {
         this(range, new Random().nextDouble());
