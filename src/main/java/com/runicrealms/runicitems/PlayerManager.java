@@ -1,7 +1,6 @@
 package com.runicrealms.runicitems;
 
 import com.codingforcookies.armorequip.ArmorEquipEvent;
-import com.codingforcookies.armorequip.ArmorType;
 import com.runicrealms.plugin.character.api.CharacterLoadEvent;
 import com.runicrealms.runicitems.player.PlayerStatHolder;
 import org.bukkit.Bukkit;
@@ -38,16 +37,10 @@ public class PlayerManager implements Listener {
         UUID uuid = player.getUniqueId();
         if (!cachedPlayerStats.containsKey(uuid)) return;
         if (e.isCancelled()) return;
-        ArmorType armorType = ArmorType.matchType(e.getNewArmorPiece());
-        if (armorType == ArmorType.HELMET) {
-            Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(uuid).updateHelmet());
-        } else if (armorType == ArmorType.CHESTPLATE) {
-            Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(uuid).updateChestplate());
-        } else if (armorType == ArmorType.LEGGINGS) {
-            Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(uuid).updateLeggings());
-        } else if (armorType == ArmorType.BOOTS) {
-            Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(uuid).updateBoots());
-        }
+        Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(uuid).updateHelmet());
+        Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(uuid).updateChestplate());
+        Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(uuid).updateLeggings());
+        Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(uuid).updateBoots());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
