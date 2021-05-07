@@ -31,7 +31,8 @@ public class ItemManager implements Listener {
                 Data data = event.getPlayerCache().getMongoData().getSection("character." + event.getSlot() + ".inventory");
                 for (String key : data.getKeys()) {
                     if (!key.equalsIgnoreCase("type")) {
-                        event.getPlayer().getInventory().setItem(Integer.parseInt(key), ItemLoader.loadItem(data.getSection(key), DupeManager.getNextItemId()).generateItem());
+                        RunicItem item = ItemLoader.loadItem(data.getSection(key), DupeManager.getNextItemId());
+                        if (item != null) event.getPlayer().getInventory().setItem(Integer.parseInt(key), item.generateItem());
                     }
                 }
             }
