@@ -2,6 +2,7 @@ package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
 import com.runicrealms.plugin.player.stat.PlayerStatEnum;
+import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
@@ -53,10 +54,13 @@ public class RunicItemArmor extends RunicItem {
                 );
             }
             return new ItemLoreSection[] {
+                    (maxGemSlots > 0 ?
                     new ItemLoreSection(new String[] {
                             ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
                             ChatColor.GRAY + "[" + ChatColor.WHITE + gems.size() + ChatColor.GRAY + "/" + ChatColor.WHITE + maxGemSlots + ChatColor.GRAY + "] Gems",
-                    }),
+                    }) : new ItemLoreSection(new String[] {
+                            ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
+                    })),
                     new ItemLoreSection(new String[] {
                             ChatColor.RED + "" + health + "❤"
                     }),
@@ -115,14 +119,13 @@ public class RunicItemArmor extends RunicItem {
     @Override
     public void addToData(Data section, String root) {
         super.addToData(section, root);
-        String dataPrefix = root.equals("") ? "" : root + ".";
         for (PlayerStatEnum statType : this.stats.keySet()) {
-            section.set(dataPrefix + "stats." + statType.getName(), this.stats.get(statType).getRollPercentage());
+            section.set(ItemManager.getInventoryPath() + "." + root + ".stats." + statType.getName(), this.stats.get(statType).getRollPercentage());
         }
         int count = 0;
         for (LinkedHashMap<PlayerStatEnum, Integer> gem : this.gems) {
             for (PlayerStatEnum statType : gem.keySet()) {
-                section.set(dataPrefix + "gems." + count + "." + statType, gem.get(statType));
+                section.set(ItemManager.getInventoryPath() + "." + root + ".gems." + count + "." + statType, gem.get(statType));
             }
             count++;
         }
