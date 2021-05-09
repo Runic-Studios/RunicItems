@@ -1,10 +1,12 @@
 package com.runicrealms.runicitems.item.template;
 
+import com.runicrealms.plugin.utilities.ColorUtil;
 import com.runicrealms.runicitems.item.RunicItemGeneric;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.ClickTrigger;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +33,11 @@ public class RunicItemGenericTemplate extends RunicItemTemplate {
     }
 
     public List<String> getLore() {
-        return this.lore;
+        List<String> formattedLore = new ArrayList<>();
+        for (String s : this.lore) {
+            formattedLore.add(ColorUtil.format(s));
+        }
+        return formattedLore;
     }
 
     public Map<ClickTrigger, String> getTriggers() {

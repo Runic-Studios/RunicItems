@@ -55,7 +55,7 @@ public abstract class RunicItem {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        scrapeArmor(item);
+        scrapeArmor(item); // todo: broken
         ItemMeta meta = item.getItemMeta();
         List<String> lore = new ArrayList<>();
         for (ItemLoreSection section : this.loreSections) {

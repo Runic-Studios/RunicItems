@@ -1,22 +1,18 @@
 package com.runicrealms.runicitems;
 
-import com.runicrealms.plugin.api.RunicCoreAPI;
 import com.runicrealms.plugin.character.api.CharacterLoadEvent;
 import com.runicrealms.plugin.database.Data;
 import com.runicrealms.plugin.database.MongoDataSection;
-import com.runicrealms.plugin.database.PlayerMongoData;
 import com.runicrealms.plugin.database.event.CacheSaveEvent;
 import com.runicrealms.runicitems.config.ItemLoader;
 import com.runicrealms.runicitems.item.*;
 import com.runicrealms.runicitems.item.event.RunicItemGenericTriggerEvent;
-import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.template.*;
 import com.runicrealms.runicitems.item.util.ClickTrigger;
 import com.runicrealms.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
