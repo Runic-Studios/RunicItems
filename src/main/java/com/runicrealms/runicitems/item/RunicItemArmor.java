@@ -17,6 +17,7 @@ import javafx.util.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
@@ -134,6 +135,9 @@ public class RunicItemArmor extends RunicItem {
     @Override
     public ItemStack generateItem() {
         ItemStack item = super.generateItem();
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(this.getRarity().getChatColor() + this.getDisplayableItem().getDisplayName()); // apply rarity color
+        item.setItemMeta(meta);
         NBTItem nbtItem = new NBTItem(item, true);
         int count = 0;
         for (PlayerStatEnum statType : this.stats.keySet()) {
