@@ -49,7 +49,7 @@ public class RunicItemWeapon extends RunicItem {
                             ""
                     })),
                     new ItemLoreSection(new String[]{
-                            ChatColor.RED + "+ " + damageRange.getMin() + "-" + damageRange.getMax() + PlayerStatEnum.STRENGTH.getIcon()
+                            ChatColor.RED + "" + damageRange.getMin() + "-" + damageRange.getMax() + " DMG"
                     }),
                     new ItemLoreSection(lore),
                     new ItemLoreSection(new String[]{
