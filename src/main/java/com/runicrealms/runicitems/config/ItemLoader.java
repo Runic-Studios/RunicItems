@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.config;
 
 import com.runicrealms.plugin.database.Data;
+import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.RunicItemArmor;
@@ -11,7 +12,6 @@ import com.runicrealms.runicitems.item.RunicItemOffhand;
 import com.runicrealms.runicitems.item.RunicItemWeapon;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
-import com.runicrealms.plugin.player.stat.PlayerStatEnum;
 import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemArtifactTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemBookTemplate;
@@ -36,12 +36,12 @@ public class ItemLoader {
             int count = section.get("count", Integer.class);
             RunicItemTemplate template = TemplateManager.getTemplateFromId(templateId);
             if (template instanceof RunicItemArmorTemplate) {
-                List<LinkedHashMap<PlayerStatEnum, Integer>> gems = new ArrayList<>();
+                List<LinkedHashMap<Stat, Integer>> gems = new ArrayList<>();
                 if (section.has("gems")) {
                     for (String gemKey : section.getSection("gems").getKeys()) {
-                        LinkedHashMap<PlayerStatEnum, Integer> gem = new LinkedHashMap<>();
+                        LinkedHashMap<Stat, Integer> gem = new LinkedHashMap<>();
                         for (String statKey : section.getSection("gems." + gemKey).getKeys()) {
-                            gem.put(PlayerStatEnum.getFromName(statKey), section.get("gems." + gemKey + "." + statKey, Integer.class));
+                            gem.put(Stat.getFromName(statKey), section.get("gems." + gemKey + "." + statKey, Integer.class));
                         }
                         gems.add(gem);
                     }
@@ -71,11 +71,11 @@ public class ItemLoader {
         return null;
     }
 
-    private static LinkedHashMap<PlayerStatEnum, RunicItemStat> loadStats(Data section, Map<PlayerStatEnum, RunicItemStatRange> templateStats) {
-        LinkedHashMap<PlayerStatEnum, RunicItemStat> stats = new LinkedHashMap<>();
+    private static LinkedHashMap<Stat, RunicItemStat> loadStats(Data section, Map<Stat, RunicItemStatRange> templateStats) {
+        LinkedHashMap<Stat, RunicItemStat> stats = new LinkedHashMap<>();
         if (section.has("stats")) {
             Set<String> sectionKeys = section.getSection("stats").getKeys();
-            for (PlayerStatEnum templateStatType : templateStats.keySet()) {
+            for (Stat templateStatType : templateStats.keySet()) {
                 if (sectionKeys.contains(templateStatType.getName())) { // Item has stat and has already been rolled (stored in database)
                     stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType), section.get("stats." + templateStatType.getName(), Double.class)));
                 } else { // Item has recently been added this stat and the roll does not exist in database, so make a new roll

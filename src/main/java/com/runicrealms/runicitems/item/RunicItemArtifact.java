@@ -1,9 +1,9 @@
 package com.runicrealms.runicitems.item;
 
+import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
-import com.runicrealms.plugin.player.stat.PlayerStatEnum;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
@@ -24,7 +24,7 @@ public class RunicItemArtifact extends RunicItemWeapon {
     private final RunicArtifactAbility ability;
 
     public RunicItemArtifact(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
-                             RunicArtifactAbility ability, RunicItemStatRange damageRange, LinkedHashMap<PlayerStatEnum, RunicItemStat> stats,
+                             RunicArtifactAbility ability, RunicItemStatRange damageRange, LinkedHashMap<Stat, RunicItemStat> stats,
                              int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(templateId, displayableItem, tags, data, count, id, damageRange, stats, level, rarity, runicClass, () -> {
             ItemLoreSection[] sections = new ItemLoreSection[3 + (stats.size() > 0 ? 1 : 0)];
@@ -34,14 +34,14 @@ public class RunicItemArtifact extends RunicItemWeapon {
                     rarity.getDisplay()
             });
             sections[1] = new ItemLoreSection(new String[] {
-                    ChatColor.RED + "+ " + damageRange.getMin() + "-" + damageRange.getMax() + PlayerStatEnum.STRENGTH.getIcon()
+                    ChatColor.RED + "+ " + damageRange.getMin() + "-" + damageRange.getMax() + Stat.STRENGTH.getIcon()
             });
             sections[2] = new ItemLoreSection(new String[] {
                     ability.getTrigger().getDisplay() + " " + ChatColor.RESET + "" + ChatColor.GREEN + ability.getAbilityName(),
                     ChatColor.translateAlternateColorCodes('&', ability.getDescription())
             });
             List<String> lore = new ArrayList<>();
-            for (Map.Entry<PlayerStatEnum, RunicItemStat> entry : stats.entrySet()) {
+            for (Map.Entry<Stat, RunicItemStat> entry : stats.entrySet()) {
                 lore.add(
                         entry.getKey().getChatColor()
                                 + (entry.getValue().getValue() < 0 ? "-" : "+")
@@ -57,7 +57,7 @@ public class RunicItemArtifact extends RunicItemWeapon {
         this.ability = ability;
     }
 
-    public RunicItemArtifact(RunicItemArtifactTemplate template, int count, long id, LinkedHashMap<PlayerStatEnum, RunicItemStat> stats) {
+    public RunicItemArtifact(RunicItemArtifactTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats) {
         this(
                 template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id,
                 template.getAbility(), template.getDamageRange(), stats,
@@ -90,20 +90,20 @@ public class RunicItemArtifact extends RunicItemWeapon {
                 amountOfStats++;
             }
         }
-        List<Pair<PlayerStatEnum, RunicItemStat>> statsList = new ArrayList<>(amountOfStats);
+        List<Pair<Stat, RunicItemStat>> statsList = new ArrayList<>(amountOfStats);
         for (int i = 0; i < amountOfStats; i++) {
             statsList.add(null);
         }
         for (String key : keys) {
             String[] split = key.split("-");
             if (split[0].equals("stat")) {
-                PlayerStatEnum statType = PlayerStatEnum.getFromName(split[2]);
+                Stat statType = Stat.getFromName(split[2]);
                 RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), nbtItem.getFloat(key));
                 statsList.set(Integer.parseInt(split[1]), new Pair<>(statType, stat));
             }
         }
-        LinkedHashMap<PlayerStatEnum, RunicItemStat> stats = new LinkedHashMap<>();
-        for (Pair<PlayerStatEnum, RunicItemStat> stat : statsList) {
+        LinkedHashMap<Stat, RunicItemStat> stats = new LinkedHashMap<>();
+        for (Pair<Stat, RunicItemStat> stat : statsList) {
             stats.put(stat.getKey(), stat.getValue());
         }
         return new RunicItemArtifact(template, item.getAmount(), nbtItem.getInteger("id"), stats);

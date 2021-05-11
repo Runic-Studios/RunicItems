@@ -2,10 +2,10 @@ package com.runicrealms.runicitems.config;
 
 import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.AbilityManager;
+import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
-import com.runicrealms.plugin.player.stat.PlayerStatEnum;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemArtifactTemplate;
@@ -111,11 +111,11 @@ public class TemplateLoader {
         return new RunicItemStatRange(itemConfig.getInt("damage.min"), itemConfig.getInt("damage.max"));
     }
 
-    private static LinkedHashMap<PlayerStatEnum, RunicItemStatRange> loadStats(FileConfiguration itemConfig) {
+    private static LinkedHashMap<Stat, RunicItemStatRange> loadStats(FileConfiguration itemConfig) {
         if (itemConfig.contains("stats")) {
-            LinkedHashMap<PlayerStatEnum, RunicItemStatRange> stats = new LinkedHashMap<>();
+            LinkedHashMap<Stat, RunicItemStatRange> stats = new LinkedHashMap<>();
             for (String key : itemConfig.getConfigurationSection("stats").getKeys(false)) {
-                stats.put(PlayerStatEnum.getFromName(key), new RunicItemStatRange(
+                stats.put(Stat.getFromName(key), new RunicItemStatRange(
                         itemConfig.getInt("stats." + key + ".min"),
                         itemConfig.getInt("stats." + key + ".max")
                 ));

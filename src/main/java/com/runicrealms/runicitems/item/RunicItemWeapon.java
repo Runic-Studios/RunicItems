@@ -1,7 +1,7 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
-import com.runicrealms.plugin.player.stat.PlayerStatEnum;
+import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
@@ -24,17 +24,17 @@ import java.util.concurrent.Callable;
 public class RunicItemWeapon extends RunicItem {
 
     protected final RunicItemStatRange damageRange;
-    protected final LinkedHashMap<PlayerStatEnum, RunicItemStat> stats;
+    protected final LinkedHashMap<Stat, RunicItemStat> stats;
     protected final int level;
     protected final RunicItemRarity rarity;
     protected final RunicItemClass runicClass;
 
     public RunicItemWeapon(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
-                           RunicItemStatRange damageRange, LinkedHashMap<PlayerStatEnum, RunicItemStat> stats,
+                           RunicItemStatRange damageRange, LinkedHashMap<Stat, RunicItemStat> stats,
                            int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(templateId, displayableItem, tags, data, count, id, () -> {
             List<String> lore = new ArrayList<>();
-            for (Map.Entry<PlayerStatEnum, RunicItemStat> entry : stats.entrySet()) {
+            for (Map.Entry<Stat, RunicItemStat> entry : stats.entrySet()) {
                 lore.add(
                         entry.getKey().getChatColor()
                                 + (entry.getValue().getValue() < 0 ? "-" : "+")
@@ -66,7 +66,7 @@ public class RunicItemWeapon extends RunicItem {
     }
 
     public RunicItemWeapon(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
-                           RunicItemStatRange damageRange, LinkedHashMap<PlayerStatEnum, RunicItemStat> stats,
+                           RunicItemStatRange damageRange, LinkedHashMap<Stat, RunicItemStat> stats,
                            int level, RunicItemRarity rarity, RunicItemClass runicClass, Callable<ItemLoreSection[]> loreSectionGenerator) {
         super(templateId, displayableItem, tags, data, count, id, loreSectionGenerator);
         this.damageRange = damageRange;
@@ -76,7 +76,7 @@ public class RunicItemWeapon extends RunicItem {
         this.runicClass = runicClass;
     }
 
-    public RunicItemWeapon(RunicItemWeaponTemplate template, int count, long id, LinkedHashMap<PlayerStatEnum, RunicItemStat> stats) {
+    public RunicItemWeapon(RunicItemWeaponTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats) {
         this(
                 template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id,
                 template.getDamageRange(), stats,
@@ -88,7 +88,7 @@ public class RunicItemWeapon extends RunicItem {
         return this.damageRange;
     }
 
-    public LinkedHashMap<PlayerStatEnum, RunicItemStat> getStats() {
+    public LinkedHashMap<Stat, RunicItemStat> getStats() {
         return stats;
     }
 
@@ -108,7 +108,7 @@ public class RunicItemWeapon extends RunicItem {
     public void addToData(Data section, String root) {
         super.addToData(section, root);
         String dataPrefix = root.equals("") ? "" : root + ".";
-        for (PlayerStatEnum statType : this.stats.keySet()) {
+        for (Stat statType : this.stats.keySet()) {
             section.set(dataPrefix + "stats." + statType.getName(), this.stats.get(statType).getRollPercentage());
         }
     }
@@ -121,7 +121,7 @@ public class RunicItemWeapon extends RunicItem {
         item.setItemMeta(meta);
         NBTItem nbtItem = new NBTItem(item, true);
         int count = 0;
-        for (PlayerStatEnum statType : this.stats.keySet()) {
+        for (Stat statType : this.stats.keySet()) {
             nbtItem.setDouble("stat-" + count + "-" + statType.getName(), this.stats.get(statType).getRollPercentage());
             count++;
         }
@@ -140,20 +140,20 @@ public class RunicItemWeapon extends RunicItem {
                 amountOfStats++;
             }
         }
-        List<Pair<PlayerStatEnum, RunicItemStat>> statsList = new ArrayList<>(amountOfStats);
+        List<Pair<Stat, RunicItemStat>> statsList = new ArrayList<>(amountOfStats);
         for (int i = 0; i < amountOfStats; i++) {
             statsList.add(null);
         }
         for (String key : keys) {
             String[] split = key.split("-");
             if (split[0].equals("stat")) {
-                PlayerStatEnum statType = PlayerStatEnum.getFromName(split[2]);
+                Stat statType = Stat.getFromName(split[2]);
                 RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), nbtItem.getFloat(key));
                 statsList.set(Integer.parseInt(split[1]), new Pair<>(statType, stat));
             }
         }
-        LinkedHashMap<PlayerStatEnum, RunicItemStat> stats = new LinkedHashMap<>();
-        for (Pair<PlayerStatEnum, RunicItemStat> stat : statsList) {
+        LinkedHashMap<Stat, RunicItemStat> stats = new LinkedHashMap<>();
+        for (Pair<Stat, RunicItemStat> stat : statsList) {
             stats.put(stat.getKey(), stat.getValue());
         }
         return new RunicItemWeapon(template, item.getAmount(), nbtItem.getInteger("id"), stats);

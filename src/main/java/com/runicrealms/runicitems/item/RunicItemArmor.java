@@ -1,8 +1,8 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
-import com.runicrealms.plugin.player.stat.PlayerStatEnum;
 import com.runicrealms.runicitems.ItemManager;
+import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
@@ -14,7 +14,6 @@ import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
 import de.tr7zw.nbtapi.NBTItem;
 import javafx.util.Pair;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -26,20 +25,20 @@ public class RunicItemArmor extends RunicItem {
     private final int level;
     private final RunicItemRarity rarity;
     private final int health;
-    private final LinkedHashMap<PlayerStatEnum, RunicItemStat> stats;
-    private final List<LinkedHashMap<PlayerStatEnum, Integer>> gems;
+    private final LinkedHashMap<Stat, RunicItemStat> stats;
+    private final List<LinkedHashMap<Stat, Integer>> gems;
     private final int maxGemSlots;
     private final RunicItemClass runicClass;
 
     public RunicItemArmor(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
-                          int health, LinkedHashMap<PlayerStatEnum, RunicItemStat> stats, List<LinkedHashMap<PlayerStatEnum, Integer>> gems, int maxGemSlots,
+                          int health, LinkedHashMap<Stat, RunicItemStat> stats, List<LinkedHashMap<Stat, Integer>> gems, int maxGemSlots,
                           int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(templateId, displayableItem, tags, data, count, id, () -> {
             List<String> lore = new ArrayList<>();
-            for (Map.Entry<PlayerStatEnum, RunicItemStat> entry : stats.entrySet()) {
+            for (Map.Entry<Stat, RunicItemStat> entry : stats.entrySet()) {
                 int finalValue = entry.getValue().getValue();
                 if (finalValue == 0) continue;
-                for (LinkedHashMap<PlayerStatEnum, Integer> gem : gems) {
+                for (LinkedHashMap<Stat, Integer> gem : gems) {
                     if (gem.containsKey(entry.getKey())) {
                         finalValue += gem.get(entry.getKey());
                     }
@@ -81,7 +80,7 @@ public class RunicItemArmor extends RunicItem {
         this.runicClass = runicClass;
     }
 
-    public RunicItemArmor(RunicItemArmorTemplate template, int count, long id, LinkedHashMap<PlayerStatEnum, RunicItemStat> stats, List<LinkedHashMap<PlayerStatEnum, Integer>> gems) {
+    public RunicItemArmor(RunicItemArmorTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats, List<LinkedHashMap<Stat, Integer>> gems) {
         this(
                 template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id,
                 template.getHealth(), stats, gems, template.getMaxGemSlots(),
@@ -93,11 +92,11 @@ public class RunicItemArmor extends RunicItem {
         return this.health;
     }
 
-    public LinkedHashMap<PlayerStatEnum, RunicItemStat> getStats() {
+    public LinkedHashMap<Stat, RunicItemStat> getStats() {
         return this.stats;
     }
 
-    public List<LinkedHashMap<PlayerStatEnum, Integer>> getGems() {
+    public List<LinkedHashMap<Stat, Integer>> getGems() {
         return this.gems;
     }
 
@@ -120,12 +119,12 @@ public class RunicItemArmor extends RunicItem {
     @Override
     public void addToData(Data section, String root) {
         super.addToData(section, root);
-        for (PlayerStatEnum statType : this.stats.keySet()) {
+        for (Stat statType : this.stats.keySet()) {
             section.set(ItemManager.getInventoryPath() + "." + root + ".stats." + statType.getName(), this.stats.get(statType).getRollPercentage());
         }
         int count = 0;
-        for (LinkedHashMap<PlayerStatEnum, Integer> gem : this.gems) {
-            for (PlayerStatEnum statType : gem.keySet()) {
+        for (LinkedHashMap<Stat, Integer> gem : this.gems) {
+            for (Stat statType : gem.keySet()) {
                 section.set(ItemManager.getInventoryPath() + "." + root + ".gems." + count + "." + statType, gem.get(statType));
             }
             count++;
@@ -140,14 +139,14 @@ public class RunicItemArmor extends RunicItem {
         item.setItemMeta(meta);
         NBTItem nbtItem = new NBTItem(item, true);
         int count = 0;
-        for (PlayerStatEnum statType : this.stats.keySet()) {
+        for (Stat statType : this.stats.keySet()) {
             nbtItem.setDouble("stat-" + count + "-" + statType.getName(), this.stats.get(statType).getRollPercentage());
             count++;
         }
         count = 0;
-        for (LinkedHashMap<PlayerStatEnum, Integer> gem : this.gems) {
+        for (LinkedHashMap<Stat, Integer> gem : this.gems) {
             int count2 = 0;
-            for (PlayerStatEnum statType : this.stats.keySet()) {
+            for (Stat statType : this.stats.keySet()) {
                 nbtItem.setInteger("gem-" + count + "-" + count2 + "-" + statType.getName(), gem.get(statType));
                 count2++;
             }
@@ -168,7 +167,7 @@ public class RunicItemArmor extends RunicItem {
                 amountOfStats++;
             }
         }
-        List<Pair<PlayerStatEnum, RunicItemStat>> statsList = new ArrayList<>(amountOfStats);
+        List<Pair<Stat, RunicItemStat>> statsList = new ArrayList<>(amountOfStats);
         for (int i = 0; i < amountOfStats; i++) {
             statsList.add(null);
         }
@@ -176,13 +175,13 @@ public class RunicItemArmor extends RunicItem {
             String[] split = key.split("-");
             if (split[0].equals("stat")) {
                 //Bukkit.broadcastMessage(Arrays.toString(split) + ", " + split.length);
-                PlayerStatEnum statType = PlayerStatEnum.getFromName(split[2]);
+                Stat statType = Stat.getFromName(split[2]);
                 RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), nbtItem.getDouble(key));
                 statsList.set(Integer.parseInt(split[1]), new Pair<>(statType, stat));
             }
         }
-        LinkedHashMap<PlayerStatEnum, RunicItemStat> stats = new LinkedHashMap<>();
-        for (Pair<PlayerStatEnum, RunicItemStat> stat : statsList) {
+        LinkedHashMap<Stat, RunicItemStat> stats = new LinkedHashMap<>();
+        for (Pair<Stat, RunicItemStat> stat : statsList) {
             stats.put(stat.getKey(), stat.getValue());
         }
         int amountOfGems = 0;
@@ -191,7 +190,7 @@ public class RunicItemArmor extends RunicItem {
                 amountOfGems++;
             }
         }
-        List<List<Pair<PlayerStatEnum, Integer>>> gemsList = new ArrayList<>(amountOfGems);
+        List<List<Pair<Stat, Integer>>> gemsList = new ArrayList<>(amountOfGems);
         for (int i = 0; i < amountOfGems; i++) {
             gemsList.add(null);
         }
@@ -199,7 +198,7 @@ public class RunicItemArmor extends RunicItem {
             String[] split = key.split("-");
             if (split[0].equals("gem")) {;
                 int gemNumber = Integer.parseInt(split[1]);
-                PlayerStatEnum statType = PlayerStatEnum.getFromName(split[3]);
+                Stat statType = Stat.getFromName(split[3]);
                 if (gemsList.get(gemNumber) == null) {
                     int amountOfGemStats = 0;
                     for (String gemKey : keys) {
@@ -210,13 +209,13 @@ public class RunicItemArmor extends RunicItem {
                     }
                     gemsList.set(gemNumber, new ArrayList<>(amountOfGemStats));
                 }
-                gemsList.get(gemNumber).set(Integer.parseInt(split[2]), new Pair<>(PlayerStatEnum.getFromName(split[3]), nbtItem.getInteger(key)));
+                gemsList.get(gemNumber).set(Integer.parseInt(split[2]), new Pair<>(Stat.getFromName(split[3]), nbtItem.getInteger(key)));
             }
         }
-        List<LinkedHashMap<PlayerStatEnum, Integer>> gems = new ArrayList<>();
-        for (List<Pair<PlayerStatEnum, Integer>> gem : gemsList) {
-            LinkedHashMap<PlayerStatEnum, Integer> newGem = new LinkedHashMap<>();
-            for (Pair<PlayerStatEnum, Integer> gemStat : gem) {
+        List<LinkedHashMap<Stat, Integer>> gems = new ArrayList<>();
+        for (List<Pair<Stat, Integer>> gem : gemsList) {
+            LinkedHashMap<Stat, Integer> newGem = new LinkedHashMap<>();
+            for (Pair<Stat, Integer> gemStat : gem) {
                 newGem.put(gemStat.getKey(), gemStat.getValue());
             }
             gems.add(newGem);
