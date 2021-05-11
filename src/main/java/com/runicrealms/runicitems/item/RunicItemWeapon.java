@@ -16,6 +16,7 @@ import de.tr7zw.nbtapi.NBTItem;
 import javafx.util.Pair;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -32,15 +33,6 @@ public class RunicItemWeapon extends RunicItem {
                            RunicItemStatRange damageRange, LinkedHashMap<PlayerStatEnum, RunicItemStat> stats,
                            int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(templateId, displayableItem, tags, data, count, id, () -> {
-            ItemLoreSection[] sections = new ItemLoreSection[2 + (stats.size() > 0 ? 1 : 0)];
-            sections[0] = new ItemLoreSection(new String[]{
-                    ChatColor.GRAY + "Req Class " + ChatColor.WHITE + runicClass.getDisplay(),
-                    ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
-                    rarity.getDisplay()
-            });
-            sections[1] = new ItemLoreSection(new String[]{
-                    ChatColor.RED + "+ " + damageRange.getMin() + "-" + damageRange.getMax() + PlayerStatEnum.STRENGTH.getIcon()
-            });
             List<String> lore = new ArrayList<>();
             for (Map.Entry<PlayerStatEnum, RunicItemStat> entry : stats.entrySet()) {
                 lore.add(
@@ -50,10 +42,21 @@ public class RunicItemWeapon extends RunicItem {
                                 + entry.getKey().getIcon()
                 );
             }
-            if (stats.size() > 0) {
-                sections[2] = new ItemLoreSection(lore);
-            }
-            return sections;
+            return new ItemLoreSection[]{
+                    (level > 0 ? new ItemLoreSection(new String[]{
+                            ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level
+                    }) : new ItemLoreSection(new String[]{
+                            ""
+                    })),
+                    new ItemLoreSection(new String[]{
+                            ChatColor.RED + "+ " + damageRange.getMin() + "-" + damageRange.getMax() + PlayerStatEnum.STRENGTH.getIcon()
+                    }),
+                    new ItemLoreSection(lore),
+                    new ItemLoreSection(new String[]{
+                            rarity.getDisplay(),
+                            ChatColor.GRAY + runicClass.getDisplay()
+                    }),
+            };
         });
         this.damageRange = damageRange;
         this.stats = stats;
@@ -113,6 +116,9 @@ public class RunicItemWeapon extends RunicItem {
     @Override
     public ItemStack generateItem() {
         ItemStack item = super.generateItem();
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(this.getRarity().getChatColor() + this.getDisplayableItem().getDisplayName()); // apply rarity color
+        item.setItemMeta(meta);
         NBTItem nbtItem = new NBTItem(item, true);
         int count = 0;
         for (PlayerStatEnum statType : this.stats.keySet()) {
