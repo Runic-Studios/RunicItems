@@ -175,7 +175,7 @@ public class RunicItemArmor extends RunicItem {
         for (String key : keys) {
             String[] split = key.split("-");
             if (split[0].equals("stat")) {
-                Bukkit.broadcastMessage(Arrays.toString(split) + ", " + split.length);
+                //Bukkit.broadcastMessage(Arrays.toString(split) + ", " + split.length);
                 PlayerStatEnum statType = PlayerStatEnum.getFromName(split[2]);
                 RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), nbtItem.getDouble(key));
                 statsList.set(Integer.parseInt(split[1]), new Pair<>(statType, stat));
