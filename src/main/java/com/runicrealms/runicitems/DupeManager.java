@@ -1,5 +1,7 @@
 package com.runicrealms.runicitems;
 
+import com.runicrealms.plugin.api.RunicCoreAPI;
+import com.runicrealms.runicguilds.gui.GuildBankUtil;
 import com.runicrealms.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -12,16 +14,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class DupeManager implements Listener {
 
@@ -29,8 +26,6 @@ public class DupeManager implements Listener {
 
     public static final String TEXT_CHANNEL_ID = "813580198133628928";
     public static final Color EMBED_COLOR = new Color(204, 35, 184);
-
-    private static final Map<Player, ConcurrentLinkedQueue<ItemStack>> itemsClicked = new ConcurrentHashMap<>();
 
     private static TextChannel channel;
 
@@ -40,102 +35,29 @@ public class DupeManager implements Listener {
         channel = RunicItems.getJda().getTextChannelById(TEXT_CHANNEL_ID);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getWhoClicked() instanceof Player) {
             final Player player = (Player) event.getWhoClicked();
+            if (RunicCoreAPI.getPlayerCache(player) == null) return;
             Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
                 final ItemStack currentItem;
+                final CurrentItemType type;
                 if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
                     Bukkit.broadcastMessage("current");
                     currentItem = event.getCurrentItem();
+                    type = CurrentItemType.CURRENT;
                 } else if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
                     Bukkit.broadcastMessage("cursor");
                     currentItem = event.getCursor();
-                } else {
-                    return;
+                    type = CurrentItemType.CURSOR;
+                } else return;
+                if (GuildBankUtil.isViewingBank(player.getUniqueId())) {
+                    checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player);
                 }
-                for (ItemStack itemOne : itemsClicked.get(player)) {
-                    if (itemOne != null && itemOne.getType() != Material.AIR) {
-                        if (itemOne != currentItem) {
-                            if (!NBTUtil.isSimilar(itemOne, currentItem, true, true)) {
-                                if (checkItemsDuped(itemOne, currentItem)) {
-                                    NBTItem nbtItemOne = new NBTItem(itemOne);
-                                    NBTItem nbtItemTwo = new NBTItem(currentItem);
-                                    Bukkit.broadcastMessage("1: " + nbtItemOne.getLong("id") + "," + nbtItemOne.getInteger("last-count") + " 2: " + nbtItemTwo.getLong("id") + "," + nbtItemTwo.getInteger("last-count"));
-                                    if (channel != null) {
-                                        channel.sendMessage(new EmbedBuilder()
-                                                .setColor(EMBED_COLOR)
-                                                .setTitle("Dupe Notification")
-                                                .setDescription("Player `"
-                                                        + player.getName()
-                                                        + "` has attempted to dupe `"
-                                                        + currentItem.getAmount()
-                                                        + "x "
-                                                        + getItemName(currentItem)
-                                                        + "` at "
-                                                        + new SimpleDateFormat("MM/dd/yy HH:mm:ss").format(System.currentTimeMillis())
-                                                ).build()).queue();
-                                    }
-                                    player.getInventory().remove(currentItem);
-                                    itemsClicked.get(player).clear();
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }
-                NBTItem nbtCurrentItem = new NBTItem(currentItem);
-                if (nbtCurrentItem.hasNBTData() && nbtCurrentItem.hasKey("id")) {
-                    boolean contains = false;
-                    Iterator<ItemStack> iterator = itemsClicked.get(player).iterator();
-                    while (iterator.hasNext()) {
-                        ItemStack item = iterator.next();
-                        if (item != null && item.getType() != Material.AIR) {
-                            if ((!contains) && NBTUtil.isSimilar(currentItem, item, true, true)) {
-                                contains = true;
-                                Bukkit.broadcastMessage("contains");
-                            }
-                        } else {
-                            itemsClicked.get(player).remove(item);
-                        }
-                    }
-//                    boolean contains = false;
-//                    Iterator<ItemStack> iterator = itemsClicked.get(player).iterator();
-//                    while (iterator.hasNext()) {
-//                        ItemStack item = iterator.next();
-//                        if (item != null && item.getType() != Material.AIR) {
-//                            NBTItem nbtItem = new NBTItem(item);
-//                            if (nbtItem.hasNBTData()
-//                                    && nbtItem.hasKey("id")
-//                                    && nbtItem.getInteger("id").equals(nbtCurrentItem.getInteger("id"))) {
-//                                contains = true;
-//                                break;
-//                            }
-//                        } else {
-//                            itemsClicked.get(player).remove(item);
-//                        }
-//                    }
-                    if (!contains) {
-                        Bukkit.broadcastMessage("doesn't contain");
-                        while (itemsClicked.get(player).size() >= MAX_ITEMS_CLICKED_CACHE_LENGTH) {
-                            itemsClicked.get(player).remove();
-                        }
-                        itemsClicked.get(player).add(currentItem);
-                    }
-                }
+                checkInventoryForDupes(player.getInventory(), currentItem, type, event, player);
             });
         }
-    }
-
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        itemsClicked.put(event.getPlayer(), new ConcurrentLinkedQueue<>());
-    }
-
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        itemsClicked.remove(event.getPlayer());
     }
 
     public static boolean checkItemsDuped(ItemStack itemOne, ItemStack itemTwo) {
@@ -178,6 +100,59 @@ public class DupeManager implements Listener {
             return ChatColor.stripColor(item.getItemMeta().getDisplayName());
         }
         return item.getType().toString().toLowerCase();
+    }
+
+    private static boolean checkInventoryForDupes(Inventory inventory, ItemStack currentItem, CurrentItemType type, InventoryClickEvent event, Player player) {
+        int ignoreSlot = -1;
+        if (type != CurrentItemType.CURSOR) {
+            for (int i = 0; i < inventory.getSize(); i++) {
+                ItemStack item = inventory.getItem(i);
+                if (item != null && item.getType() != Material.AIR && item.getAmount() == currentItem.getAmount()) {
+                    if (NBTUtil.isNBTSimilar(item, currentItem, true, true)) {
+                        ignoreSlot = i;
+                        break; // We only want to remove once!!!
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < inventory.getSize(); i++) {
+            ItemStack item = inventory.getItem(i);
+            if (item != null && item.getType() != Material.AIR && item != currentItem && i != ignoreSlot) {
+                if (checkItemsDuped(item, currentItem)) {
+                    NBTItem nbtItemOne = new NBTItem(item);
+                    NBTItem nbtItemTwo = new NBTItem(currentItem);
+                    Bukkit.broadcastMessage("1: " + nbtItemOne.getLong("id") + "," + nbtItemOne.getInteger("last-count") + " 2: " + nbtItemTwo.getLong("id") + "," + nbtItemTwo.getInteger("last-count"));
+                    if (channel != null) {
+                        channel.sendMessage(new EmbedBuilder()
+                                .setColor(EMBED_COLOR)
+                                .setTitle("Dupe Notification")
+                                .setDescription("Player `"
+                                        + player.getName()
+                                        + "` has attempted to dupe `"
+                                        + currentItem.getAmount()
+                                        + "x "
+                                        + getItemName(currentItem)
+                                        + "` at "
+                                        + new SimpleDateFormat("MM/dd/yy HH:mm:ss").format(System.currentTimeMillis())
+                                ).build()).queue();
+                    }
+                    type.deleteItem(event);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private enum CurrentItemType {
+        CURRENT, CURSOR;
+
+        void deleteItem(InventoryClickEvent event) {
+            switch (this) {
+                case CURSOR: event.setCursor(null);
+                case CURRENT: event.setCurrentItem(null);
+            }
+        }
     }
 
 }

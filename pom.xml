@@ -213,5 +213,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/../lib/craftbukkit-1.16.4.jar</systemPath>
         </dependency>
+        <!-- RunicGuilds -->
+        <dependency>
+            <groupId>com.runicrealms.runicguilds</groupId>
+            <artifactId>RunicGuilds</artifactId>
+            <version>1.16.4</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../lib/RunicGuilds-1.16.4.jar</systemPath>
+        </dependency>
     </dependencies>
 </project>

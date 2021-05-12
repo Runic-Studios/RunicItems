@@ -1,16 +1,18 @@
 package com.runicrealms.runicitems.util;
 
 import de.tr7zw.nbtapi.NBTItem;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 public class NBTUtil {
 
     public static Object getNBTObject(NBTItem nbtItem, String key) {
-        if (!nbtItem.hasNBTData() || nbtItem.hasKey(key)) throw new IllegalArgumentException("NBTItem does not contain key \"" + key + "\"!");
+        if (!nbtItem.hasNBTData() || !nbtItem.hasKey(key)) throw new IllegalArgumentException("NBTItem does not contain key \"" + key + "\"!");
         switch (nbtItem.getType(key)) {
             case NBTTagByte:
                 return nbtItem.getByte(key);
@@ -39,7 +41,7 @@ public class NBTUtil {
         }
     }
 
-    public static boolean isSimilar(ItemStack itemOne, ItemStack itemTwo, boolean checkId, boolean checkLastCount) {
+    public static boolean isNBTSimilar(ItemStack itemOne, ItemStack itemTwo, boolean checkId, boolean checkLastCount) {
         if (itemOne.getType() != itemTwo.getType()) return false;
         if (itemOne.getItemMeta() instanceof Damageable && itemTwo.getItemMeta() instanceof Damageable) {
             if (((Damageable) itemOne.getItemMeta()).getDamage() != ((Damageable) itemTwo.getItemMeta()).getDamage()) return false;
@@ -48,14 +50,30 @@ public class NBTUtil {
         NBTItem nbtItemTwo = new NBTItem(itemTwo);
         Set<String> keys = new HashSet<>(nbtItemOne.getKeys());
         keys.addAll(nbtItemTwo.getKeys());
-        if (!checkId) keys.remove("id");
-        if (!checkLastCount) keys.remove("last-count");
+        if (!checkId) {
+            keys.remove("id");
+        }
+        if (!checkLastCount) {
+            keys.remove("last-count");
+        }
+        keys.remove("Unbreakable");
+        keys.remove("HideFlags");
+        keys.remove("display");
         try {
             for (String key : keys) {
-                if (!nbtItemOne.hasKey(key) || !nbtItemTwo.hasKey(key)) return false;
-                if (getNBTObject(nbtItemOne, key) != getNBTObject(nbtItemTwo, key)) return false;
+                if (
+                        !nbtItemOne.hasKey(key) ||
+                                !nbtItemTwo.hasKey(key)) {
+                    return false;
+                }
+                Object obj1 = getNBTObject(nbtItemOne, key);
+                Object obj2 = getNBTObject(nbtItemTwo, key);
+                if (obj1 != obj2 && !obj1.equals(obj2)) {
+                    return false;
+                }
             }
         } catch (Exception exception) {
+            exception.printStackTrace();
             return false;
         }
         return true;
