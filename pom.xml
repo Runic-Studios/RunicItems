@@ -221,5 +221,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/../lib/RunicGuilds-1.16.4.jar</systemPath>
         </dependency>
+        <!-- RunicBank -->
+        <dependency>
+            <groupId>com.runicrealms.runicbank</groupId>
+            <artifactId>RunicBank</artifactId>
+            <version>1.16.4</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../lib/RunicBank-1.16.4.jar</systemPath>
+        </dependency>
     </dependencies>
 </project>

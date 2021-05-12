@@ -94,18 +94,15 @@ public class ItemManager implements Listener {
             if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) return;
             if (NBTUtil.isNBTSimilar(event.getCurrentItem(), event.getCursor(), false, false)) {
                 if (event.getCurrentItem().getAmount() == event.getCurrentItem().getMaxStackSize()) {
-                    //Bukkit.broadcastMessage("1");
                     ItemStack currentItem = event.getCurrentItem();
                     event.setCurrentItem(event.getCursor());
                     event.setCursor(currentItem);
                 } else if (event.getCurrentItem().getAmount() + event.getCursor().getAmount() == event.getCurrentItem().getMaxStackSize()) {
-                    //Bukkit.broadcastMessage("2");
                     ItemStack item = event.getCurrentItem();
                     item.setAmount(event.getCurrentItem().getMaxStackSize());
                     event.setCurrentItem(item);
                     event.setCursor(null);
                 } else if (event.getCurrentItem().getAmount() + event.getCursor().getAmount() > event.getCurrentItem().getMaxStackSize()) {
-                    //Bukkit.broadcastMessage("3");
                     ItemStack cursorItem = event.getCursor();
                     cursorItem.setAmount(event.getCursor().getAmount() - (event.getCurrentItem().getMaxStackSize() - event.getCurrentItem().getAmount()));
                     ItemStack currentItem = event.getCurrentItem();
@@ -113,7 +110,6 @@ public class ItemManager implements Listener {
                     event.setCursor(cursorItem);
                     event.setCurrentItem(currentItem);
                 } else if (event.getCurrentItem().getAmount() + event.getCursor().getAmount() < event.getCurrentItem().getMaxStackSize()) {
-                    //Bukkit.broadcastMessage("4");
                     ItemStack item = event.getCurrentItem();
                     item.setAmount(item.getAmount() + event.getCursor().getAmount());
                     event.setCurrentItem(item);

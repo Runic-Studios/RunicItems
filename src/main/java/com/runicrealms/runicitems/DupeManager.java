@@ -1,5 +1,6 @@
 package com.runicrealms.runicitems;
 
+import com.runicrealms.plugin.api.RunicBankAPI;
 import com.runicrealms.plugin.api.RunicCoreAPI;
 import com.runicrealms.runicguilds.gui.GuildBankUtil;
 import com.runicrealms.runicitems.util.NBTUtil;
@@ -44,15 +45,16 @@ public class DupeManager implements Listener {
                 final ItemStack currentItem;
                 final CurrentItemType type;
                 if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
-                    Bukkit.broadcastMessage("current");
                     currentItem = event.getCurrentItem();
                     type = CurrentItemType.CURRENT;
                 } else if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
-                    Bukkit.broadcastMessage("cursor");
                     currentItem = event.getCursor();
                     type = CurrentItemType.CURSOR;
                 } else return;
                 if (GuildBankUtil.isViewingBank(player.getUniqueId())) {
+                    checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player);
+                }
+                if (RunicBankAPI.isViewingBank(player)) {
                     checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player);
                 }
                 checkInventoryForDupes(player.getInventory(), currentItem, type, event, player);
@@ -121,7 +123,6 @@ public class DupeManager implements Listener {
                 if (checkItemsDuped(item, currentItem)) {
                     NBTItem nbtItemOne = new NBTItem(item);
                     NBTItem nbtItemTwo = new NBTItem(currentItem);
-                    Bukkit.broadcastMessage("1: " + nbtItemOne.getLong("id") + "," + nbtItemOne.getInteger("last-count") + " 2: " + nbtItemTwo.getLong("id") + "," + nbtItemTwo.getInteger("last-count"));
                     if (channel != null) {
                         channel.sendMessage(new EmbedBuilder()
                                 .setColor(EMBED_COLOR)
