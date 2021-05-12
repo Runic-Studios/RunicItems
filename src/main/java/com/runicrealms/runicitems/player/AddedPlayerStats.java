@@ -1,23 +1,23 @@
 package com.runicrealms.runicitems.player;
 
-import com.runicrealms.plugin.player.stat.PlayerStatEnum;
+import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
 
 import java.util.Map;
 
 public class AddedPlayerStats {
 
-    private Map<PlayerStatEnum, Integer> addedStats;
+    private Map<Stat, Integer> addedStats;
     private int addedHealth;
     private RunicArtifactAbility ability;
 
-    public AddedPlayerStats(Map<PlayerStatEnum, Integer> addedStats, int addedHealth, RunicArtifactAbility ability) {
+    public AddedPlayerStats(Map<Stat, Integer> addedStats, int addedHealth, RunicArtifactAbility ability) {
         this.addedStats = addedStats;
         this.addedHealth = addedHealth;
         this.ability = ability;
     }
 
-    public Map<PlayerStatEnum, Integer> getAddedStats() {
+    public Map<Stat, Integer> getAddedStats() {
         return addedStats;
     }
 
@@ -29,7 +29,7 @@ public class AddedPlayerStats {
         return ability;
     }
 
-    public void setAddedStats(Map<PlayerStatEnum, Integer> addedStats) {
+    public void setAddedStats(Map<Stat, Integer> addedStats) {
         this.addedStats = addedStats;
     }
 

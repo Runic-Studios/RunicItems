@@ -1,6 +1,8 @@
 package com.runicrealms.runicitems.item;
 
+import com.runicrealms.plugin.attributes.AttributeUtil;
 import com.runicrealms.plugin.database.Data;
+import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
@@ -53,6 +55,7 @@ public abstract class RunicItem {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+        scrapeArmor(item); // todo: broken
         ItemMeta meta = item.getItemMeta();
         List<String> lore = new ArrayList<>();
         for (ItemLoreSection section : this.loreSections) {
@@ -83,6 +86,17 @@ public abstract class RunicItem {
         return item;
     }
 
+    /**
+     * Removes the default 'armor' values from items so they don't display above hotbar.
+     * @param item an ItemStack (from RunicItemArmor)
+     */
+    private void scrapeArmor(ItemStack item) {
+        AttributeUtil.addGenericStat(item, "generic.armor", 0, "head");
+        AttributeUtil.addGenericStat(item, "generic.armor", 0, "chest");
+        AttributeUtil.addGenericStat(item, "generic.armor", 0, "legs");
+        AttributeUtil.addGenericStat(item, "generic.armor", 0, "feet");
+    }
+
     public DisplayableItem getDisplayableItem() {
         return this.displayableItem;
     }
@@ -108,16 +122,15 @@ public abstract class RunicItem {
     }
 
     public void addToData(Data section, String root) {
-        String dataPrefix = root.equals("") ? "" : root + ".";
-        section.set(dataPrefix + "template-id", this.templateId);
-        section.set(dataPrefix + "count", this.count);
+        section.set(ItemManager.getInventoryPath() + "." + root + ".template-id", this.templateId);
+        section.set(ItemManager.getInventoryPath() + "." + root + ".count", this.count);
         int count = 0;
         for (RunicItemTag tag : this.tags) {
-            section.set(dataPrefix + "tags." + count, tag.getIdentifier());
+            section.set(ItemManager.getInventoryPath() + "." + root + ".tags." + count, tag.getIdentifier());
             count++;
         }
         for (String dataKey : this.data.keySet()) {
-            section.set(dataPrefix + "data." + dataKey, this.data.get(dataKey));
+            section.set(ItemManager.getInventoryPath() + "." + root + ".data." + dataKey, this.data.get(dataKey));
         }
     }
 

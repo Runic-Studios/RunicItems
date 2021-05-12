@@ -24,9 +24,11 @@ import org.bukkit.inventory.ItemStack;
 
 public class ItemManager implements Listener {
 
+    private static final String INVENTORY_PATH = "inventory";
+
     @EventHandler
     public void onCharacterJoin(CharacterLoadEvent event) {
-        if (RunicItems.isDatabaseLoadingEnabled()) {
+        //if (RunicItems.isDatabaseLoadingEnabled()) {
             if (event.getPlayerCache().getMongoData().has("character." + event.getSlot() + ".inventory")) {
                 Data data = event.getPlayerCache().getMongoData().getSection("character." + event.getSlot() + ".inventory");
                 for (String key : data.getKeys()) {
@@ -36,31 +38,27 @@ public class ItemManager implements Listener {
                     }
                 }
             }
-        }
+        //}
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onCacheSave(CacheSaveEvent event) {
-        if (RunicItems.isDatabaseLoadingEnabled()) {
-            if (!event.getMongoDataSection().has("inventory")) {
-                event.getMongoDataSection().set("inventory.type", "runicitems");
-                event.getMongoDataSection().save();
-            }
-            MongoDataSection inventorySection = event.getMongoDataSection().getSection("inventory");
-            for (String key : inventorySection.getKeys()) {
-                inventorySection.remove(key);
-            }
-            event.getMongoDataSection().save();
-            ItemStack[] contents = event.getPlayer().getInventory().getContents();
-            for (int i = 0; i < contents.length; i++) {
-                if (contents[i] != null) {
-                    RunicItem runicItem = getRunicItemFromItemStack(contents[i]);
-                    if (runicItem != null) {
-                        runicItem.addToData(inventorySection, i + "");
-                    }
+        //if (RunicItems.isDatabaseLoadingEnabled()) {
+        ItemStack[] contents = event.getPlayer().getInventory().getContents();
+        MongoDataSection character = event.getMongoDataSection();
+        character.remove(INVENTORY_PATH); // removes all stored inventory stuffs
+        character.set(INVENTORY_PATH + ".type", "runicitems");
+        character.save();
+        for (int i = 0; i < contents.length; i++) {
+            if (contents[i] != null) {
+                RunicItem runicItem = getRunicItemFromItemStack(contents[i]);
+                if (runicItem != null) {
+                    runicItem.addToData(character, i + "");
                 }
             }
         }
+        character.save();
+        //}
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -146,4 +144,7 @@ public class ItemManager implements Listener {
         return null;
     }
 
+    public static String getInventoryPath() {
+        return INVENTORY_PATH;
+    }
 }

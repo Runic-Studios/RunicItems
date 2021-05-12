@@ -13,7 +13,7 @@ import java.util.Map;
 public class AbilityLoader {
 
     public static void loadAbilities() {
-        Map<String, RunicArtifactAbility> abilities = new HashMap<String, RunicArtifactAbility>();
+        Map<String, RunicArtifactAbility> abilities = new HashMap<>();
         File file = new File(RunicItems.getInstance().getDataFolder(), "abilities.yml");
         if (file.exists()) {
             FileConfiguration abilityConfig = ConfigUtil.getYamlConfigFile(file.getName(), RunicItems.getInstance().getDataFolder());

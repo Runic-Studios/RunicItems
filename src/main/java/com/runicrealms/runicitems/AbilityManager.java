@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class AbilityManager {
 
-    private static Map<String, RunicArtifactAbility> abilities = new HashMap<String, RunicArtifactAbility>();
+    private static Map<String, RunicArtifactAbility> abilities = new HashMap<>();
 
     public static void setAbilities(Map<String, RunicArtifactAbility> abilities) {
         AbilityManager.abilities = abilities;

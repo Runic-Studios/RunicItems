@@ -1,7 +1,7 @@
 package com.runicrealms.runicitems.player;
 
-import com.runicrealms.plugin.player.stat.PlayerStatEnum;
 import com.runicrealms.runicitems.ItemManager;
+import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.item.*;
 import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
 import org.bukkit.Bukkit;
@@ -33,11 +33,11 @@ public class PlayerStatHolder {
     }
 
     public AddedPlayerStats getTotalStats() {
-        Map<PlayerStatEnum, Integer> stats = new HashMap<>();
+        Map<Stat, Integer> stats = new HashMap<>();
         RunicArtifactAbility ability = null;
         int health = 0;
         if (this.helmet != null) {
-            for (PlayerStatEnum statType : this.helmet.getStats().keySet()) {
+            for (Stat statType : this.helmet.getStats().keySet()) {
                 if (stats.containsKey(statType)) {
                     stats.put(statType, stats.get(statType) + this.helmet.getStats().get(statType).getValue());
                 } else {
@@ -47,7 +47,7 @@ public class PlayerStatHolder {
             health += this.helmet.getHealth();
         }
         if (this.chestplate != null) {
-            for (PlayerStatEnum statType : this.chestplate.getStats().keySet()) {
+            for (Stat statType : this.chestplate.getStats().keySet()) {
                 if (stats.containsKey(statType)) {
                     stats.put(statType, stats.get(statType) + this.chestplate.getStats().get(statType).getValue());
                 } else {
@@ -57,7 +57,7 @@ public class PlayerStatHolder {
             health += this.chestplate.getHealth();
         }
         if (this.leggings != null) {
-            for (PlayerStatEnum statType : this.leggings.getStats().keySet()) {
+            for (Stat statType : this.leggings.getStats().keySet()) {
                 if (stats.containsKey(statType)) {
                     stats.put(statType, stats.get(statType) + this.leggings.getStats().get(statType).getValue());
                 } else {
@@ -67,7 +67,7 @@ public class PlayerStatHolder {
             health += this.leggings.getHealth();
         }
         if (this.boots != null) {
-            for (PlayerStatEnum statType : this.boots.getStats().keySet()) {
+            for (Stat statType : this.boots.getStats().keySet()) {
                 if (stats.containsKey(statType)) {
                     stats.put(statType, stats.get(statType) + this.boots.getStats().get(statType).getValue());
                 } else {
@@ -77,7 +77,7 @@ public class PlayerStatHolder {
             health += this.boots.getHealth();
         }
         if (this.offhand != null) {
-            for (PlayerStatEnum statType : this.offhand.getStats().keySet()) {
+            for (Stat statType : this.offhand.getStats().keySet()) {
                 if (stats.containsKey(statType)) {
                     stats.put(statType, stats.get(statType) + this.offhand.getStats().get(statType).getValue());
                 } else {
@@ -86,7 +86,7 @@ public class PlayerStatHolder {
             }
         }
         if (this.weapon != null) {
-            for (PlayerStatEnum statType : this.weapon.getStats().keySet()) {
+            for (Stat statType : this.weapon.getStats().keySet()) {
                 if (stats.containsKey(statType)) {
                     stats.put(statType, stats.get(statType) + this.weapon.getStats().get(statType).getValue());
                 } else {
