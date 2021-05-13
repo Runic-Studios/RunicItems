@@ -2,6 +2,7 @@ package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.attributes.AttributeUtil;
 import com.runicrealms.plugin.database.Data;
+import com.runicrealms.plugin.utilities.ColorUtil;
 import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
@@ -59,7 +60,9 @@ public abstract class RunicItem {
         ItemMeta meta = item.getItemMeta();
         List<String> lore = new ArrayList<>();
         for (ItemLoreSection section : this.loreSections) {
-            lore.addAll(section.getLore());
+            for (String s : section.getLore()) {
+                lore.add(ColorUtil.format(s));
+            }
             if (!section.isEmpty() && !section.equals(this.loreSections.get(this.loreSections.size() - 1))) { // no space for last section
                 lore.add("");
             }
