@@ -183,7 +183,7 @@ public class PlayerStatHolder {
     }
 
     public void updateOffhand() {
-        if (this.player.getInventory().getItemInOffHand() != null && this.player.getInventory().getItemInOffHand().getType() != Material.AIR) {
+        if (this.player.getInventory().getItemInOffHand().getType() != Material.AIR) {
             try {
                 RunicItem item = ItemManager.getRunicItemFromItemStack(this.player.getInventory().getItemInOffHand());
                 if (item instanceof RunicItemOffhand) {
@@ -202,7 +202,7 @@ public class PlayerStatHolder {
     }
 
     public void updateWeapon() {
-        if (this.player.getInventory().getItemInMainHand() != null && this.player.getInventory().getItemInMainHand().getType() != Material.AIR) {
+        if (this.player.getInventory().getItemInMainHand().getType() != Material.AIR) {
             try {
                 RunicItem item = ItemManager.getRunicItemFromItemStack(this.player.getInventory().getItemInMainHand());
                 if (item instanceof RunicItemWeapon) {
@@ -219,5 +219,4 @@ public class PlayerStatHolder {
             this.weapon = null;
         }
     }
-
 }
