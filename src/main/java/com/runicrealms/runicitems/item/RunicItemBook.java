@@ -7,7 +7,9 @@ import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import de.tr7zw.nbtapi.NBTItem;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
@@ -19,11 +21,11 @@ public class RunicItemBook extends RunicItem {
 
     private final List<String> lore;
     private final String author;
-    private final Collection<String> pages;
+    private final List<String> pages;
 
     public RunicItemBook(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
-                         List<String> lore, String author, Collection<String> pages) {
-        super(templateId, displayableItem, tags, data, count, id, () -> new ItemLoreSection[] {new ItemLoreSection(lore)});
+                         List<String> lore, String author, List<String> pages) {
+        super(templateId, displayableItem, tags, data, count, id, () -> new ItemLoreSection[] {ItemLoreSection.generateTranslateColorCodes(lore)});
         this.lore = lore;
         this.author = author;
         this.pages = pages;
@@ -54,10 +56,11 @@ public class RunicItemBook extends RunicItem {
         ItemStack item = super.generateItem();
         if (this.getDisplayableItem().getMaterial() == Material.WRITTEN_BOOK) {
             BookMeta bookMeta = (BookMeta) item.getItemMeta();
-            bookMeta.setAuthor(author);
-            for (String page : pages) {
-                bookMeta.addPage(page);
-            }
+            bookMeta.setGeneration(BookMeta.Generation.ORIGINAL);
+            if (this.author != null) bookMeta.setAuthor(author);
+            bookMeta.setTitle(this.displayableItem.getDisplayName());
+            bookMeta.setPages(this.pages);
+            item.setItemMeta(bookMeta);
         }
         return item;
     }

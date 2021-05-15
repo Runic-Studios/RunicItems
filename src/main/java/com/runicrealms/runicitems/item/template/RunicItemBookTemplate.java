@@ -3,7 +3,9 @@ package com.runicrealms.runicitems.item.template;
 import com.runicrealms.runicitems.item.RunicItemBook;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
+import org.bukkit.ChatColor;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -12,14 +14,17 @@ public class RunicItemBookTemplate extends RunicItemTemplate {
 
     private final List<String> lore;
     private final String author;
-    private final Collection<String> pages;
+    private final List<String> pages;
 
     public RunicItemBookTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data,
-                                    List<String> lore, String author, Collection<String> pages) {
+                                    List<String> lore, String author, List<String> pages) {
         super(id, displayableItem, tags, data);
         this.lore = lore;
         this.author = author;
-        this.pages = pages;
+        this.pages = new ArrayList<>();
+        for (String page : pages) {
+            this.pages.add(ChatColor.translateAlternateColorCodes('&', page));
+        }
     }
 
     @Override
@@ -40,7 +45,7 @@ public class RunicItemBookTemplate extends RunicItemTemplate {
         return this.author;
     }
 
-    public Collection<String> getPages() {
+    public List<String> getPages() {
         return this.pages;
     }
 

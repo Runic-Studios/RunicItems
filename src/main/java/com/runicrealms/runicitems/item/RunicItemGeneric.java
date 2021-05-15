@@ -20,7 +20,7 @@ public class RunicItemGeneric extends RunicItem {
 
     public RunicItemGeneric(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
                             Map<ClickTrigger, String> triggers, List<String> lore) {
-        super(templateId, displayableItem, tags, data, count, id, () -> new ItemLoreSection[] {new ItemLoreSection(lore)});
+        super(templateId, displayableItem, tags, data, count, id, () -> new ItemLoreSection[] {ItemLoreSection.generateTranslateColorCodes(lore)});
         this.lore = lore;
         this.triggers = triggers;
     }

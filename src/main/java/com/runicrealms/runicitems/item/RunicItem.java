@@ -7,6 +7,7 @@ import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import de.tr7zw.nbtapi.NBTItem;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -56,7 +57,7 @@ public abstract class RunicItem {
             exception.printStackTrace();
         }
         scrapeArmor(item); // todo: broken
-        ItemMeta meta = item.getItemMeta();
+        ItemMeta meta = item.getItemMeta() != null ? item.getItemMeta() : Bukkit.getItemFactory().getItemMeta(item.getType());
         List<String> lore = new ArrayList<>();
         for (ItemLoreSection section : this.loreSections) {
             lore.addAll(section.getLore());

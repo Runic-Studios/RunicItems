@@ -93,6 +93,7 @@ public class DupeManager implements Listener {
         }
         return nbtItemOne.getLong("id").equals(nbtItemTwo.getLong("id"));
     }
+
     public static long getNextItemId() {
         return nextId++;
     }

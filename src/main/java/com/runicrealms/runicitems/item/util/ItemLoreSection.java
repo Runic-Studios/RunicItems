@@ -1,5 +1,7 @@
 package com.runicrealms.runicitems.item.util;
 
+import org.bukkit.ChatColor;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +43,14 @@ public class ItemLoreSection {
 
     public static ItemLoreSection combine(ItemLoreSection... loreSections) {
         return combine("", loreSections);
+    }
+
+    public static ItemLoreSection generateTranslateColorCodes(List<String> lore) {
+        List<String> colored = new ArrayList<>();
+        for (String line : lore) {
+            colored.add(ChatColor.translateAlternateColorCodes('&', line));
+        }
+        return new ItemLoreSection(colored);
     }
 
 }

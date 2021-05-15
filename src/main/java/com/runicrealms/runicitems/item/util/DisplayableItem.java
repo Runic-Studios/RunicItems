@@ -14,7 +14,7 @@ public class DisplayableItem {
     private final short damage;
 
     public DisplayableItem(String displayName, Material material, short damage) {
-        this.displayName = displayName;
+        this.displayName = ChatColor.translateAlternateColorCodes('&', "&r" + displayName);
         this.material = material;
         this.damage = damage;
     }
@@ -40,7 +40,7 @@ public class DisplayableItem {
         if (meta instanceof Damageable) {
             ((Damageable) meta).setDamage(this.damage);
         }
-        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&r" + this.displayName));
+        meta.setDisplayName(this.displayName);
         item.setItemMeta(meta);
         item.setAmount(count);
         return item;

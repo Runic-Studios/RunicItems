@@ -100,7 +100,9 @@ public class TemplateLoader {
         } else if (itemConfig.getString("type").equalsIgnoreCase("book")) {
             return new RunicItemBookTemplate(
                     id, displayableItem, tags, data,
-                    itemConfig.getStringList("lore"), itemConfig.getString("author"), itemConfig.getStringList("pages")
+                    itemConfig.getStringList("lore"),
+                    itemConfig.contains("author") ? itemConfig.getString("author") : null,
+                    itemConfig.getStringList("pages")
             );
         } else {
             return null;
