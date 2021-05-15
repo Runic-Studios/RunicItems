@@ -47,7 +47,8 @@ public class PlayerManager implements Listener {
     public void onPlayerItemHeld(PlayerItemHeldEvent event) {
         if (!cachedPlayerStats.containsKey(event.getPlayer().getUniqueId())) return;
         if (!event.isCancelled()) {
-            cachedPlayerStats.get(event.getPlayer().getUniqueId()).updateWeapon();
+            Bukkit.getScheduler().scheduleSyncDelayedTask(RunicItems.getInstance(),
+                    () -> cachedPlayerStats.get(event.getPlayer().getUniqueId()).updateWeapon(), 1L);
         }
     }
 
