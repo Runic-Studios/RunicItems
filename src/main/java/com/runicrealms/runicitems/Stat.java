@@ -135,4 +135,13 @@ public enum Stat {
         return null;
     }
 
+    public static Stat getFromName(String name) {
+        for (Stat stat : Stat.values()) {
+            if (stat.getName().equalsIgnoreCase(name)) {
+                return stat;
+            }
+        }
+        return null;
+    }
+
 }
