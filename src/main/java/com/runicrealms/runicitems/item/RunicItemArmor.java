@@ -174,7 +174,7 @@ public class RunicItemArmor extends RunicItem {
         for (String key : keys) {
             String[] split = key.split("-");
             if (split[0].equals("stat")) {
-                Stat statType = Stat.getFromName(split[2]);
+                Stat statType = Stat.getFromIdentifier(split[2]);
                 RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), nbtItem.getDouble(key));
                 statsList.set(Integer.parseInt(split[1]), new Pair<>(statType, stat));
             }
@@ -197,7 +197,7 @@ public class RunicItemArmor extends RunicItem {
             String[] split = key.split("-");
             if (split[0].equals("gem")) {;
                 int gemNumber = Integer.parseInt(split[1]);
-                Stat statType = Stat.getFromName(split[3]);
+                Stat statType = Stat.getFromIdentifier(split[3]);
                 if (gemsList.get(gemNumber) == null) {
                     int amountOfGemStats = 0;
                     for (String gemKey : keys) {
@@ -208,7 +208,7 @@ public class RunicItemArmor extends RunicItem {
                     }
                     gemsList.set(gemNumber, new ArrayList<>(amountOfGemStats));
                 }
-                gemsList.get(gemNumber).set(Integer.parseInt(split[2]), new Pair<>(Stat.getFromName(split[3]), nbtItem.getInteger(key)));
+                gemsList.get(gemNumber).set(Integer.parseInt(split[2]), new Pair<>(Stat.getFromIdentifier(split[3]), nbtItem.getInteger(key)));
             }
         }
         List<LinkedHashMap<Stat, Integer>> gems = new ArrayList<>();

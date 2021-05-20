@@ -147,7 +147,7 @@ public class RunicItemWeapon extends RunicItem {
         for (String key : keys) {
             String[] split = key.split("-");
             if (split[0].equals("stat")) {
-                Stat statType = Stat.getFromName(split[2]);
+                Stat statType = Stat.getFromIdentifier(split[2]);
                 RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), nbtItem.getFloat(key));
                 statsList.set(Integer.parseInt(split[1]), new Pair<>(statType, stat));
             }

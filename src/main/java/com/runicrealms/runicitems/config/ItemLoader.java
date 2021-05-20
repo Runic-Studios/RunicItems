@@ -41,7 +41,7 @@ public class ItemLoader {
                     for (String gemKey : section.getSection("gems").getKeys()) {
                         LinkedHashMap<Stat, Integer> gem = new LinkedHashMap<>();
                         for (String statKey : section.getSection("gems." + gemKey).getKeys()) {
-                            gem.put(Stat.getFromName(statKey), section.get("gems." + gemKey + "." + statKey, Integer.class));
+                            gem.put(Stat.getFromIdentifier(statKey), section.get("gems." + gemKey + "." + statKey, Integer.class));
                         }
                         gems.add(gem);
                     }

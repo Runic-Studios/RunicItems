@@ -117,7 +117,7 @@ public class TemplateLoader {
         if (itemConfig.contains("stats")) {
             LinkedHashMap<Stat, RunicItemStatRange> stats = new LinkedHashMap<>();
             for (String key : itemConfig.getConfigurationSection("stats").getKeys(false)) {
-                stats.put(Stat.getFromName(key), new RunicItemStatRange(
+                stats.put(Stat.getFromIdentifier(key), new RunicItemStatRange(
                         itemConfig.getInt("stats." + key + ".min"),
                         itemConfig.getInt("stats." + key + ".max")
                 ));

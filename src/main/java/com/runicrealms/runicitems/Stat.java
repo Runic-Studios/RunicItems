@@ -7,17 +7,17 @@ public enum Stat {
     /*
     Player stats
      */
-    DEXTERITY("Dexterity", "DEX", ChatColor.YELLOW, "✦", "Deal more ranged damage and gain movement speed!"),
-    INTELLIGENCE("Intelligence", "INT", ChatColor.DARK_AQUA, "ʔ", "Deal more spell damage and gain more max mana!"),
-    STRENGTH("Strength", "STR", ChatColor.RED, "⚔", "Deal more melee weapon damage!"),
-    VITALITY("Vitality", "VIT", ChatColor.WHITE, "■", "Gain damage reduction and health regen!"),
-    WISDOM("Wisdom", "WIS", ChatColor.GREEN, "✸", "Gain more spell healing and mana regen!"),
-    ATTACK_SPEED("Attack Speed", "ATK SPD", ChatColor.GRAY, "", "Determines the swing speed of your weapon!"),
+    DEXTERITY("dexterity", "Dexterity", "DEX", ChatColor.YELLOW, "✦", "Deal more ranged damage and gain movement speed!"),
+    INTELLIGENCE("intelligence", "Intelligence", "INT", ChatColor.DARK_AQUA, "ʔ", "Deal more spell damage and gain more max mana!"),
+    STRENGTH("strength", "Strength", "STR", ChatColor.RED, "⚔", "Deal more melee weapon damage!"),
+    VITALITY("vitality", "Vitality", "VIT", ChatColor.WHITE, "■", "Gain damage reduction and health regen!"),
+    WISDOM("wisdom", "Wisdom", "WIS", ChatColor.GREEN, "✸", "Gain more spell healing and mana regen!"),
+    ATTACK_SPEED("attack-speed", "Attack Speed", "ATK SPD", ChatColor.GRAY, "", "Determines the swing speed of your weapon!"),
     /*
     Item-exclusive stats
      */
-    CRIT("Crit", "CRIT", ChatColor.YELLOW, "", "Chance to deal a critical strike!"),
-    DODGE("Dodge", "DODGE", ChatColor.WHITE, "","Chance to dodge the damage of an attack!");
+    CRIT("critical", "Crit", "CRIT", ChatColor.YELLOW, "", "Chance to deal a critical strike!"),
+    DODGE("dodge", "Dodge", "DODGE", ChatColor.WHITE, "","Chance to dodge the damage of an attack!");
 
     /*
     Combat multipliers
@@ -38,18 +38,24 @@ public enum Stat {
     /*
     Enum fields
      */
+    private final String identifier;
     private final String name;
     private final String prefix;
     private final ChatColor chatColor;
     private final String icon;
     private final String description;
 
-    Stat(String name, String prefix, ChatColor chatColor, String icon, String description) {
+    Stat(String identifier, String name, String prefix, ChatColor chatColor, String icon, String description) {
+        this.identifier = identifier;
         this.name = name;
         this.prefix = prefix;
         this.chatColor = chatColor;
         this.icon = icon;
         this.description = description;
+    }
+
+    public String getIdentifier() {
+        return this.identifier;
     }
 
     public String getName() {
@@ -117,15 +123,16 @@ public enum Stat {
 
     /**
      * Returns the enum value of a stat from its string
-     * @param name of stat (not case sensitive)
+     * @param identifier of stat (not case sensitive)
      * @return enum of stat
      */
-    public static Stat getFromName(String name) {
+    public static Stat getFromIdentifier(String identifier) {
         for (Stat stat : Stat.values()) {
-            if (stat.getName().equalsIgnoreCase(name)) {
+            if (stat.getIdentifier().equalsIgnoreCase(identifier)) {
                 return stat;
             }
         }
         return null;
     }
+
 }
