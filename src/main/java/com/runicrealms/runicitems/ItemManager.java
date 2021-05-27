@@ -63,27 +63,22 @@ public class ItemManager implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (!event.isCancelled()) {
-            if (event.getAction() == Action.LEFT_CLICK_AIR
-                    || event.getAction() == Action.LEFT_CLICK_BLOCK
-                    || event.getAction() == Action.RIGHT_CLICK_AIR
-                    || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                if (event.getPlayer().getInventory().getItemInMainHand() != null
-                        && event.getPlayer().getInventory().getItemInMainHand().getType() != Material.AIR) {
-                    Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
-                        RunicItem item = getRunicItemFromItemStack(event.getPlayer().getInventory().getItemInMainHand());
-                        if (item == null) return;
-                        if (!(item instanceof RunicItemGeneric)) return;
-                        RunicItemGeneric generic = (RunicItemGeneric) item;
-                        ClickTrigger clickTrigger = ClickTrigger.getFromInteractAction(event.getAction(), event.getPlayer());
-                        if (generic.getTriggers().containsKey(clickTrigger)) {
-                            Bukkit.getScheduler().runTask(RunicItems.getInstance(), () -> {
-                                Bukkit.getPluginManager().callEvent(new RunicItemGenericTriggerEvent(event.getPlayer(), generic, clickTrigger, generic.getTriggers().get(clickTrigger)));
-                            });
-                        }
-                    });
+        if (event.getAction() == Action.LEFT_CLICK_AIR
+                || event.getAction() == Action.LEFT_CLICK_BLOCK
+                || event.getAction() == Action.RIGHT_CLICK_AIR
+                || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            ItemStack itemStack = event.getItem();
+            if (itemStack == null) return;
+            Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
+                RunicItem item = getRunicItemFromItemStack(itemStack);
+                if (!(item instanceof RunicItemGeneric)) return;
+                RunicItemGeneric generic = (RunicItemGeneric) item;
+                ClickTrigger clickTrigger = ClickTrigger.getFromInteractAction(event.getAction(), event.getPlayer());
+                if (generic.getTriggers().containsKey(clickTrigger)) {
+                    Bukkit.getScheduler().runTask(RunicItems.getInstance(),
+                            () -> Bukkit.getPluginManager().callEvent(new RunicItemGenericTriggerEvent(event.getPlayer(), generic, itemStack, clickTrigger, generic.getTriggers().get(clickTrigger))));
                 }
-            }
+            });
         }
     }
 
