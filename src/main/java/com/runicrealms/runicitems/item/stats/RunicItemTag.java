@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 
 public enum RunicItemTag {
 
+    CONSUMABLE("consumable", ChatColor.GRAY + "Consumable"),
     SOULBOUND("soulbound", ChatColor.DARK_GRAY + "Soulbound"),
     UNTRADEABLE("untradeable", ChatColor.DARK_RED + "Untradeable"),
     QUEST_ITEM("quest-item", ChatColor.GOLD + "Quest Item");
