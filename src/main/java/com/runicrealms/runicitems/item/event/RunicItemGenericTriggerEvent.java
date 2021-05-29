@@ -5,19 +5,30 @@ import com.runicrealms.runicitems.item.util.ClickTrigger;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.bukkit.inventory.ItemStack;
 
 public class RunicItemGenericTriggerEvent extends Event {
 
     private final Player player;
     private final RunicItemGeneric item;
+    private final ItemStack itemStack;
     private final ClickTrigger trigger;
     private final String action;
 
     private static final HandlerList handlers = new HandlerList();
 
-    public RunicItemGenericTriggerEvent(Player player, RunicItemGeneric item, ClickTrigger trigger, String action) {
+    /**
+     * Calls a RunicItemGenericTriggerEvent, for use with built-in item tags and data.
+     * @param player player who triggered the item
+     * @param item runic item
+     * @param itemStack reference to item stack
+     * @param trigger click of ClickTrigger enum
+     * @param action which action was taken
+     */
+    public RunicItemGenericTriggerEvent(Player player, RunicItemGeneric item, ItemStack itemStack, ClickTrigger trigger, String action) {
         this.player = player;
         this.item = item;
+        this.itemStack = itemStack;
         this.trigger = trigger;
         this.action = action;
     }
@@ -36,6 +47,10 @@ public class RunicItemGenericTriggerEvent extends Event {
 
     public RunicItemGeneric getItem() {
         return this.item;
+    }
+
+    public ItemStack getItemStack() {
+        return this.itemStack;
     }
 
     public ClickTrigger getTrigger() {
