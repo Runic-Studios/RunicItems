@@ -17,6 +17,7 @@ import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -63,6 +64,31 @@ public class RunicItemCommand extends BaseCommand {
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
         player.getInventory().addItem(item.generateItem());
         player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dGiven you &5" + count + "x &r" + item.getDisplayableItem().getDisplayName()));
+    }
+
+    @Subcommand("drop")
+    @Conditions("is-op")
+    @Syntax("<item> <location> [amount]")
+    @CommandCompletion("@item-ids @nothing @nothing")
+    public void onCommandDrop(CommandSender sender, String[] args) {
+        if (args.length < 2) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+        RunicItemTemplate template = TemplateManager.getTemplateFromId(args[0]);
+        int count = 1;
+        if (template == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!")); return; }
+        String[] splitLocation = args[1].split(",");
+        Location location = new Location(
+                Bukkit.getWorld(splitLocation[0]),
+                Double.parseDouble(splitLocation[1]),
+                Double.parseDouble(splitLocation[2]),
+                Double.parseDouble(splitLocation[3])
+        );
+        if (args.length >= 3) {
+            if (isInt(args[2])) {
+                count = Integer.parseInt(args[2]);
+            } else { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+        }
+        RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
+        location.getWorld().dropItem(location, item.generateItem());
     }
 
     @Subcommand("give")
