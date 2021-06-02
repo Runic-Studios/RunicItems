@@ -53,23 +53,36 @@ public class RunicItemArmor extends RunicItem {
                                 + entry.getKey().getIcon()
                 );
             }
-            return new ItemLoreSection[] {
-                    (maxGemSlots > 0 ?
-                    new ItemLoreSection(new String[] {
-                            ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
-                            ChatColor.GRAY + "[" + ChatColor.WHITE + gems.size() + ChatColor.GRAY + "/" + ChatColor.WHITE + maxGemSlots + ChatColor.GRAY + "] Gems",
-                    }) : new ItemLoreSection(new String[] {
-                            ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
-                    })),
-                    new ItemLoreSection(new String[] {
-                            ChatColor.RED + "" + health + "❤"
-                    }),
-                    new ItemLoreSection(lore),
-                    new ItemLoreSection(new String[] {
-                            rarity.getDisplay(),
-                            ChatColor.GRAY + runicClass.getDisplay()
-                    }),
-            };
+            if (level > 0) {
+                return new ItemLoreSection[]{
+                        (maxGemSlots > 0 ?
+                                new ItemLoreSection(new String[]{
+                                        ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
+                                        ChatColor.GRAY + "[" + ChatColor.WHITE + gems.size() + ChatColor.GRAY + "/" + ChatColor.WHITE + maxGemSlots + ChatColor.GRAY + "] Gems",
+                                }) : new ItemLoreSection(new String[]{
+                                ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
+                        })),
+                        new ItemLoreSection(new String[]{
+                                ChatColor.RED + "" + health + "❤"
+                        }),
+                        new ItemLoreSection(lore),
+                        new ItemLoreSection(new String[]{
+                                rarity.getDisplay(),
+                                ChatColor.GRAY + runicClass.getDisplay()
+                        }),
+                };
+            } else {
+                return new ItemLoreSection[]{
+                        new ItemLoreSection(new String[]{
+                                ChatColor.RED + "" + health + "❤"
+                        }),
+                        new ItemLoreSection(lore),
+                        new ItemLoreSection(new String[]{
+                                rarity.getDisplay(),
+                                ChatColor.GRAY + runicClass.getDisplay()
+                        }),
+                };
+            }
         });
         this.rarity = rarity;
         this.level = level;

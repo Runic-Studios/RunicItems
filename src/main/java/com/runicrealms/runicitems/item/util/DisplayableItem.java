@@ -14,7 +14,7 @@ public class DisplayableItem {
     private final short damage;
 
     public DisplayableItem(String displayName, Material material, short damage) {
-        this.displayName = ChatColor.translateAlternateColorCodes('&', "&r" + displayName);
+        this.displayName = ChatColor.translateAlternateColorCodes('&', displayName);
         this.material = material;
         this.damage = damage;
     }
