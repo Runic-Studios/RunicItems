@@ -33,6 +33,7 @@ public class RunicItems extends JavaPlugin {
         AbilityLoader.loadAbilities();
         try {
             TemplateLoader.loadTemplates();
+            LootManager.sortItems(TemplateManager.getTemplates());
         } catch (Exception exception) {
             exception.printStackTrace();
         }

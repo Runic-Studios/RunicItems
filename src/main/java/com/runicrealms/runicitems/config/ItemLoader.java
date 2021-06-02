@@ -76,8 +76,8 @@ public class ItemLoader {
         if (section.has("stats")) {
             Set<String> sectionKeys = section.getSection("stats").getKeys();
             for (Stat templateStatType : templateStats.keySet()) {
-                if (sectionKeys.contains(templateStatType.getName())) { // Item has stat and has already been rolled (stored in database)
-                    stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType), section.get("stats." + templateStatType.getName(), Double.class)));
+                if (sectionKeys.contains(templateStatType.getIdentifier())) { // Item has stat and has already been rolled (stored in database)
+                    stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType), section.get("stats." + templateStatType.getIdentifier(), Double.class)));
                 } else { // Item has recently been added this stat and the roll does not exist in database, so make a new roll
                     stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType)));
                 }

@@ -8,10 +8,7 @@ import co.aikar.commands.annotation.Conditions;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
-import com.runicrealms.runicitems.DupeManager;
-import com.runicrealms.runicitems.ItemManager;
-import com.runicrealms.runicitems.RunicItems;
-import com.runicrealms.runicitems.TemplateManager;
+import com.runicrealms.runicitems.*;
 import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import de.tr7zw.nbtapi.NBTItem;
@@ -66,6 +63,26 @@ public class RunicItemCommand extends BaseCommand {
         player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dGiven you &5" + count + "x &r" + item.getDisplayableItem().getDisplayName()));
     }
 
+    @Subcommand("get-range")
+    @Conditions("is-player|is-op")
+    @Syntax("<level-min> <level-max> [amount]")
+    @CommandCompletion("@range:0-60 @range:0-60 @nothing")
+    public void onCommandGetRange(Player player, String[] args) {
+        if (args.length == 1) { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+        if (!isInt(args[0]) || !isInt(args[1])) { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Level min and level max must be integers!")); return; }
+        RunicItemTemplate template = LootManager.getRandomItemInRange(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+        int count = 1;
+        if (template == null) { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!")); return; }
+        if (args.length >= 3) {
+            if (isInt(args[2])) {
+                count = Integer.parseInt(args[2]);
+            } else { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+        }
+        RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
+        player.getInventory().addItem(item.generateItem());
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dGiven you &5" + count + "x &r" + item.getDisplayableItem().getDisplayName()));
+    }
+
     @Subcommand("drop")
     @Conditions("is-op")
     @Syntax("<item> <location> [amount]")
@@ -91,6 +108,33 @@ public class RunicItemCommand extends BaseCommand {
         location.getWorld().dropItem(location, item.generateItem());
     }
 
+    @Subcommand("drop-range")
+    @Conditions("is-op")
+    @Syntax("<min-level> <max-level> <location> [amount]")
+    @CommandCompletion("@range:0-60 @range:0-60 @nothing @nothing")
+    public void onCommandDropRange(CommandSender sender, String[] args) {
+        if (args.length < 3) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+        if (!isInt(args[0]) || !isInt(args[1])) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Level min and level max must be integers!")); return; }
+        RunicItemTemplate template = LootManager.getRandomItemInRange(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+        int count = 1;
+        if (template == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!")); return; }
+        String[] splitLocation = args[2].split(",");
+        Location location = new Location(
+                Bukkit.getWorld(splitLocation[0]),
+                Double.parseDouble(splitLocation[1]),
+                Double.parseDouble(splitLocation[2]),
+                Double.parseDouble(splitLocation[3])
+        );
+        if (args.length >= 4) {
+            if (isInt(args[3])) {
+                count = Integer.parseInt(args[3]);
+            } else { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+        }
+        RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
+        location.getWorld().dropItem(location, item.generateItem());
+    }
+
+
     @Subcommand("give")
     @Conditions("is-op")
     @Syntax("<player> <item> [amount]")
@@ -105,6 +149,28 @@ public class RunicItemCommand extends BaseCommand {
         if (args.length >= 3) {
             if (!isInt(args[2])) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
             count = Integer.parseInt(args[2]);
+            if (count < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+        }
+        RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
+        target.getInventory().addItem(item.generateItem());
+        target.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dGiven you &5" + count + "x &r" + item.getDisplayableItem().getDisplayName()));
+    }
+
+    @Subcommand("give-range")
+    @Conditions("is-op")
+    @Syntax("<player> <level-min> <level-max> [amount]")
+    @CommandCompletion("@players @range:0-60 @range:0-60 @nothing")
+    public void onCommandGiveRange(CommandSender sender, String[] args) {
+        if (args.length < 3) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+        Player target = Bukkit.getPlayerExact(args[0]);
+        if (target == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid player!")); return; }
+        if (!isInt(args[1]) || !isInt(args[2])) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Level min and level max must be integers!")); return; }
+        RunicItemTemplate template = LootManager.getRandomItemInRange(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+        int count = 1;
+        if (template == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!")); return; }
+        if (args.length >= 4) {
+            if (!isInt(args[3])) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+            count = Integer.parseInt(args[3]);
             if (count < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);

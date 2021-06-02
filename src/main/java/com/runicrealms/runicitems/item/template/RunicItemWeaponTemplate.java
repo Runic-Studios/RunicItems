@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RunicItemWeaponTemplate extends RunicItemTemplate {
+public class RunicItemWeaponTemplate extends RunicRarityLevelItemTemplate {
 
     private final RunicItemStatRange damageRange;
     private final LinkedHashMap<Stat, RunicItemStatRange> stats;
@@ -55,10 +55,12 @@ public class RunicItemWeaponTemplate extends RunicItemTemplate {
         return stats;
     }
 
+    @Override
     public int getLevel() {
         return this.level;
     }
 
+    @Override
     public RunicItemRarity getRarity() {
         return this.rarity;
     }

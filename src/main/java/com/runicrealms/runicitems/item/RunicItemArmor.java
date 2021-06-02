@@ -120,7 +120,7 @@ public class RunicItemArmor extends RunicItem {
     public void addToData(Data section, String root) {
         super.addToData(section, root);
         for (Stat statType : this.stats.keySet()) {
-            section.set(ItemManager.getInventoryPath() + "." + root + ".stats." + statType.getName(), this.stats.get(statType).getRollPercentage());
+            section.set(ItemManager.getInventoryPath() + "." + root + ".stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
         }
         int count = 0;
         for (LinkedHashMap<Stat, Integer> gem : this.gems) {
@@ -140,14 +140,14 @@ public class RunicItemArmor extends RunicItem {
         NBTItem nbtItem = new NBTItem(item, true);
         int count = 0;
         for (Stat statType : this.stats.keySet()) {
-            nbtItem.setDouble("stat-" + count + "-" + statType.getName(), this.stats.get(statType).getRollPercentage());
+            nbtItem.setDouble("stat-" + count + "-" + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
             count++;
         }
         count = 0;
         for (LinkedHashMap<Stat, Integer> gem : this.gems) {
             int count2 = 0;
             for (Stat statType : this.stats.keySet()) {
-                nbtItem.setInteger("gem-" + count + "-" + count2 + "-" + statType.getName(), gem.get(statType));
+                nbtItem.setInteger("gem-" + count + "-" + count2 + "-" + statType.getIdentifier(), gem.get(statType));
                 count2++;
             }
             count++;

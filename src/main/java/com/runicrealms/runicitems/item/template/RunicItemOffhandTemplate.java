@@ -12,7 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RunicItemOffhandTemplate extends RunicItemTemplate {
+public class RunicItemOffhandTemplate extends RunicRarityLevelItemTemplate {
 
     private final LinkedHashMap<Stat, RunicItemStatRange> stats;
     private final int level;
@@ -46,10 +46,12 @@ public class RunicItemOffhandTemplate extends RunicItemTemplate {
         return this.stats;
     }
 
+    @Override
     public int getLevel() {
         return this.level;
     }
 
+    @Override
     public RunicItemRarity getRarity() {
         return this.rarity;
     }

@@ -22,6 +22,7 @@ import java.util.*;
 public class RunicItemArtifact extends RunicItemWeapon {
 
     private final RunicArtifactAbility ability;
+    private final RunicItemRarity rarity;
 
     public RunicItemArtifact(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
                              RunicArtifactAbility ability, RunicItemStatRange damageRange, LinkedHashMap<Stat, RunicItemStat> stats,
@@ -55,6 +56,7 @@ public class RunicItemArtifact extends RunicItemWeapon {
             return sections;
         });
         this.ability = ability;
+        this.rarity = rarity;
     }
 
     public RunicItemArtifact(RunicItemArtifactTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats) {
@@ -67,6 +69,10 @@ public class RunicItemArtifact extends RunicItemWeapon {
 
     public RunicArtifactAbility getAbility() {
         return this.ability;
+    }
+
+    public RunicItemRarity getRarity() {
+        return this.rarity;
     }
 
     @Override

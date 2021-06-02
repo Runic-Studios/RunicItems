@@ -14,7 +14,7 @@ package com.runicrealms.runicitems.item.template;
 import java.util.List;
  import java.util.Map;
 
-public class RunicItemArtifactTemplate extends RunicItemTemplate {
+public class RunicItemArtifactTemplate extends RunicRarityLevelItemTemplate {
 
     private final RunicArtifactAbility ability;
     private final RunicItemStatRange damageRange;
@@ -62,10 +62,12 @@ public class RunicItemArtifactTemplate extends RunicItemTemplate {
         return this.stats;
     }
 
+    @Override
     public int getLevel() {
         return this.level;
     }
 
+    @Override
     public RunicItemRarity getRarity() {
         return this.rarity;
     }
