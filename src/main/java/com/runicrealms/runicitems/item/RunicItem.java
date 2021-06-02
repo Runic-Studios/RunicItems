@@ -9,6 +9,7 @@ import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -59,6 +60,7 @@ public abstract class RunicItem {
         }
         scrapeArmor(item); // todo: broken
         ItemMeta meta = item.getItemMeta() != null ? item.getItemMeta() : Bukkit.getItemFactory().getItemMeta(item.getType());
+        meta.setDisplayName(ChatColor.WHITE + this.getDisplayableItem().getDisplayName());
         List<String> lore = new ArrayList<>();
         for (ItemLoreSection section : this.loreSections) {
             for (String s : section.getLore()) {
