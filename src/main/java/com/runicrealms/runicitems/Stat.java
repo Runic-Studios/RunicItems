@@ -16,8 +16,8 @@ public enum Stat {
     /*
     Item-exclusive stats
      */
-    CRIT("critical", "Crit", "CRIT", ChatColor.YELLOW, "", "Chance to deal a critical strike!"),
-    DODGE("dodge", "Dodge", "DODGE", ChatColor.WHITE, "","Chance to dodge the damage of an attack!");
+    CRIT("critical", "Crit", "CRIT", ChatColor.YELLOW, " CRIT", "Chance to deal a critical strike!"),
+    DODGE("dodge", "Dodge", "DODGE", ChatColor.WHITE, " DODGE","Chance to dodge the damage of an attack!");
 
     /*
     Combat multipliers
