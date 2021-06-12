@@ -7,12 +7,16 @@ import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
+import com.runicrealms.runicitems.util.DataUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +81,10 @@ public abstract class RunicItem {
         meta.setUnbreakable(true);
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+        if (item.getType() == Material.POTION) {
+            ((PotionMeta) meta).setColor(DataUtil.getColorFromData(this));
+        }
         meta.setLore(lore);
         item.setItemMeta(meta);
         NBTItem nbtItem = new NBTItem(item, true);
