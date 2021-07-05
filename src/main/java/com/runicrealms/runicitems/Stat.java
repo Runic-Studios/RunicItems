@@ -34,7 +34,7 @@ public enum Stat {
     /*
     Damage caps
      */
-    private static final int DAMAGE_REDUCTION_CAP = 40;
+    private static final double DAMAGE_REDUCTION_CAP = 40;
     /*
     Enum fields
      */
@@ -117,7 +117,7 @@ public enum Stat {
         return MANA_REGEN_MULT / 100;
     }
 
-    public static int getDamageReductionCap() {
+    public static double getDamageReductionCap() {
         return DAMAGE_REDUCTION_CAP;
     }
 
