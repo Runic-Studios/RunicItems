@@ -14,7 +14,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <fileOutput>${user.home}/Desktop/Runic Server Assets/~ Local Server/plugins</fileOutput>
+        <fileOutput>${project.basedir}/../lib</fileOutput>
     </properties>
 
     <build>
