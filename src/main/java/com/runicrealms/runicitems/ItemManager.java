@@ -20,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
@@ -123,13 +124,15 @@ public class ItemManager implements Listener {
         if (event.getEntity() instanceof Player) {
             event.setCancelled(true);
             Player player = (Player) event.getEntity();
-            if (event.getItem().getItemStack().getType() == Material.AIR) return;
-            int amountLeft = event.getItem().getItemStack().getAmount();
+            ItemStack droppedItem = event.getItem().getItemStack().clone();
+            DupeManager.checkMissingDupeNBT(droppedItem);
+            if (droppedItem.getType() == Material.AIR) return;
+            int amountLeft = droppedItem.getAmount();
             for (ItemStack item : player.getInventory().getContents()) {
                 if (amountLeft > 0) {
                     if (item == null || item.getType() == Material.AIR) continue;
                     if (item.getAmount() == item.getMaxStackSize()) continue;
-                    if (NBTUtil.isNBTSimilar(event.getItem().getItemStack(), item, false, false)) {
+                    if (NBTUtil.isNBTSimilar(droppedItem, item, false, false)) {
                         ItemStack itemToAdd = item.clone();
                         if (item.getAmount() + amountLeft <= item.getMaxStackSize()) {
                             itemToAdd.setAmount(amountLeft);
@@ -144,15 +147,23 @@ public class ItemManager implements Listener {
                 } else break;
             }
             if (amountLeft > 0) {
-                ItemStack itemToAdd = event.getItem().getItemStack().clone();
-                itemToAdd.setAmount(amountLeft);
-                player.getInventory().addItem(itemToAdd);
+                droppedItem.setAmount(amountLeft);
+                player.getInventory().addItem(droppedItem);
             }
             event.getItem().remove();
             player.updateInventory();
         }
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onDrop(PlayerDropItemEvent event) {
+        if (event.isCancelled()) return;
+        ItemStack item = event.getItemDrop().getItemStack().clone();
+        NBTItem nbtItem = new NBTItem(item, true);
+        if (!nbtItem.hasNBTData()) return;
+        if (nbtItem.hasKey("last-count")) nbtItem.removeKey("last-count");
+        if (nbtItem.hasKey("id")) nbtItem.removeKey("id");
+    }
 
     public static RunicItem getRunicItemFromItemStack(ItemStack itemStack) {
         NBTItem nbtItem = new NBTItem(itemStack);

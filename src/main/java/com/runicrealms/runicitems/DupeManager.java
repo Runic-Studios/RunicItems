@@ -62,6 +62,15 @@ public class DupeManager implements Listener {
         }
     }
 
+    public static void checkMissingDupeNBT(ItemStack item) {
+        NBTItem nbtItem = new NBTItem(item, true);
+        if (!nbtItem.hasNBTData() || !nbtItem.hasKey("template-id")) return;
+        if (!nbtItem.hasKey("id")) nbtItem.setLong("id", getNextItemId());
+        if (!nbtItem.hasKey("last-count")
+                || nbtItem.getInteger("last-count") != item.getAmount())
+            nbtItem.setInteger("last-count", item.getAmount());
+    }
+
     public static boolean checkItemsDuped(ItemStack itemOne, ItemStack itemTwo) {
         NBTItem nbtItemOne = new NBTItem(itemOne, true);
         NBTItem nbtItemTwo = new NBTItem(itemTwo, true);
