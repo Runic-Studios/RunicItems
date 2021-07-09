@@ -13,12 +13,15 @@ import com.runicrealms.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 
@@ -113,6 +116,43 @@ public class ItemManager implements Listener {
             }
         }
     }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPickup(EntityPickupItemEvent event) {
+        if (event.isCancelled()) return;
+        if (event.getEntity() instanceof Player) {
+            event.setCancelled(true);
+            Player player = (Player) event.getEntity();
+            if (event.getItem().getItemStack().getType() == Material.AIR) return;
+            int amountLeft = event.getItem().getItemStack().getAmount();
+            for (ItemStack item : player.getInventory().getContents()) {
+                if (amountLeft > 0) {
+                    if (item == null || item.getType() == Material.AIR) continue;
+                    if (item.getAmount() == item.getMaxStackSize()) continue;
+                    if (NBTUtil.isNBTSimilar(event.getItem().getItemStack(), item, false, false)) {
+                        ItemStack itemToAdd = item.clone();
+                        if (item.getAmount() + amountLeft <= item.getMaxStackSize()) {
+                            itemToAdd.setAmount(amountLeft);
+                            amountLeft = 0;
+                        } else if (item.getAmount() + amountLeft > item.getMaxStackSize()) {
+                            int amountAdded = item.getMaxStackSize() - item.getAmount();
+                            itemToAdd.setAmount(amountAdded);
+                            amountLeft -= amountAdded;
+                        }
+                        player.getInventory().addItem(itemToAdd);
+                    }
+                } else break;
+            }
+            if (amountLeft > 0) {
+                ItemStack itemToAdd = event.getItem().getItemStack().clone();
+                itemToAdd.setAmount(amountLeft);
+                player.getInventory().addItem(itemToAdd);
+            }
+            event.getItem().remove();
+            player.updateInventory();
+        }
+    }
+
 
     public static RunicItem getRunicItemFromItemStack(ItemStack itemStack) {
         NBTItem nbtItem = new NBTItem(itemStack);
