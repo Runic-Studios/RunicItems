@@ -5,6 +5,7 @@ import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
 import com.runicrealms.runicitems.player.AddedPlayerStats;
 import com.runicrealms.runicitems.player.PlayerStatHolder;
+import com.runicrealms.runicitems.util.NBTUtil;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -108,6 +109,10 @@ public class RunicItemsAPI {
      */
     public static PlayerStatHolder getCachedPlayerItems(UUID uuid) {
         return PlayerManager.getCachedPlayerStats().get(uuid);
+    }
+
+    public static boolean isRunicItemSimilar(ItemStack firstRunicItemStack, ItemStack secondRunicItemStack) {
+        return NBTUtil.isNBTSimilar(firstRunicItemStack, secondRunicItemStack, false, false);
     }
 
 }
