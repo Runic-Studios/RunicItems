@@ -6,6 +6,7 @@ import com.runicrealms.runicitems.command.RunicItemCommand;
 import com.runicrealms.runicitems.config.ConfigUtil;
 import com.runicrealms.runicitems.config.AbilityLoader;
 import com.runicrealms.runicitems.config.TemplateLoader;
+import com.runicrealms.runicitems.listeners.SoulboundListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -42,6 +43,7 @@ public class RunicItems extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new ItemManager(), this);
         Bukkit.getPluginManager().registerEvents(new DupeManager(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerManager(), this);
+        Bukkit.getPluginManager().registerEvents(new SoulboundListener(), this);
 
         // Register Commands
         commandManager = new PaperCommandManager(this);
