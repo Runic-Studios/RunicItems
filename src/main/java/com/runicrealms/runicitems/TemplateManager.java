@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class TemplateManager {
 
-    private static Map<String, RunicItemTemplate> templates = new HashMap<String, RunicItemTemplate>();
+    private static Map<String, RunicItemTemplate> templates = new HashMap<>();
 
     public static Map<String, RunicItemTemplate> getTemplates() {
         return templates;

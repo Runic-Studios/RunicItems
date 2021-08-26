@@ -318,6 +318,24 @@ public class RunicItemCommand extends BaseCommand {
         }
     }
 
+    @Subcommand("picker")
+    @Conditions("is-player|is-op")
+    @Syntax("<player> <item> <item> <item> <item> <item>")
+    @CommandCompletion("@online @item-ids @item-ids item-ids item-ids item-ids")
+    public void onCommandPicker(Player player, String[] args) {
+        if (args.length != 6) { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+        for (int i = 1; i < 6; i++) {
+            RunicItemTemplate template = TemplateManager.getTemplateFromId(args[i]);
+            if (template == null) {
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!"));
+                return;
+            }
+            RunicItem item = template.generateItem(1, DupeManager.getNextItemId(), null, null);
+            // todo: check the item. match it to a class, then give if matches and return, else continue
+            player.getInventory().addItem(item.generateItem());
+        }
+    }
+
     private static boolean isInt(String number) {
         try {
             Integer.parseInt(number);

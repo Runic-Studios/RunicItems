@@ -176,6 +176,8 @@ public class ItemManager implements Listener {
             return RunicItemArtifact.getFromItemStack(itemStack);
         } else if (template instanceof RunicItemBookTemplate) {
             return RunicItemBook.getFromItemStack(itemStack);
+        } else if (template instanceof RunicItemBagTemplate) {
+            return RunicItemBag.getFromItemStack(itemStack);
         } else if (template instanceof RunicItemGenericTemplate) {
             return RunicItemGeneric.getFromItemStack(itemStack);
         } else if (template instanceof RunicItemOffhandTemplate) {
