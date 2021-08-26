@@ -13,6 +13,7 @@ import com.runicrealms.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -24,6 +25,9 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ItemManager implements Listener {
@@ -121,37 +125,74 @@ public class ItemManager implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPickup(EntityPickupItemEvent event) {
         if (event.isCancelled()) return;
+
         if (event.getEntity() instanceof Player) {
+
             event.setCancelled(true);
+
             Player player = (Player) event.getEntity();
+
             ItemStack droppedItem = event.getItem().getItemStack().clone();
             DupeManager.checkMissingDupeNBT(droppedItem);
+
             if (droppedItem.getType() == Material.AIR) return;
+
             int amountLeft = droppedItem.getAmount();
-            for (ItemStack item : player.getInventory().getContents()) {
+            ItemStack[] contents = player.getInventory().getContents();
+
+            List<Integer> slotsReceivingNewIds = new ArrayList<>();
+
+            for (int i = 0; i < contents.length; i++) {
+
+                ItemStack item = contents[i];
+
                 if (amountLeft > 0) {
+
                     if (item == null || item.getType() == Material.AIR) continue;
                     if (item.getAmount() == item.getMaxStackSize()) continue;
+
                     if (NBTUtil.isNBTSimilar(droppedItem, item, false, false)) {
+
                         ItemStack itemToAdd = item.clone();
+
                         if (item.getAmount() + amountLeft <= item.getMaxStackSize()) {
+
                             itemToAdd.setAmount(amountLeft);
                             amountLeft = 0;
+
                         } else if (item.getAmount() + amountLeft > item.getMaxStackSize()) {
+
                             int amountAdded = item.getMaxStackSize() - item.getAmount();
                             itemToAdd.setAmount(amountAdded);
                             amountLeft -= amountAdded;
+
                         }
+
+                        slotsReceivingNewIds.add(i);
+
                         player.getInventory().addItem(itemToAdd);
+
                     }
+
                 } else break;
+
             }
+
             if (amountLeft > 0) {
                 droppedItem.setAmount(amountLeft);
                 player.getInventory().addItem(droppedItem);
             }
+
+            for (int slot : slotsReceivingNewIds) {
+                ItemStack item = player.getInventory().getItem(slot);
+                if (item != null && item.getType() != Material.AIR) {
+                    DupeManager.assignNewDupeId(item);
+                }
+            }
+
             event.getItem().remove();
             player.updateInventory();
+            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1, 1);
         }
     }
 

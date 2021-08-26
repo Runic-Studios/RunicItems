@@ -71,6 +71,11 @@ public class DupeManager implements Listener {
             nbtItem.setInteger("last-count", item.getAmount());
     }
 
+    public static void assignNewDupeId(ItemStack item) {
+        NBTItem nbtItem = new NBTItem(item, true);
+        nbtItem.setLong("id", getNextItemId());
+    }
+
     public static boolean checkItemsDuped(ItemStack itemOne, ItemStack itemTwo) {
         NBTItem nbtItemOne = new NBTItem(itemOne, true);
         NBTItem nbtItemTwo = new NBTItem(itemTwo, true);
