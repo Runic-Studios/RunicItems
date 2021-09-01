@@ -42,9 +42,9 @@ public class ItemLoader {
             } else if (template instanceof RunicItemBookTemplate) {
                 RunicItemBookTemplate bookTemplate = (RunicItemBookTemplate) template;
                 return new RunicItemBook(bookTemplate, count, id);
-            } else if (template instanceof RunicItemBagTemplate) {
-                int coins = section.get("coins", Integer.class);
-                return new RunicItemBag((RunicItemBagTemplate) template, count, id, coins);
+            } else if (template instanceof RunicItemDynamicTemplate) {
+                int dynamicField = section.get(RunicItemDynamic.getDynamicFieldString(), Integer.class);
+                return new RunicItemDynamic((RunicItemDynamicTemplate) template, count, id, dynamicField);
             } else if (template instanceof RunicItemGenericTemplate) {
                 return new RunicItemGeneric((RunicItemGenericTemplate) template, count, id);
             } else if (template instanceof RunicItemOffhandTemplate) {

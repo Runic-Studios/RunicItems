@@ -4,6 +4,7 @@ import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.AbilityManager;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
+import com.runicrealms.runicitems.item.RunicItemDynamic;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
@@ -79,10 +80,10 @@ public class TemplateLoader {
                     id, displayableItem, tags, data, loadTriggers(itemConfig),
                     itemConfig.getStringList("lore")
             );
-        } else if (itemConfig.getString("type").equalsIgnoreCase("bag")) {
-            return new RunicItemBagTemplate(
+        } else if (itemConfig.getString("type").equalsIgnoreCase("dynamic")) {
+            return new RunicItemDynamicTemplate(
                     id, displayableItem, tags, data, loadTriggers(itemConfig),
-                    itemConfig.getStringList("lore"),  itemConfig.getInt("coins")
+                    itemConfig.getStringList("lore"),  itemConfig.getInt(RunicItemDynamic.getDynamicFieldString())
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("offhand")) {
             return new RunicItemOffhandTemplate(
