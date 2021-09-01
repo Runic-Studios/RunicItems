@@ -43,7 +43,8 @@ public class ItemLoader {
                 RunicItemBookTemplate bookTemplate = (RunicItemBookTemplate) template;
                 return new RunicItemBook(bookTemplate, count, id);
             } else if (template instanceof RunicItemBagTemplate) {
-                return new RunicItemBag((RunicItemBagTemplate) template, count, id);
+                int coins = section.get("coins", Integer.class);
+                return new RunicItemBag((RunicItemBagTemplate) template, count, id, coins);
             } else if (template instanceof RunicItemGenericTemplate) {
                 return new RunicItemGeneric((RunicItemGenericTemplate) template, count, id);
             } else if (template instanceof RunicItemOffhandTemplate) {

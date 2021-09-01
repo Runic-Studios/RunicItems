@@ -82,7 +82,7 @@ public class TemplateLoader {
         } else if (itemConfig.getString("type").equalsIgnoreCase("bag")) {
             return new RunicItemBagTemplate(
                     id, displayableItem, tags, data, loadTriggers(itemConfig),
-                    itemConfig.getStringList("lore"),  itemConfig.getInt("coins"), itemConfig.getInt("maxNumberOfCoins")
+                    itemConfig.getStringList("lore"),  itemConfig.getInt("coins")
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("offhand")) {
             return new RunicItemOffhandTemplate(

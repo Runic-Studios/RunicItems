@@ -13,21 +13,15 @@ import java.util.Map;
 public class RunicItemBagTemplate extends RunicItemGenericTemplate {
 
     private final int coins;
-    private final int maxNumberOfCoins;
 
     public RunicItemBagTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags,
                                 Map<String, String> data, Map<ClickTrigger, String> triggers, List<String> lore,
-                                int coins, int maxNumberOfCoins) {
+                                int coins) {
         super(id, displayableItem, tags, data, triggers, lore);
         this.coins = coins;
-        this.maxNumberOfCoins = maxNumberOfCoins;
     }
 
     public int getCoins() {
         return coins;
-    }
-
-    public int getMaxNumberOfCoins() {
-        return maxNumberOfCoins;
     }
 }
