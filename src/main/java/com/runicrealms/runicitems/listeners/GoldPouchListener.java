@@ -4,6 +4,7 @@ import com.runicrealms.plugin.api.RunicCoreAPI;
 import com.runicrealms.plugin.item.util.ItemRemover;
 import com.runicrealms.plugin.utilities.CurrencyUtil;
 import com.runicrealms.runicguilds.Plugin;
+import com.runicrealms.runicitems.RunicItemsAPI;
 import com.runicrealms.runicitems.item.RunicItemDynamic;
 import com.runicrealms.runicitems.item.event.RunicItemGenericTriggerEvent;
 import com.runicrealms.runicitems.item.util.ClickTrigger;
@@ -29,7 +30,8 @@ public class GoldPouchListener implements Listener {
         if (!e.getItem().getTemplateId().equals(POUCH_ID)) return;
         RunicItemDynamic goldPouch = (RunicItemDynamic) e.getItem();
         Player player = e.getPlayer();
-
+        if (player.getInventory().getItemInOffHand().getType() != Material.AIR
+                && RunicItemsAPI.isRunicItemSimilar(player.getInventory().getItemInOffHand(), e.getItemStack())) return; // dupe bugfix
         playersUpdatingPouches.add(e.getPlayer().getUniqueId());
         if (e.getTrigger() == ClickTrigger.LEFT_CLICK) {
             player.playSound(player.getLocation(), Sound.ENTITY_HORSE_SADDLE, 0.5f, 1.0f);
