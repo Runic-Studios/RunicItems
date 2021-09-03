@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
+import com.runicrealms.plugin.utilities.ColorUtil;
 import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
@@ -87,7 +88,7 @@ public class RunicItemDynamic extends RunicItemGeneric {
     public ItemStack generateItem() {
         ItemStack item = super.generateItem();
         ItemMeta meta = item.getItemMeta();
-        String dynamicLore = this.getData().get("dynamicLore") != null ? this.getData().get("dynamicLore") : "";
+        String dynamicLore = ColorUtil.format(this.getData().get("dynamicLore") != null ? this.getData().get("dynamicLore") : "");
         if (this.getDynamicField() > 0) {
             meta.setDisplayName
                     (
