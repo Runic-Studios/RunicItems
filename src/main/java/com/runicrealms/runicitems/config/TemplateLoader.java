@@ -4,16 +4,11 @@ import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.AbilityManager;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
+import com.runicrealms.runicitems.item.RunicItemDynamic;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
-import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemArtifactTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemBookTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemGenericTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemOffhandTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemWeaponTemplate;
+import com.runicrealms.runicitems.item.template.*;
 import com.runicrealms.runicitems.item.util.ClickTrigger;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
@@ -84,6 +79,11 @@ public class TemplateLoader {
             return new RunicItemGenericTemplate(
                     id, displayableItem, tags, data, loadTriggers(itemConfig),
                     itemConfig.getStringList("lore")
+            );
+        } else if (itemConfig.getString("type").equalsIgnoreCase("dynamic")) {
+            return new RunicItemDynamicTemplate(
+                    id, displayableItem, tags, data, loadTriggers(itemConfig),
+                    itemConfig.getStringList("lore"),  itemConfig.getInt(RunicItemDynamic.getDynamicFieldString())
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("offhand")) {
             return new RunicItemOffhandTemplate(

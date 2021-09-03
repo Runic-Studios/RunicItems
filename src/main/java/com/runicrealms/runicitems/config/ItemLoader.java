@@ -3,22 +3,10 @@ package com.runicrealms.runicitems.config;
 import com.runicrealms.plugin.database.Data;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
-import com.runicrealms.runicitems.item.RunicItem;
-import com.runicrealms.runicitems.item.RunicItemArmor;
-import com.runicrealms.runicitems.item.RunicItemArtifact;
-import com.runicrealms.runicitems.item.RunicItemBook;
-import com.runicrealms.runicitems.item.RunicItemGeneric;
-import com.runicrealms.runicitems.item.RunicItemOffhand;
-import com.runicrealms.runicitems.item.RunicItemWeapon;
+import com.runicrealms.runicitems.item.*;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
-import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemArtifactTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemBookTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemGenericTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemOffhandTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemWeaponTemplate;
+import com.runicrealms.runicitems.item.template.*;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
@@ -54,6 +42,9 @@ public class ItemLoader {
             } else if (template instanceof RunicItemBookTemplate) {
                 RunicItemBookTemplate bookTemplate = (RunicItemBookTemplate) template;
                 return new RunicItemBook(bookTemplate, count, id);
+            } else if (template instanceof RunicItemDynamicTemplate) {
+                int dynamicField = section.get(RunicItemDynamic.getDynamicFieldString(), Integer.class);
+                return new RunicItemDynamic((RunicItemDynamicTemplate) template, count, id, dynamicField);
             } else if (template instanceof RunicItemGenericTemplate) {
                 return new RunicItemGeneric((RunicItemGenericTemplate) template, count, id);
             } else if (template instanceof RunicItemOffhandTemplate) {

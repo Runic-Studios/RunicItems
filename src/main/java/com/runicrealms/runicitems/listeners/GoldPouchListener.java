@@ -1,0 +1,131 @@
+package com.runicrealms.runicitems.listeners;
+
+import com.runicrealms.plugin.api.RunicCoreAPI;
+import com.runicrealms.plugin.item.util.ItemRemover;
+import com.runicrealms.plugin.utilities.CurrencyUtil;
+import com.runicrealms.runicguilds.Plugin;
+import com.runicrealms.runicitems.RunicItemsAPI;
+import com.runicrealms.runicitems.item.RunicItem;
+import com.runicrealms.runicitems.item.RunicItemDynamic;
+import com.runicrealms.runicitems.item.event.RunicItemGenericTriggerEvent;
+import com.runicrealms.runicitems.item.util.ClickTrigger;
+import org.bukkit.*;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.UUID;
+
+public class GoldPouchListener implements Listener {
+
+    private static final int GOLD_POUCH_INTERACT_DELAY = 10; // ticks
+    private static final String POUCH_ID = "gold-pouch";
+    private final HashSet<UUID> playersUpdatingPouches = new HashSet<>(); // prevents exploits
+
+    @EventHandler(priority = EventPriority.HIGHEST) // event runs LAST
+    public void onInventoryClick(InventoryClickEvent e) {
+        if (e.getClick() != ClickType.RIGHT) return;
+        if (e.getClickedInventory() == null) return;
+        if (e.getClickedInventory().getType() != InventoryType.PLAYER) return;
+        if (e.isCancelled()) return;
+        Player player = (Player) e.getWhoClicked();
+        ItemStack itemStack = e.getCurrentItem();
+        if (itemStack == null) return;
+        if (player.getGameMode() != GameMode.SURVIVAL) return;
+        RunicItem runicItem = RunicItemsAPI.getRunicItemFromItemStack(itemStack);
+        if (!runicItem.getTemplateId().equals(POUCH_ID)) return;
+        e.setCancelled(true);
+        RunicItemDynamic goldPouch = (RunicItemDynamic) runicItem;
+        player.playSound(player.getLocation(), Sound.ENTITY_HORSE_SADDLE, 0.5f, 1.0f);
+        int currentCoins = emptyPouch(goldPouch);
+        ItemStack emptyPouch = goldPouch.generateItem();
+        ItemRemover.takeItem(player, itemStack, 1);
+        // give coins contained inside, drops remaining coins on the floor
+        HashMap<Integer, ItemStack> coinsToAdd = player.getInventory().addItem(CurrencyUtil.goldCoin(currentCoins));
+        for (ItemStack is : coinsToAdd.values()) {
+            player.getWorld().dropItem(player.getLocation(), is);
+        }
+        player.getInventory().addItem(emptyPouch);
+    }
+
+    @EventHandler
+    public void onGoldPouchTrigger(RunicItemGenericTriggerEvent e) {
+        if (playersUpdatingPouches.contains(e.getPlayer().getUniqueId())) return;
+        if (!e.getItem().getTemplateId().equals(POUCH_ID)) return;
+        RunicItemDynamic goldPouch = (RunicItemDynamic) e.getItem();
+        Player player = e.getPlayer();
+        if (player.getInventory().getItemInOffHand().getType() != Material.AIR
+                && RunicItemsAPI.isRunicItemSimilar(player.getInventory().getItemInOffHand(), e.getItemStack())) return; // dupe bugfix
+        playersUpdatingPouches.add(e.getPlayer().getUniqueId());
+        if (e.getTrigger() == ClickTrigger.RIGHT_CLICK) {
+            player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 1.0f);
+            fillPouch(player, goldPouch);
+            ItemStack filledPouch = goldPouch.generateItem();
+            ItemRemover.takeItem(player, e.getItemStack(), 1);
+            player.getInventory().addItem(filledPouch);
+        }
+        Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> playersUpdatingPouches.remove(player.getUniqueId()), GOLD_POUCH_INTERACT_DELAY);
+    }
+
+    /**
+     * Fills our gold pouch item using gold from the player's inventory
+     */
+    public void fillPouch(Player player, RunicItemDynamic runicItemDynamic) {
+        int currentAmount = runicItemDynamic.getDynamicField();
+        int maxAmount = Integer.parseInt(runicItemDynamic.getData().get("maxCoins"));
+        int amountToFill = maxAmount - currentAmount;
+        // if player has enough coins to fill the pouch, fill it
+        if (RunicCoreAPI.hasItems(player, CurrencyUtil.goldCoin(), amountToFill)) {
+            ItemRemover.takeItem(player, CurrencyUtil.goldCoin(), amountToFill);
+            runicItemDynamic.setDynamicField(maxAmount);
+            return;
+        }
+        // if player does not have enough coins to fill it, start filling it using the largest stack size possible
+        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 64);
+        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 48);
+        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 32);
+        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 16);
+        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 8);
+        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 4);
+        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 2);
+        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 1);
+        runicItemDynamic.setDynamicField(currentAmount);
+    }
+
+    /**
+     * If a player doesn't have enough coins to fill a pouch, we manually start filling it by the largest stack possible
+     *
+     * @param currentAmount the amount of coins in the pouch
+     * @param maxAmount the total amount of coins the pouch can hold
+     * @param player to check inventory from
+     * @param stackSize the amount of coins we will try to fill
+     * @return the new current amount of coins in the pouch
+     */
+    private int removeGoldStackSize(int currentAmount, int maxAmount, Player player, int stackSize) {
+        while (RunicCoreAPI.hasItems(player, CurrencyUtil.goldCoin(), stackSize) && currentAmount < maxAmount) {
+            // remove it, add to pouch
+            ItemRemover.takeItem(player, CurrencyUtil.goldCoin(), stackSize);
+            currentAmount += stackSize;
+        }
+        return currentAmount;
+    }
+
+    /**
+     * Empties our RunicItemDynamic object of its stored coins with a reference to the previous amount
+     * Should be used before generateItem
+     *
+     * @return the previously held coins amount
+     */
+    public int emptyPouch(RunicItemDynamic runicItemDynamic) {
+        int coins = runicItemDynamic.getDynamicField();
+        runicItemDynamic.setDynamicField(0);
+        return coins;
+    }
+}

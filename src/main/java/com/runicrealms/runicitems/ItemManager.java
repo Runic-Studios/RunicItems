@@ -23,7 +23,6 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -217,6 +216,8 @@ public class ItemManager implements Listener {
             return RunicItemArtifact.getFromItemStack(itemStack);
         } else if (template instanceof RunicItemBookTemplate) {
             return RunicItemBook.getFromItemStack(itemStack);
+        } else if (template instanceof RunicItemDynamicTemplate) {
+            return RunicItemDynamic.getFromItemStack(itemStack);
         } else if (template instanceof RunicItemGenericTemplate) {
             return RunicItemGeneric.getFromItemStack(itemStack);
         } else if (template instanceof RunicItemOffhandTemplate) {
