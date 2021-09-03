@@ -25,8 +25,24 @@ import java.util.*;
 public class RunicItemDynamic extends RunicItemGeneric {
 
     private static final String DYNAMIC_FIELD_STRING = "dynamic";
+    private static final String DYNAMIC_FIELD_INITIAL_VALUE = "dynamicFieldInitialValue";
     private int dynamicField;
 
+    /**
+     * Constructor to initialize dynamic item with dynamic field initial value equal to the template value
+     */
+    public RunicItemDynamic(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags,
+                            Map<String, String> data, int count, long id, Map<ClickTrigger, String> triggers,
+                            List<String> lore) {
+        super(templateId, displayableItem, tags, data, count, id, triggers, lore);
+        this.dynamicField = this.getData().get(DYNAMIC_FIELD_INITIAL_VALUE) != null ? Integer.parseInt(this.getData().get(DYNAMIC_FIELD_INITIAL_VALUE)) : 0;
+    }
+
+    /**
+     * Constructor to initialize dynamic item with dynamic field initial value equal to the stored value in player's database
+     *
+     * @param dynamicField from the player's database info
+     */
     public RunicItemDynamic(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags,
                             Map<String, String> data, int count, long id, Map<ClickTrigger, String> triggers,
                             List<String> lore, int dynamicField) {
@@ -35,7 +51,7 @@ public class RunicItemDynamic extends RunicItemGeneric {
     }
 
     /**
-     * This gets called when a character loads into the server, and grabs the item data from the database
+     * This constructor gets called when a character loads into the server, and grabs the item data from the database
      *
      * @param template the cached YAML template to load basic item info from
      * @param count the number of item from database
