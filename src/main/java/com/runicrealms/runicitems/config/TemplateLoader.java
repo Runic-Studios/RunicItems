@@ -75,15 +75,15 @@ public class TemplateLoader {
                     AbilityManager.getAbilityFromId(itemConfig.getString("ability")), loadDamage(itemConfig), loadStats(itemConfig),
                     itemConfig.getInt("level"), RunicItemRarity.getFromIdentifier(itemConfig.getString("rarity")), RunicItemClass.getFromIdentifier(itemConfig.getString("class"))
             );
+        } else if (itemConfig.getString("type").equalsIgnoreCase(RunicItemDynamic.getDynamicFieldString())) {
+            return new RunicItemDynamicTemplate(
+                    id, displayableItem, tags, data, loadTriggers(itemConfig),
+                    itemConfig.getStringList("lore"),  itemConfig.getInt(RunicItemDynamic.getDynamicFieldString())
+            );
         } else if (itemConfig.getString("type").equalsIgnoreCase("generic")) {
             return new RunicItemGenericTemplate(
                     id, displayableItem, tags, data, loadTriggers(itemConfig),
                     itemConfig.getStringList("lore")
-            );
-        } else if (itemConfig.getString("type").equalsIgnoreCase("dynamic")) {
-            return new RunicItemDynamicTemplate(
-                    id, displayableItem, tags, data, loadTriggers(itemConfig),
-                    itemConfig.getStringList("lore"),  itemConfig.getInt(RunicItemDynamic.getDynamicFieldString())
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("offhand")) {
             return new RunicItemOffhandTemplate(
