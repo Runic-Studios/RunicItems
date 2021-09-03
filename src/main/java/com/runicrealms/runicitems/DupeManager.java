@@ -42,31 +42,27 @@ public class DupeManager implements Listener {
         if (event.getWhoClicked() instanceof Player) {
             final Player player = (Player) event.getWhoClicked();
             if (RunicCoreAPI.getPlayerCache(player) == null) return;
-            Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
-                long timeStart = System.currentTimeMillis();
-                final ItemStack currentItem;
-                final CurrentItemType type;
-                if (event.isRightClick()) {
-                    String current = event.getCurrentItem() != null ? event.getCurrentItem().getType().toString() : "";
-                    String cursor = event.getCursor() != null ? event.getCursor().getType().toString() : "";
-                    Bukkit.broadcastMessage("[DEBUG] Current: " + current + " Cursor: " + cursor);
-                }
-                if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
-                    currentItem = event.getCurrentItem();
-                    type = CurrentItemType.CURRENT;
-                } else if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
-                    currentItem = event.getCursor();
-                    type = CurrentItemType.CURSOR;
-                } else return;
-                if (GuildBankUtil.isViewingBank(player.getUniqueId())) {
-                    checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player);
-                }
-                if (RunicBankAPI.isViewingBank(player)) {
-                    checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player);
-                }
-                checkInventoryForDupes(player.getInventory(), currentItem, type, event, player);
-                Bukkit.broadcastMessage("[DEBUG] Item check time taken: " + (System.currentTimeMillis() - timeStart) + "ms");
-            });
+            final ItemStack currentItem;
+            final CurrentItemType type;
+            if (event.isRightClick()
+                    && (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)
+                    && event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
+                assignNewDupeId(event.getCursor());
+            }
+            if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
+                currentItem = event.getCurrentItem();
+                type = CurrentItemType.CURRENT;
+            } else if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
+                currentItem = event.getCursor();
+                type = CurrentItemType.CURSOR;
+            } else return;
+            if (GuildBankUtil.isViewingBank(player.getUniqueId())) {
+                checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player);
+            }
+            if (RunicBankAPI.isViewingBank(player)) {
+                checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player);
+            }
+            checkInventoryForDupes(player.getInventory(), currentItem, type, event, player);
         }
     }
 
