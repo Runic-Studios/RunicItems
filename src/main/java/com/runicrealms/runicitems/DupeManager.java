@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
+import java.util.logging.Level;
 
 public class DupeManager implements Listener {
 
@@ -42,8 +43,14 @@ public class DupeManager implements Listener {
             final Player player = (Player) event.getWhoClicked();
             if (RunicCoreAPI.getPlayerCache(player) == null) return;
             Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
+                long timeStart = System.currentTimeMillis();
                 final ItemStack currentItem;
                 final CurrentItemType type;
+                if (event.isRightClick()) {
+                    String current = event.getCurrentItem() != null ? event.getCurrentItem().getType().toString() : "";
+                    String cursor = event.getCursor() != null ? event.getCursor().getType().toString() : "";
+                    Bukkit.broadcastMessage("[DEBUG] Current: " + current + " Cursor: " + cursor);
+                }
                 if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
                     currentItem = event.getCurrentItem();
                     type = CurrentItemType.CURRENT;
@@ -58,6 +65,7 @@ public class DupeManager implements Listener {
                     checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player);
                 }
                 checkInventoryForDupes(player.getInventory(), currentItem, type, event, player);
+                Bukkit.broadcastMessage("[DEBUG] Item check time taken: " + (System.currentTimeMillis() - timeStart) + "ms");
             });
         }
     }
