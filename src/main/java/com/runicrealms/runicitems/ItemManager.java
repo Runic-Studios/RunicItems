@@ -26,6 +26,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -139,7 +140,7 @@ public class ItemManager implements Listener {
             int amountLeft = droppedItem.getAmount();
             ItemStack[] contents = player.getInventory().getContents();
 
-            List<Integer> slotsReceivingNewIds = new ArrayList<>();
+            List<Integer> slotsReceivingNewIds = new LinkedList<>();
 
             for (int i = 0; i < contents.length; i++) {
 
