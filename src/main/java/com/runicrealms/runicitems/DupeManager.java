@@ -15,6 +15,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -123,7 +125,7 @@ public class DupeManager implements Listener {
         return item.getType().toString().toLowerCase();
     }
 
-    private static boolean checkInventoryForDupes(Inventory inventory, ItemStack currentItem, CurrentItemType type, InventoryClickEvent event, Player player) {
+    public static boolean checkInventoryForDupes(Inventory inventory, ItemStack currentItem, CurrentItemType type, InventoryClickEvent event, Player player) {
         int ignoreSlot = -1;
         if (type != CurrentItemType.CURSOR) {
             for (int i = 0; i < inventory.getSize(); i++) {
@@ -136,12 +138,25 @@ public class DupeManager implements Listener {
                 }
             }
         }
+
+        boolean hasDuped = checkInventoryForDupesNoDelete(inventory, currentItem, player, ignoreSlot);
+        if (hasDuped) type.deleteItem(event);
+        return hasDuped;
+    }
+
+    public static boolean checkInventoryForDupes(Inventory inventory, ItemStack currentItem, PlayerInteractEvent event, Player player, int ignoreSlot) {
+        boolean hasDuped = checkInventoryForDupesNoDelete(inventory, currentItem, player, ignoreSlot);
+        if (hasDuped) {
+            event.getPlayer().getInventory().setItemInMainHand(null);
+        }
+        return hasDuped;
+    }
+
+    private static boolean checkInventoryForDupesNoDelete(Inventory inventory, ItemStack currentItem, Player player, int ignoreSlot) {
         for (int i = 0; i < inventory.getSize(); i++) {
             ItemStack item = inventory.getItem(i);
             if (item != null && item.getType() != Material.AIR && item != currentItem && i != ignoreSlot) {
                 if (checkItemsDuped(item, currentItem)) {
-                    NBTItem nbtItemOne = new NBTItem(item);
-                    NBTItem nbtItemTwo = new NBTItem(currentItem);
                     if (channel != null) {
                         channel.sendMessage(new EmbedBuilder()
                                 .setColor(EMBED_COLOR)
@@ -156,13 +171,14 @@ public class DupeManager implements Listener {
                                         + new SimpleDateFormat("MM/dd/yy HH:mm:ss").format(System.currentTimeMillis())
                                 ).build()).queue();
                     }
-                    type.deleteItem(event);
                     return true;
                 }
             }
         }
         return false;
     }
+
+
 
     private enum CurrentItemType {
         CURRENT, CURSOR;

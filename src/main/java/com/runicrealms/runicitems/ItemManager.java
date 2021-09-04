@@ -23,7 +23,10 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -37,15 +40,15 @@ public class ItemManager implements Listener {
     @EventHandler
     public void onCharacterJoin(CharacterLoadEvent event) {
         //if (RunicItems.isDatabaseLoadingEnabled()) {
-            if (event.getPlayerCache().getMongoData().has("character." + event.getSlot() + ".inventory")) {
-                Data data = event.getPlayerCache().getMongoData().getSection("character." + event.getSlot() + ".inventory");
-                for (String key : data.getKeys()) {
-                    if (!key.equalsIgnoreCase("type")) {
-                        RunicItem item = ItemLoader.loadItem(data.getSection(key), DupeManager.getNextItemId());
-                        if (item != null) event.getPlayer().getInventory().setItem(Integer.parseInt(key), item.generateItem());
-                    }
+        if (event.getPlayerCache().getMongoData().has("character." + event.getSlot() + ".inventory")) {
+            Data data = event.getPlayerCache().getMongoData().getSection("character." + event.getSlot() + ".inventory");
+            for (String key : data.getKeys()) {
+                if (!key.equalsIgnoreCase("type")) {
+                    RunicItem item = ItemLoader.loadItem(data.getSection(key), DupeManager.getNextItemId());
+                    if (item != null) event.getPlayer().getInventory().setItem(Integer.parseInt(key), item.generateItem());
                 }
             }
+        }
         //}
     }
 
@@ -71,22 +74,23 @@ public class ItemManager implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getAction() == Action.LEFT_CLICK_AIR
+        if (event.getHand() == EquipmentSlot.HAND
+                && (event.getAction() == Action.LEFT_CLICK_AIR
                 || event.getAction() == Action.LEFT_CLICK_BLOCK
                 || event.getAction() == Action.RIGHT_CLICK_AIR
-                || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            ItemStack itemStack = event.getItem();
-            if (itemStack == null) return;
-            Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
-                RunicItem item = getRunicItemFromItemStack(itemStack);
-                if (!(item instanceof RunicItemGeneric)) return;
-                RunicItemGeneric generic = (RunicItemGeneric) item;
-                ClickTrigger clickTrigger = ClickTrigger.getFromInteractAction(event.getAction(), event.getPlayer());
-                if (generic.getTriggers().containsKey(clickTrigger)) {
-                    Bukkit.getScheduler().runTask(RunicItems.getInstance(),
-                            () -> Bukkit.getPluginManager().callEvent(new RunicItemGenericTriggerEvent(event.getPlayer(), generic, itemStack, clickTrigger, generic.getTriggers().get(clickTrigger))));
-                }
-            });
+                || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
+            PlayerInventory inventory = event.getPlayer().getInventory();
+            if (event.getHand() == null) return;
+            ItemStack itemStack = inventory.getItem(event.getHand());
+            if (itemStack.getType() == Material.AIR) return;
+            RunicItem item = getRunicItemFromItemStack(itemStack);
+            if (!(item instanceof RunicItemGeneric)) return;
+            RunicItemGeneric generic = (RunicItemGeneric) item;
+            ClickTrigger clickTrigger = ClickTrigger.getFromInteractAction(event.getAction(), event.getPlayer());
+            if (generic.getTriggers().containsKey(clickTrigger)) {
+                boolean isDuped = DupeManager.checkInventoryForDupes(inventory, event.getItem(), event, event.getPlayer(), event.getPlayer().getInventory().getHeldItemSlot());
+                if (!isDuped) Bukkit.getPluginManager().callEvent(new RunicItemGenericTriggerEvent(event.getPlayer(), generic, itemStack, clickTrigger, generic.getTriggers().get(clickTrigger)));
+            }
         }
     }
 
