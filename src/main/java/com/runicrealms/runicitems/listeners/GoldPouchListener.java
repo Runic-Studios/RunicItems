@@ -5,21 +5,15 @@ import com.runicrealms.plugin.item.util.ItemRemover;
 import com.runicrealms.plugin.utilities.CurrencyUtil;
 import com.runicrealms.runicguilds.Plugin;
 import com.runicrealms.runicitems.RunicItemsAPI;
-import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.RunicItemDynamic;
 import com.runicrealms.runicitems.item.event.RunicItemGenericTriggerEvent;
 import com.runicrealms.runicitems.item.util.ClickTrigger;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
@@ -28,38 +22,6 @@ public class GoldPouchListener implements Listener {
     private static final int GOLD_POUCH_INTERACT_DELAY = 10; // ticks
     private static final String POUCH_ID = "gold-pouch";
     private final HashSet<UUID> playersUpdatingPouches = new HashSet<>(); // prevents exploits
-
-    @EventHandler(priority = EventPriority.HIGHEST) // event runs LAST
-    public void onInventoryClick(InventoryClickEvent e) {
-        if (e.getClick() != ClickType.RIGHT) return;
-        if (e.getClickedInventory() == null) return;
-        if (e.getClickedInventory().getType() != InventoryType.PLAYER) return;
-        if (e.isCancelled()) return;
-        Player player = (Player) e.getWhoClicked();
-        ItemStack itemStack = e.getCurrentItem();
-        if (itemStack == null) return;
-        if (player.getGameMode() != GameMode.SURVIVAL) return;
-        RunicItem runicItem = RunicItemsAPI.getRunicItemFromItemStack(itemStack);
-        if (!runicItem.getTemplateId().equals(POUCH_ID)) return;
-        e.setCancelled(true);
-        RunicItemDynamic goldPouch = (RunicItemDynamic) runicItem;
-        player.playSound(player.getLocation(), Sound.ENTITY_HORSE_SADDLE, 0.5f, 1.0f);
-        int currentCoins = emptyPouch(goldPouch);
-        ItemStack emptyPouch = goldPouch.generateItem();
-        ItemRemover.takeItem(player, itemStack, 1);
-        // give coins contained inside, drops remaining coins on the floor
-        int remaining = currentCoins;
-        while (remaining != 0) {
-            if (remaining >= 64) {
-                RunicItemsAPI.addItem(player.getInventory(), CurrencyUtil.goldCoin(64), player.getLocation());
-                remaining -= 64;
-            } else {
-                RunicItemsAPI.addItem(player.getInventory(), CurrencyUtil.goldCoin(remaining), player.getLocation());
-                remaining = 0;
-            }
-        }
-        RunicItemsAPI.addItem(player.getInventory(), emptyPouch, player.getLocation());
-    }
 
     @EventHandler
     public void onGoldPouchTrigger(RunicItemGenericTriggerEvent e) {
@@ -70,15 +32,33 @@ public class GoldPouchListener implements Listener {
         if (player.getInventory().getItemInOffHand().getType() != Material.AIR
                 && RunicItemsAPI.isRunicItemSimilar(player.getInventory().getItemInOffHand(), e.getItemStack())) return; // dupe bugfix
         playersUpdatingPouches.add(e.getPlayer().getUniqueId());
-        if (e.getTrigger() == ClickTrigger.RIGHT_CLICK) {
+        if (e.getTrigger() == ClickTrigger.LEFT_CLICK) {
+            player.playSound(player.getLocation(), Sound.ENTITY_HORSE_SADDLE, 0.5f, 1.0f);
+            int currentCoins = emptyPouch(goldPouch);
+            ItemStack emptyPouch = goldPouch.generateItem();
+            ItemRemover.takeItem(player, e.getItemStack(), 1);
+            // give coins contained inside, drops remaining coins on the floor
+            int remaining = currentCoins;
+            while (remaining != 0) {
+                if (remaining >= 64) {
+                    RunicItemsAPI.addItem(player.getInventory(), CurrencyUtil.goldCoin(64), player.getLocation());
+                    remaining -= 64;
+                } else {
+                    RunicItemsAPI.addItem(player.getInventory(), CurrencyUtil.goldCoin(remaining), player.getLocation());
+                    remaining = 0;
+                }
+            }
+            RunicItemsAPI.addItem(player.getInventory(), emptyPouch, player.getLocation());
+        } else if (e.getTrigger() == ClickTrigger.RIGHT_CLICK) {
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 1.0f);
             fillPouch(player, goldPouch);
             ItemStack filledPouch = goldPouch.generateItem();
             ItemRemover.takeItem(player, e.getItemStack(), 1);
-            RunicItemsAPI.addItem(player.getInventory(), filledPouch, player.getLocation());
+            player.getInventory().addItem(filledPouch);
         }
         Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> playersUpdatingPouches.remove(player.getUniqueId()), GOLD_POUCH_INTERACT_DELAY);
     }
+
 
     /**
      * Fills our gold pouch item using gold from the player's inventory
