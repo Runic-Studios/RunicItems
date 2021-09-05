@@ -30,7 +30,7 @@ public class TemplateLoader {
         File folder = new File(RunicItems.getInstance().getDataFolder(), "items");
         Map<String, RunicItemTemplate> templates = new HashMap<>();
         for (File file : folder.listFiles()) {
-            Bukkit.getLogger().log(Level.INFO, "[RunicItems] Loading template " + file.getName());
+            //Bukkit.getLogger().log(Level.INFO, "[RunicItems] Loading template " + file.getName());
             FileConfiguration itemConfig;
             itemConfig = ConfigUtil.getYamlConfigFile(file.getName(), folder);
             RunicItemTemplate template;
