@@ -11,9 +11,11 @@ import com.runicrealms.runicitems.item.template.*;
 import com.runicrealms.runicitems.item.util.ClickTrigger;
 import com.runicrealms.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
+import net.minecraft.server.v1_16_R3.PacketPlayOutCollect;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -21,21 +23,33 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class ItemManager implements Listener {
 
     private static final String INVENTORY_PATH = "inventory";
+
+    private static int tickCounter = 0;
+
+    public ItemManager() {
+        Bukkit.getScheduler().runTaskTimer(RunicItems.getInstance(), () -> {
+            tickCounter++;
+            if (tickCounter >= 20) {
+                tickCounter = 0;
+            }
+        }, 0L, 1L);
+    }
 
     @EventHandler
     public void onCharacterJoin(CharacterLoadEvent event) {
@@ -127,77 +141,104 @@ public class ItemManager implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPickup(EntityPickupItemEvent event) {
+    public void onPickup(PlayerAttemptPickupItemEvent event) {
+
+        if (!event.getFlyAtPlayer()) return;
+
+        if (tickCounter != 0) return;
+
         if (event.isCancelled()) return;
 
-        if (event.getEntity() instanceof Player) {
+        event.setCancelled(true);
 
-            event.setCancelled(true);
+        ItemStack droppedItem = event.getItem().getItemStack().clone();
+        DupeManager.checkMissingDupeNBT(droppedItem);
 
-            Player player = (Player) event.getEntity();
+        int initialAmount = event.getItem().getItemStack().getAmount();
 
-            ItemStack droppedItem = event.getItem().getItemStack().clone();
-            DupeManager.checkMissingDupeNBT(droppedItem);
+        if (droppedItem.getType() == Material.AIR) return;
 
-            if (droppedItem.getType() == Material.AIR) return;
+        int amountLeft = droppedItem.getAmount();
+        ItemStack[] contents = event.getPlayer().getInventory().getContents();
 
-            int amountLeft = droppedItem.getAmount();
-            ItemStack[] contents = player.getInventory().getContents();
+        List<Integer> slotsReceivingNewIds = new LinkedList<>();
 
-            List<Integer> slotsReceivingNewIds = new LinkedList<>();
+        for (int i = 0; i < contents.length; i++) {
 
-            for (int i = 0; i < contents.length; i++) {
+            ItemStack item = contents[i];
 
-                ItemStack item = contents[i];
+            if (amountLeft > 0) {
 
-                if (amountLeft > 0) {
+                if (item == null || item.getType() == Material.AIR) continue;
+                if (item.getAmount() == item.getMaxStackSize()) continue;
 
-                    if (item == null || item.getType() == Material.AIR) continue;
-                    if (item.getAmount() == item.getMaxStackSize()) continue;
+                if (NBTUtil.isNBTSimilar(droppedItem, item, false, false)) {
 
-                    if (NBTUtil.isNBTSimilar(droppedItem, item, false, false)) {
+                    ItemStack itemToAdd = item.clone();
 
-                        ItemStack itemToAdd = item.clone();
+                    if (item.getAmount() + amountLeft <= item.getMaxStackSize()) {
 
-                        if (item.getAmount() + amountLeft <= item.getMaxStackSize()) {
+                        itemToAdd.setAmount(amountLeft);
+                        amountLeft = 0;
 
-                            itemToAdd.setAmount(amountLeft);
-                            amountLeft = 0;
+                    } else if (item.getAmount() + amountLeft > item.getMaxStackSize()) {
 
-                        } else if (item.getAmount() + amountLeft > item.getMaxStackSize()) {
-
-                            int amountAdded = item.getMaxStackSize() - item.getAmount();
-                            itemToAdd.setAmount(amountAdded);
-                            amountLeft -= amountAdded;
-
-                        }
-
-                        slotsReceivingNewIds.add(i);
-
-                        player.getInventory().addItem(itemToAdd);
+                        int amountAdded = item.getMaxStackSize() - item.getAmount();
+                        itemToAdd.setAmount(amountAdded);
+                        amountLeft -= amountAdded;
 
                     }
 
-                } else break;
+                    slotsReceivingNewIds.add(i);
 
-            }
+                    event.getPlayer().getInventory().addItem(itemToAdd);
 
-            if (amountLeft > 0) {
-                droppedItem.setAmount(amountLeft);
-                player.getInventory().addItem(droppedItem);
-            }
-
-            for (int slot : slotsReceivingNewIds) {
-                ItemStack item = player.getInventory().getItem(slot);
-                if (item != null && item.getType() != Material.AIR) {
-                    DupeManager.assignNewDupeId(item);
                 }
-            }
 
-            event.getItem().remove();
-            player.updateInventory();
-            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1, 1);
+            } else break;
+
         }
+
+        for (int slot : slotsReceivingNewIds) {
+            ItemStack item = event.getPlayer().getInventory().getItem(slot);
+            if (item != null && item.getType() != Material.AIR) {
+                DupeManager.assignNewDupeId(item);
+            }
+        }
+
+        HashMap<Integer, ItemStack> overflow = null;
+
+        if (amountLeft > 0) {
+            droppedItem.setAmount(amountLeft);
+            overflow = event.getPlayer().getInventory().addItem(droppedItem);
+        }
+
+        boolean pickedUp = true;
+        boolean remove = false;
+        int pickupItemCount = 1;
+
+        if (overflow != null && !overflow.isEmpty()) {
+            AtomicInteger totalOverflow = new AtomicInteger();
+            overflow.forEach((slot, leftOver) -> totalOverflow.addAndGet(leftOver.getAmount()));
+            if (totalOverflow.get() != initialAmount) {
+                ItemStack ground = event.getItem().getItemStack();
+                ground.setAmount(totalOverflow.get());
+                event.getItem().setItemStack(ground);
+                pickupItemCount = totalOverflow.get();
+            } else pickedUp = false;
+        } else {
+            remove = true;
+            pickupItemCount = event.getItem().getItemStack().getAmount();
+        }
+
+        if (pickedUp) {
+            PacketPlayOutCollect packet = new PacketPlayOutCollect(event.getItem().getEntityId(), event.getPlayer().getEntityId(), pickupItemCount);
+            ((CraftPlayer) event.getPlayer()).getHandle().playerConnection.sendPacket(packet);
+            event.getPlayer().updateInventory();
+            event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_ITEM_PICKUP, 1, 1);
+        }
+
+        if (remove) event.getItem().remove();
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

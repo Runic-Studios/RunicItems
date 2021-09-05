@@ -59,7 +59,7 @@ public class RunicItemCommand extends BaseCommand {
             } else { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
-        player.getInventory().addItem(item.generateItem());
+        RunicItemsAPI.addItem(player.getInventory(), item.generateItem());
         player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dGiven you &5" + count + "x &r" + item.getDisplayableItem().getDisplayName()));
     }
 
@@ -79,7 +79,7 @@ public class RunicItemCommand extends BaseCommand {
             } else { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
-        player.getInventory().addItem(item.generateItem());
+        RunicItemsAPI.addItem(player.getInventory(), item.generateItem());
         player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dGiven you &5" + count + "x &r" + item.getDisplayableItem().getDisplayName()));
     }
 
@@ -152,7 +152,7 @@ public class RunicItemCommand extends BaseCommand {
             if (count < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
-        target.getInventory().addItem(item.generateItem());
+        RunicItemsAPI.addItem(target.getInventory(), item.generateItem());
         target.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dGiven you &5" + count + "x &r" + item.getDisplayableItem().getDisplayName()));
     }
 
@@ -174,7 +174,8 @@ public class RunicItemCommand extends BaseCommand {
             if (count < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
-        target.getInventory().addItem(item.generateItem());
+        RunicItemsAPI.addItem(target.getInventory(), item.generateItem());
+        RunicItemsAPI.addItem(target.getInventory(), item.generateItem());
         target.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dGiven you &5" + count + "x &r" + item.getDisplayableItem().getDisplayName()));
     }
 
@@ -332,7 +333,7 @@ public class RunicItemCommand extends BaseCommand {
             }
             RunicItem item = template.generateItem(1, DupeManager.getNextItemId(), null, null);
             // todo: check the item. match it to a class, then give if matches and return, else continue
-            player.getInventory().addItem(item.generateItem());
+            RunicItemsAPI.addItem(player.getInventory(), item.generateItem());
         }
     }
 

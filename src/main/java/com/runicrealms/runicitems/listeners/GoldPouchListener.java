@@ -48,11 +48,17 @@ public class GoldPouchListener implements Listener {
         ItemStack emptyPouch = goldPouch.generateItem();
         ItemRemover.takeItem(player, itemStack, 1);
         // give coins contained inside, drops remaining coins on the floor
-        HashMap<Integer, ItemStack> coinsToAdd = player.getInventory().addItem(CurrencyUtil.goldCoin(currentCoins));
-        for (ItemStack is : coinsToAdd.values()) {
-            player.getWorld().dropItem(player.getLocation(), is);
+        int remaining = currentCoins;
+        while (remaining != 0) {
+            if (remaining >= 64) {
+                RunicItemsAPI.addItem(player.getInventory(), CurrencyUtil.goldCoin(64), player.getLocation());
+                remaining -= 64;
+            } else {
+                RunicItemsAPI.addItem(player.getInventory(), CurrencyUtil.goldCoin(remaining), player.getLocation());
+                remaining = 0;
+            }
         }
-        player.getInventory().addItem(emptyPouch);
+        RunicItemsAPI.addItem(player.getInventory(), emptyPouch, player.getLocation());
     }
 
     @EventHandler
@@ -69,7 +75,7 @@ public class GoldPouchListener implements Listener {
             fillPouch(player, goldPouch);
             ItemStack filledPouch = goldPouch.generateItem();
             ItemRemover.takeItem(player, e.getItemStack(), 1);
-            player.getInventory().addItem(filledPouch);
+            RunicItemsAPI.addItem(player.getInventory(), filledPouch, player.getLocation());
         }
         Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> playersUpdatingPouches.remove(player.getUniqueId()), GOLD_POUCH_INTERACT_DELAY);
     }
