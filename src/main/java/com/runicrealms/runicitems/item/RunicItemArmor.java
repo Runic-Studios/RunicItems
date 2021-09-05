@@ -1,5 +1,8 @@
 package com.runicrealms.runicitems.item;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import com.runicrealms.plugin.database.Data;
 import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.Stat;
@@ -15,12 +18,17 @@ import com.runicrealms.runicitems.item.util.RunicItemClass;
 import de.tr7zw.nbtapi.NBTItem;
 import javafx.util.Pair;
 import org.bukkit.ChatColor;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.w3c.dom.Attr;
 
 import java.util.*;
 
 public class RunicItemArmor extends RunicItem {
+
+    private static final AttributeModifier attributeModifier = new AttributeModifier("generic.armor", 0, AttributeModifier.Operation.ADD_NUMBER);
 
     private final int level;
     private final RunicItemRarity rarity;
@@ -149,6 +157,7 @@ public class RunicItemArmor extends RunicItem {
         ItemStack item = super.generateItem();
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(this.getRarity().getChatColor() + this.getDisplayableItem().getDisplayName()); // apply rarity color
+        meta.addAttributeModifier(Attribute.GENERIC_ARMOR, attributeModifier);
         item.setItemMeta(meta);
         NBTItem nbtItem = new NBTItem(item, true);
         int count = 0;
