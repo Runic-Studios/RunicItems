@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -46,10 +47,36 @@ public class DupeManager implements Listener {
             if (RunicCoreAPI.getPlayerCache(player) == null) return;
             final ItemStack currentItem;
             final CurrentItemType type;
-            if (event.isRightClick()
+            if (event.getAction() == InventoryAction.PICKUP_HALF
                     && (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)
                     && event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
                 assignNewDupeId(event.getCursor());
+            }
+            if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
+                ItemStack cursor = event.getCursor();
+                if (cursor != null && cursor.getType() != Material.AIR) {
+                    int cursorAmount = cursor.getAmount();
+                    if (cursorAmount != cursor.getMaxStackSize()) {
+                        ItemStack[] contents = event.getInventory().getContents();
+                        for (int i = 0; i < contents.length; i++) {
+                            ItemStack item = contents[i];
+                            if (contents[i] == null || contents[i].getType() == Material.AIR) continue;
+                            if (contents[i].getAmount() == contents[i].getMaxStackSize()) continue;
+                            if (!NBTUtil.isNBTSimilar(item, cursor, false, false)) continue;
+                            if (cursorAmount + item.getAmount() <= cursor.getMaxStackSize()) {
+                                cursorAmount += item.getAmount();
+                                player.getInventory().setItem(i, null);
+                            } else {
+                                item.setAmount(item.getAmount() - cursor.getMaxStackSize() + cursorAmount);
+                                player.getInventory().setItem(i, item);
+                                cursorAmount = cursor.getMaxStackSize();
+                                break;
+                            }
+                        }
+                    }
+                    cursor.setAmount(cursorAmount);
+                    event.setCursor(cursor); // only deprecated because it can create server-client desync, don't care lol
+                }
             }
             if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
                 currentItem = event.getCurrentItem();

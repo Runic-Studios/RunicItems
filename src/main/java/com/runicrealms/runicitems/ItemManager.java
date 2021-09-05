@@ -22,6 +22,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -110,31 +111,51 @@ public class ItemManager implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!event.isCancelled()) {
-            if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
-            if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) return;
+        if (event.isCancelled()) return;
+        if (!(event.getWhoClicked() instanceof Player)) return;
+        Player player = (Player) event.getWhoClicked();
+
+        if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
+        if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) return;
+
+        if (event.getAction() == InventoryAction.SWAP_WITH_CURSOR) {
             if (NBTUtil.isNBTSimilar(event.getCurrentItem(), event.getCursor(), false, false)) {
-                if (event.getCurrentItem().getAmount() == event.getCurrentItem().getMaxStackSize()) {
-                    ItemStack currentItem = event.getCurrentItem();
-                    event.setCurrentItem(event.getCursor());
-                    event.setCursor(currentItem);
-                } else if (event.getCurrentItem().getAmount() + event.getCursor().getAmount() == event.getCurrentItem().getMaxStackSize()) {
-                    ItemStack item = event.getCurrentItem();
-                    item.setAmount(event.getCurrentItem().getMaxStackSize());
-                    event.setCurrentItem(item);
-                    event.setCursor(null);
-                } else if (event.getCurrentItem().getAmount() + event.getCursor().getAmount() > event.getCurrentItem().getMaxStackSize()) {
-                    ItemStack cursorItem = event.getCursor();
-                    cursorItem.setAmount(event.getCursor().getAmount() - (event.getCurrentItem().getMaxStackSize() - event.getCurrentItem().getAmount()));
-                    ItemStack currentItem = event.getCurrentItem();
-                    currentItem.setAmount(currentItem.getMaxStackSize());
-                    event.setCursor(cursorItem);
-                    event.setCurrentItem(currentItem);
-                } else if (event.getCurrentItem().getAmount() + event.getCursor().getAmount() < event.getCurrentItem().getMaxStackSize()) {
-                    ItemStack item = event.getCurrentItem();
-                    item.setAmount(item.getAmount() + event.getCursor().getAmount());
-                    event.setCurrentItem(item);
-                    event.setCursor(null);
+                if (event.isLeftClick()) {
+                    if (event.getCurrentItem().getAmount() + event.getCursor().getAmount() == event.getCurrentItem().getMaxStackSize()) {
+                        ItemStack item = event.getCurrentItem();
+                        item.setAmount(event.getCurrentItem().getMaxStackSize());
+                        event.setCurrentItem(item);
+                        event.setCursor(null);
+                        event.setCancelled(true);
+                    } else if (event.getCurrentItem().getAmount() + event.getCursor().getAmount() > event.getCurrentItem().getMaxStackSize()) {
+                        ItemStack cursorItem = event.getCursor();
+                        cursorItem.setAmount(event.getCursor().getAmount() - (event.getCurrentItem().getMaxStackSize() - event.getCurrentItem().getAmount()));
+                        ItemStack currentItem = event.getCurrentItem();
+                        currentItem.setAmount(currentItem.getMaxStackSize());
+                        event.setCursor(cursorItem);
+                        event.setCurrentItem(currentItem);
+                        event.setCancelled(true);
+                    } else if (event.getCurrentItem().getAmount() + event.getCursor().getAmount() < event.getCurrentItem().getMaxStackSize()) {
+                        ItemStack item = event.getCurrentItem();
+                        item.setAmount(item.getAmount() + event.getCursor().getAmount());
+                        event.setCurrentItem(item);
+                        event.setCursor(null);
+                        event.setCancelled(true);
+                    }
+                } else if (event.isRightClick()) {
+                    if (event.getCurrentItem().getAmount() != event.getCurrentItem().getMaxStackSize()) {
+                        ItemStack currentItem = event.getCurrentItem();
+                        currentItem.setAmount(currentItem.getAmount() + 1);
+                        event.setCurrentItem(currentItem);
+                        if (event.getCursor().getAmount() > 1) {
+                            ItemStack cursor = event.getCursor();
+                            cursor.setAmount( cursor.getAmount() - 1);
+                            event.setCursor(cursor);
+                        } else {
+                            event.setCursor(null);
+                        }
+                        event.setCancelled(true);
+                    }
                 }
             }
         }
