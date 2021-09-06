@@ -3,6 +3,7 @@ package com.runicrealms.runicitems;
 import com.runicrealms.plugin.api.RunicBankAPI;
 import com.runicrealms.plugin.api.RunicCoreAPI;
 import com.runicrealms.runicguilds.gui.GuildBankUtil;
+import com.runicrealms.runicitems.command.RunicItemCommand;
 import com.runicrealms.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -17,17 +18,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.permissions.ServerOperator;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
-import java.util.logging.Level;
 
 public class DupeManager implements Listener {
-
-    public static final int MAX_ITEMS_CLICKED_CACHE_LENGTH = 50;
 
     public static final String TEXT_CHANNEL_ID = "813580198133628928";
     public static final Color EMBED_COLOR = new Color(204, 35, 184);
@@ -51,32 +49,6 @@ public class DupeManager implements Listener {
                     && (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)
                     && event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
                 assignNewDupeId(event.getCursor());
-            }
-            if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
-                ItemStack cursor = event.getCursor();
-                if (cursor != null && cursor.getType() != Material.AIR) {
-                    int cursorAmount = cursor.getAmount();
-                    if (cursorAmount != cursor.getMaxStackSize()) {
-                        ItemStack[] contents = event.getInventory().getContents();
-                        for (int i = 0; i < contents.length; i++) {
-                            ItemStack item = contents[i];
-                            if (contents[i] == null || contents[i].getType() == Material.AIR) continue;
-                            if (contents[i].getAmount() == contents[i].getMaxStackSize()) continue;
-                            if (!NBTUtil.isNBTSimilar(item, cursor, false, false)) continue;
-                            if (cursorAmount + item.getAmount() <= cursor.getMaxStackSize()) {
-                                cursorAmount += item.getAmount();
-                                player.getInventory().setItem(i, null);
-                            } else {
-                                item.setAmount(item.getAmount() - cursor.getMaxStackSize() + cursorAmount);
-                                player.getInventory().setItem(i, item);
-                                cursorAmount = cursor.getMaxStackSize();
-                                break;
-                            }
-                        }
-                    }
-                    cursor.setAmount(cursorAmount);
-                    event.setCursor(cursor); // only deprecated because it can create server-client desync, don't care lol
-                }
             }
             if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
                 currentItem = event.getCurrentItem();
@@ -197,6 +169,11 @@ public class DupeManager implements Listener {
                                         + "` at "
                                         + new SimpleDateFormat("MM/dd/yy HH:mm:ss").format(System.currentTimeMillis())
                                 ).build()).queue();
+                        Bukkit.getOnlinePlayers().stream().filter(ServerOperator::isOp).forEach(target -> {
+                            target.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                                    RunicItemCommand.PREFIX + "Player " + player.getName() + " has attempted dupe. Check discord for more info."
+                                    ));
+                        });
                     }
                     return true;
                 }

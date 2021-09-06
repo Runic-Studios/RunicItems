@@ -25,7 +25,7 @@ import java.util.Arrays;
 @CommandAlias("ri|runicitems|runicitem")
 public class RunicItemCommand extends BaseCommand {
 
-    private static final String PREFIX = "&5[RunicItems] &6» &r";
+    public static final String PREFIX = "&5[RunicItems] &6» &r";
 
     public RunicItemCommand() {
         RunicItems.getCommandManager().getCommandCompletions().registerAsyncCompletion("item-ids", context -> TemplateManager.getTemplates().keySet());
