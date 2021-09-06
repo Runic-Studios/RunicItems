@@ -13,6 +13,7 @@ import com.runicrealms.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import net.minecraft.server.v1_16_R3.PacketPlayOutCollect;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
@@ -211,14 +212,20 @@ public class ItemManager implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onMoveToOtherInventory(InventoryClickEvent event) {
+
+
+        Inventory clickedInventory = event.getClickedInventory();
+        Inventory targetInventory = event.getClickedInventory() instanceof PlayerInventory ? event.getView().getTopInventory() : event.getWhoClicked().getInventory();
+
+        String inventoryTitle = ChatColor.stripColor(event.getView().getTitle());
+        if (inventoryTitle.equalsIgnoreCase("Guild Bank")) return;
+
         if (event.isCancelled()) return;
         if (!(event.getWhoClicked() instanceof Player)) return;
 
         if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
 
         if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-            Inventory clickedInventory = event.getClickedInventory();
-            Inventory targetInventory = event.getClickedInventory() instanceof PlayerInventory ? event.getView().getTopInventory() : event.getWhoClicked().getInventory();
             int amountLeft = event.getCurrentItem().getAmount();
             if (clickedInventory != null) {
                 for (ItemStack item : targetInventory) {
