@@ -1,5 +1,11 @@
 package com.runicrealms.runicitems;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.runicrealms.plugin.character.api.CharacterLoadEvent;
 import com.runicrealms.plugin.database.Data;
 import com.runicrealms.plugin.database.MongoDataSection;
@@ -52,6 +58,31 @@ public class ItemManager implements Listener {
                 tickCounter = 0;
             }
         }, 0L, 1L);
+
+        /*
+        Note to developers:
+        We use this packet receiver instead of using PlayerDropItemEvent because
+        dropping events are split into multiple categories: hitting q with an item in your hand,
+        using ctrl+q, opening inventory and hitting q or moving items outside the inventory, etc.
+
+        PlayerDropItemEvent fires on all of these, InventoryClickEvent (while checking event.getAction)
+        fires only when you have the inventory open, and this packet only fires when you don't have your
+        inventory open and hit q.
+
+        We use this packet + InventoryClickEvent to handle all of the events without overlap.
+
+        In addition, this receiver should fire before the bukkit events, allowing us to handle it before bukkit.
+         */
+        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(RunicItems.getInstance(), PacketType.Play.Client.BLOCK_DIG) {
+            @Override
+            public void onPacketReceiving(PacketEvent event) {
+                PacketContainer container = event.getPacket();
+                if (container.getPlayerDigTypes().getValues().get(0).equals(EnumWrappers.PlayerDigType.DROP_ITEM) // Just Q
+                        || container.getPlayerDigTypes().getValues().get(0).equals(EnumWrappers.PlayerDigType.DROP_ALL_ITEMS)) { // CTRL+Q
+                    DupeManager.checkInventoryForDupes(event.getPlayer().getInventory(), event.getPlayer());
+                }
+            }
+        });
     }
 
     @EventHandler
@@ -212,7 +243,6 @@ public class ItemManager implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onMoveToOtherInventory(InventoryClickEvent event) {
-
 
         Inventory clickedInventory = event.getClickedInventory();
         Inventory targetInventory = event.getClickedInventory() instanceof PlayerInventory ? event.getView().getTopInventory() : event.getWhoClicked().getInventory();

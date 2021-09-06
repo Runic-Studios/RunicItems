@@ -17,6 +17,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -50,6 +51,15 @@ public class DupeManager implements Listener {
                     && event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
                 assignNewDupeId(event.getCursor());
             }
+
+            if (event.getAction() == InventoryAction.DROP_ALL_CURSOR
+                    || event.getAction() == InventoryAction.DROP_ONE_CURSOR) {
+                if (checkInventoryForDupes(event.getClickedInventory(), event.getCursor(), CurrentItemType.CURSOR, event, player)) return;
+            } else if (event.getAction() == InventoryAction.DROP_ALL_SLOT
+                    || event.getAction() == InventoryAction.DROP_ONE_SLOT) {
+                if (checkInventoryForDupes(event.getClickedInventory(), event.getCurrentItem(), CurrentItemType.CURRENT, event, player)) return;
+            }
+
             if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
                 currentItem = event.getCurrentItem();
                 type = CurrentItemType.CURRENT;
@@ -58,10 +68,10 @@ public class DupeManager implements Listener {
                 type = CurrentItemType.CURSOR;
             } else return;
             if (GuildBankUtil.isViewingBank(player.getUniqueId())) {
-                checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player);
+                if (checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player)) return;
             }
             if (RunicBankAPI.isViewingBank(player)) {
-                checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player);
+                if (checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player)) return;
             }
             checkInventoryForDupes(player.getInventory(), currentItem, type, event, player);
         }
@@ -124,6 +134,7 @@ public class DupeManager implements Listener {
         return item.getType().toString().toLowerCase();
     }
 
+    // For inventory click events
     public static boolean checkInventoryForDupes(Inventory inventory, ItemStack currentItem, CurrentItemType type, InventoryClickEvent event, Player player) {
         int ignoreSlot = -1;
         if (type != CurrentItemType.CURSOR) {
@@ -143,10 +154,20 @@ public class DupeManager implements Listener {
         return hasDuped;
     }
 
+    // For player right/left clicking with generic item
     public static boolean checkInventoryForDupes(Inventory inventory, ItemStack currentItem, PlayerInteractEvent event, Player player, int ignoreSlot) {
         boolean hasDuped = checkInventoryForDupesNoDelete(inventory, currentItem, player, ignoreSlot);
         if (hasDuped) {
             event.getPlayer().getInventory().setItemInMainHand(null);
+        }
+        return hasDuped;
+    }
+
+    // For using the item the player is holding
+    public static boolean checkInventoryForDupes(Inventory inventory, Player player) {
+        boolean hasDuped = checkInventoryForDupesNoDelete(inventory, player.getInventory().getItemInMainHand(), player, player.getInventory().getHeldItemSlot());
+        if (hasDuped) {
+            player.getInventory().setItemInMainHand(null);
         }
         return hasDuped;
     }
