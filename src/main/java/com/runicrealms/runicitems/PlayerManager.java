@@ -19,7 +19,7 @@ public class PlayerManager implements Listener {
 
     private static final Map<UUID, PlayerStatHolder> cachedPlayerStats = new HashMap<>();
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.NORMAL)
     // Fire before other character load events so checking stats functions properly
     public void onCharacterLoad(CharacterLoadEvent e) {
         cachedPlayerStats.put(e.getPlayer().getUniqueId(), new PlayerStatHolder(e.getPlayer()));

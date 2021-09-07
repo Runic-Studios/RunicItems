@@ -85,7 +85,8 @@ public class ItemManager implements Listener {
         });
     }
 
-    @EventHandler
+    // Fire before loading stats
+    @EventHandler(priority = EventPriority.LOW)
     public void onCharacterJoin(CharacterLoadEvent event) {
         //if (RunicItems.isDatabaseLoadingEnabled()) {
         if (event.getPlayerCache().getMongoData().has("character." + event.getSlot() + ".inventory")) {
