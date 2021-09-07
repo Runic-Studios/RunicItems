@@ -34,7 +34,7 @@ public class RunicItemOffhand extends RunicItem {
                         entry.getKey().getChatColor()
                                 + (entry.getValue().getValue() < 0 ? "-" : "+")
                                 + entry.getValue().getValue()
-                                + entry.getKey().getName()
+                                + entry.getKey().getIcon()
                 );
             }
             return new ItemLoreSection[] {
