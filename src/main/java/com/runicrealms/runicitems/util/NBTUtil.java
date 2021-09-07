@@ -59,6 +59,7 @@ public class NBTUtil {
         keys.remove("Unbreakable");
         keys.remove("HideFlags");
         keys.remove("display");
+        keys.remove("AttributeModifiers");
         try {
             for (String key : keys) {
                 if (

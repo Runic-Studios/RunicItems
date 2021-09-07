@@ -3,6 +3,7 @@ package com.runicrealms.runicitems;
 import com.runicrealms.plugin.api.RunicBankAPI;
 import com.runicrealms.plugin.api.RunicCoreAPI;
 import com.runicrealms.runicguilds.gui.GuildBankUtil;
+import com.runicrealms.runicitems.command.RunicItemCommand;
 import com.runicrealms.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -14,16 +15,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.permissions.ServerOperator;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
 
 public class DupeManager implements Listener {
-
-    public static final int MAX_ITEMS_CLICKED_CACHE_LENGTH = 50;
 
     public static final String TEXT_CHANNEL_ID = "813580198133628928";
     public static final Color EMBED_COLOR = new Color(204, 35, 184);
@@ -41,24 +44,36 @@ public class DupeManager implements Listener {
         if (event.getWhoClicked() instanceof Player) {
             final Player player = (Player) event.getWhoClicked();
             if (RunicCoreAPI.getPlayerCache(player) == null) return;
-            Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
-                final ItemStack currentItem;
-                final CurrentItemType type;
-                if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
-                    currentItem = event.getCurrentItem();
-                    type = CurrentItemType.CURRENT;
-                } else if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
-                    currentItem = event.getCursor();
-                    type = CurrentItemType.CURSOR;
-                } else return;
-                if (GuildBankUtil.isViewingBank(player.getUniqueId())) {
-                    checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player);
-                }
-                if (RunicBankAPI.isViewingBank(player)) {
-                    checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player);
-                }
-                checkInventoryForDupes(player.getInventory(), currentItem, type, event, player);
-            });
+            final ItemStack currentItem;
+            final CurrentItemType type;
+            if (event.getAction() == InventoryAction.PICKUP_HALF
+                    && (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)
+                    && event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
+                assignNewDupeId(event.getCursor());
+            }
+
+            if (event.getAction() == InventoryAction.DROP_ALL_CURSOR
+                    || event.getAction() == InventoryAction.DROP_ONE_CURSOR) {
+                if (checkInventoryForDupes(event.getClickedInventory(), event.getCursor(), CurrentItemType.CURSOR, event, player)) return;
+            } else if (event.getAction() == InventoryAction.DROP_ALL_SLOT
+                    || event.getAction() == InventoryAction.DROP_ONE_SLOT) {
+                if (checkInventoryForDupes(event.getClickedInventory(), event.getCurrentItem(), CurrentItemType.CURRENT, event, player)) return;
+            }
+
+            if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
+                currentItem = event.getCurrentItem();
+                type = CurrentItemType.CURRENT;
+            } else if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
+                currentItem = event.getCursor();
+                type = CurrentItemType.CURSOR;
+            } else return;
+            if (GuildBankUtil.isViewingBank(player.getUniqueId())) {
+                if (checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player)) return;
+            }
+            if (RunicBankAPI.isViewingBank(player)) {
+                if (checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player)) return;
+            }
+            checkInventoryForDupes(player.getInventory(), currentItem, type, event, player);
         }
     }
 
@@ -69,6 +84,11 @@ public class DupeManager implements Listener {
         if (!nbtItem.hasKey("last-count")
                 || nbtItem.getInteger("last-count") != item.getAmount())
             nbtItem.setInteger("last-count", item.getAmount());
+    }
+
+    public static void assignNewDupeId(ItemStack item) {
+        NBTItem nbtItem = new NBTItem(item, true);
+        nbtItem.setLong("id", getNextItemId());
     }
 
     public static boolean checkItemsDuped(ItemStack itemOne, ItemStack itemTwo) {
@@ -114,7 +134,8 @@ public class DupeManager implements Listener {
         return item.getType().toString().toLowerCase();
     }
 
-    private static boolean checkInventoryForDupes(Inventory inventory, ItemStack currentItem, CurrentItemType type, InventoryClickEvent event, Player player) {
+    // For inventory click events
+    public static boolean checkInventoryForDupes(Inventory inventory, ItemStack currentItem, CurrentItemType type, InventoryClickEvent event, Player player) {
         int ignoreSlot = -1;
         if (type != CurrentItemType.CURSOR) {
             for (int i = 0; i < inventory.getSize(); i++) {
@@ -127,12 +148,35 @@ public class DupeManager implements Listener {
                 }
             }
         }
+
+        boolean hasDuped = checkInventoryForDupesNoDelete(inventory, currentItem, player, ignoreSlot);
+        if (hasDuped) type.deleteItem(event);
+        return hasDuped;
+    }
+
+    // For player right/left clicking with generic item
+    public static boolean checkInventoryForDupes(Inventory inventory, ItemStack currentItem, PlayerInteractEvent event, Player player, int ignoreSlot) {
+        boolean hasDuped = checkInventoryForDupesNoDelete(inventory, currentItem, player, ignoreSlot);
+        if (hasDuped) {
+            event.getPlayer().getInventory().setItemInMainHand(null);
+        }
+        return hasDuped;
+    }
+
+    // For using the item the player is holding
+    public static boolean checkInventoryForDupes(Inventory inventory, Player player) {
+        boolean hasDuped = checkInventoryForDupesNoDelete(inventory, player.getInventory().getItemInMainHand(), player, player.getInventory().getHeldItemSlot());
+        if (hasDuped) {
+            player.getInventory().setItemInMainHand(null);
+        }
+        return hasDuped;
+    }
+
+    private static boolean checkInventoryForDupesNoDelete(Inventory inventory, ItemStack currentItem, Player player, int ignoreSlot) {
         for (int i = 0; i < inventory.getSize(); i++) {
             ItemStack item = inventory.getItem(i);
             if (item != null && item.getType() != Material.AIR && item != currentItem && i != ignoreSlot) {
                 if (checkItemsDuped(item, currentItem)) {
-                    NBTItem nbtItemOne = new NBTItem(item);
-                    NBTItem nbtItemTwo = new NBTItem(currentItem);
                     if (channel != null) {
                         channel.sendMessage(new EmbedBuilder()
                                 .setColor(EMBED_COLOR)
@@ -146,14 +190,20 @@ public class DupeManager implements Listener {
                                         + "` at "
                                         + new SimpleDateFormat("MM/dd/yy HH:mm:ss").format(System.currentTimeMillis())
                                 ).build()).queue();
+                        Bukkit.getOnlinePlayers().stream().filter(ServerOperator::isOp).forEach(target -> {
+                            target.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                                    RunicItemCommand.PREFIX + "Player " + player.getName() + " has attempted dupe. Check discord for more info."
+                                    ));
+                        });
                     }
-                    type.deleteItem(event);
                     return true;
                 }
             }
         }
         return false;
     }
+
+
 
     private enum CurrentItemType {
         CURRENT, CURSOR;

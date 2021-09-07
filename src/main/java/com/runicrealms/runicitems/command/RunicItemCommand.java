@@ -25,7 +25,7 @@ import java.util.Arrays;
 @CommandAlias("ri|runicitems|runicitem")
 public class RunicItemCommand extends BaseCommand {
 
-    private static final String PREFIX = "&5[RunicItems] &6» &r";
+    public static final String PREFIX = "&5[RunicItems] &6» &r";
 
     public RunicItemCommand() {
         RunicItems.getCommandManager().getCommandCompletions().registerAsyncCompletion("item-ids", context -> TemplateManager.getTemplates().keySet());
@@ -59,7 +59,7 @@ public class RunicItemCommand extends BaseCommand {
             } else { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
-        player.getInventory().addItem(item.generateItem());
+        RunicItemsAPI.addItem(player.getInventory(), item.generateItem());
         player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dGiven you &5" + count + "x &r" + item.getDisplayableItem().getDisplayName()));
     }
 
@@ -79,7 +79,7 @@ public class RunicItemCommand extends BaseCommand {
             } else { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
-        player.getInventory().addItem(item.generateItem());
+        RunicItemsAPI.addItem(player.getInventory(), item.generateItem());
         player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dGiven you &5" + count + "x &r" + item.getDisplayableItem().getDisplayName()));
     }
 
@@ -152,7 +152,7 @@ public class RunicItemCommand extends BaseCommand {
             if (count < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
-        target.getInventory().addItem(item.generateItem());
+        RunicItemsAPI.addItem(target.getInventory(), item.generateItem());
         target.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dGiven you &5" + count + "x &r" + item.getDisplayableItem().getDisplayName()));
     }
 
@@ -174,7 +174,8 @@ public class RunicItemCommand extends BaseCommand {
             if (count < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
-        target.getInventory().addItem(item.generateItem());
+        RunicItemsAPI.addItem(target.getInventory(), item.generateItem());
+        RunicItemsAPI.addItem(target.getInventory(), item.generateItem());
         target.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dGiven you &5" + count + "x &r" + item.getDisplayableItem().getDisplayName()));
     }
 
@@ -315,6 +316,24 @@ public class RunicItemCommand extends BaseCommand {
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dAdded duped item to your inventory!"));
         } else {
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dYou do not have space in your inventory!"));
+        }
+    }
+
+    @Subcommand("picker")
+    @Conditions("is-player|is-op")
+    @Syntax("<player> <item> <item> <item> <item> <item>")
+    @CommandCompletion("@online @item-ids @item-ids item-ids item-ids item-ids")
+    public void onCommandPicker(Player player, String[] args) {
+        if (args.length != 6) { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+        for (int i = 1; i < 6; i++) {
+            RunicItemTemplate template = TemplateManager.getTemplateFromId(args[i]);
+            if (template == null) {
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!"));
+                return;
+            }
+            RunicItem item = template.generateItem(1, DupeManager.getNextItemId(), null, null);
+            // todo: check the item. match it to a class, then give if matches and return, else continue
+            RunicItemsAPI.addItem(player.getInventory(), item.generateItem());
         }
     }
 

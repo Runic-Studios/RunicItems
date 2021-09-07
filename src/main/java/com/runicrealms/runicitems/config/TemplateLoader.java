@@ -4,16 +4,11 @@ import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.AbilityManager;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
+import com.runicrealms.runicitems.item.RunicItemDynamic;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
-import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemArtifactTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemBookTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemGenericTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemOffhandTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemWeaponTemplate;
+import com.runicrealms.runicitems.item.template.*;
 import com.runicrealms.runicitems.item.util.ClickTrigger;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
@@ -35,7 +30,7 @@ public class TemplateLoader {
         File folder = new File(RunicItems.getInstance().getDataFolder(), "items");
         Map<String, RunicItemTemplate> templates = new HashMap<>();
         for (File file : folder.listFiles()) {
-            Bukkit.getLogger().log(Level.INFO, "[RunicItems] Loading template " + file.getName());
+            //Bukkit.getLogger().log(Level.INFO, "[RunicItems] Loading template " + file.getName());
             FileConfiguration itemConfig;
             itemConfig = ConfigUtil.getYamlConfigFile(file.getName(), folder);
             RunicItemTemplate template;
@@ -79,6 +74,11 @@ public class TemplateLoader {
                     id, displayableItem, tags, data,
                     AbilityManager.getAbilityFromId(itemConfig.getString("ability")), loadDamage(itemConfig), loadStats(itemConfig),
                     itemConfig.getInt("level"), RunicItemRarity.getFromIdentifier(itemConfig.getString("rarity")), RunicItemClass.getFromIdentifier(itemConfig.getString("class"))
+            );
+        } else if (itemConfig.getString("type").equalsIgnoreCase(RunicItemDynamic.getDynamicFieldString())) {
+            return new RunicItemDynamicTemplate(
+                    id, displayableItem, tags, data, loadTriggers(itemConfig),
+                    itemConfig.getStringList("lore"),  itemConfig.getInt(RunicItemDynamic.getDynamicFieldString())
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("generic")) {
             return new RunicItemGenericTemplate(
