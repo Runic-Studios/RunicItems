@@ -115,7 +115,10 @@ public class RunicItemArmor extends RunicItem {
             calculatedStats.put(stat, roll.getValue());
         });
         for (LinkedHashMap<Stat, Integer> gem : this.gems) {
-            gem.forEach(calculatedStats::put);
+            gem.forEach((stat, value) -> {
+                if (!calculatedStats.containsKey(stat)) calculatedStats.put(stat, 0);
+                calculatedStats.put(stat, calculatedStats.get(stat) + value);
+            });
         }
         return calculatedStats;
     }
