@@ -37,62 +37,44 @@ public class PlayerStatHolder {
         RunicArtifactAbility ability = null;
         int health = 0;
         if (this.helmet != null) {
-            for (Stat statType : this.helmet.getStats().keySet()) {
-                if (stats.containsKey(statType)) {
-                    stats.put(statType, stats.get(statType) + this.helmet.getStats().get(statType).getValue());
-                } else {
-                    stats.put(statType, this.helmet.getStats().get(statType).getValue());
-                }
-            }
+            this.helmet.calculateAddedStats().forEach((stat, value) -> {
+                if (!stats.containsKey(stat)) stats.put(stat, 0);
+                stats.put(stat, stats.get(stat) + value);
+            });
             health += this.helmet.getHealth();
         }
         if (this.chestplate != null) {
-            for (Stat statType : this.chestplate.getStats().keySet()) {
-                if (stats.containsKey(statType)) {
-                    stats.put(statType, stats.get(statType) + this.chestplate.getStats().get(statType).getValue());
-                } else {
-                    stats.put(statType, this.chestplate.getStats().get(statType).getValue());
-                }
-            }
+            this.chestplate.calculateAddedStats().forEach((stat, value) -> {
+                if (!stats.containsKey(stat)) stats.put(stat, 0);
+                stats.put(stat, stats.get(stat) + value);
+            });
             health += this.chestplate.getHealth();
         }
         if (this.leggings != null) {
-            for (Stat statType : this.leggings.getStats().keySet()) {
-                if (stats.containsKey(statType)) {
-                    stats.put(statType, stats.get(statType) + this.leggings.getStats().get(statType).getValue());
-                } else {
-                    stats.put(statType, this.leggings.getStats().get(statType).getValue());
-                }
-            }
+            this.leggings.calculateAddedStats().forEach((stat, value) -> {
+                if (!stats.containsKey(stat)) stats.put(stat, 0);
+                stats.put(stat, stats.get(stat) + value);
+            });
             health += this.leggings.getHealth();
         }
         if (this.boots != null) {
-            for (Stat statType : this.boots.getStats().keySet()) {
-                if (stats.containsKey(statType)) {
-                    stats.put(statType, stats.get(statType) + this.boots.getStats().get(statType).getValue());
-                } else {
-                    stats.put(statType, this.boots.getStats().get(statType).getValue());
-                }
-            }
+            this.boots.calculateAddedStats().forEach((stat, value) -> {
+                if (!stats.containsKey(stat)) stats.put(stat, 0);
+                stats.put(stat, stats.get(stat) + value);
+            });
             health += this.boots.getHealth();
         }
         if (this.offhand != null) {
-            for (Stat statType : this.offhand.getStats().keySet()) {
-                if (stats.containsKey(statType)) {
-                    stats.put(statType, stats.get(statType) + this.offhand.getStats().get(statType).getValue());
-                } else {
-                    stats.put(statType, this.offhand.getStats().get(statType).getValue());
-                }
-            }
+            this.offhand.getStats().forEach((stat, roll) -> {
+                if (!stats.containsKey(stat)) stats.put(stat, 0);
+                stats.put(stat, stats.get(stat) + roll.getValue());
+            });
         }
         if (this.weapon != null) {
-            for (Stat statType : this.weapon.getStats().keySet()) {
-                if (stats.containsKey(statType)) {
-                    stats.put(statType, stats.get(statType) + this.weapon.getStats().get(statType).getValue());
-                } else {
-                    stats.put(statType, this.weapon.getStats().get(statType).getValue());
-                }
-            }
+            this.weapon.getStats().forEach((stat, roll) -> {
+                if (!stats.containsKey(stat)) stats.put(stat, 0);
+                stats.put(stat, stats.get(stat) + roll.getValue());
+            });
             ability = this.weapon instanceof RunicItemArtifact ? ((RunicItemArtifact) this.weapon).getAbility() : null;
         }
         return new AddedPlayerStats(stats, health, ability);
