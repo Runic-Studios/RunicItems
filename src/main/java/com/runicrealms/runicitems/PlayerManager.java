@@ -31,24 +31,27 @@ public class PlayerManager implements Listener {
         cachedPlayerStats.remove(event.getPlayer().getUniqueId());
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onInventoryClick(ArmorEquipEvent e) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    // Fire before other armor equip events so checking stats functions properly
+    public void onArmorEquipEvent(ArmorEquipEvent e) {
         Player player = e.getPlayer();
         UUID uuid = player.getUniqueId();
         if (!cachedPlayerStats.containsKey(uuid)) return;
         if (e.isCancelled()) return;
-        Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(uuid).updateHelmet());
-        Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(uuid).updateChestplate());
-        Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(uuid).updateLeggings());
-        Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(uuid).updateBoots());
+        Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
+            cachedPlayerStats.get(uuid).updateHelmet();
+            cachedPlayerStats.get(uuid).updateChestplate();
+            cachedPlayerStats.get(uuid).updateLeggings();
+            cachedPlayerStats.get(uuid).updateBoots();
+            cachedPlayerStats.get(uuid).updateOffhand();
+        });
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerItemHeld(PlayerItemHeldEvent event) {
         if (!cachedPlayerStats.containsKey(event.getPlayer().getUniqueId())) return;
         if (!event.isCancelled()) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(RunicItems.getInstance(),
-                    () -> cachedPlayerStats.get(event.getPlayer().getUniqueId()).updateWeapon(), 1L);
+            Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(event.getPlayer().getUniqueId()).updateWeapon());
         }
     }
 
