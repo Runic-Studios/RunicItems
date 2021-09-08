@@ -3,9 +3,11 @@ package com.runicrealms.runicitems;
 import com.runicrealms.plugin.database.Data;
 import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
+import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.runicitems.player.AddedPlayerStats;
 import com.runicrealms.runicitems.player.PlayerStatHolder;
 import com.runicrealms.runicitems.util.NBTUtil;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -235,6 +237,19 @@ public class RunicItemsAPI {
      */
     public static void addItem(Inventory inventory, ItemStack itemStack, Location location) {
         addItem(inventory, itemStack).forEach((slot, leftOver) -> Objects.requireNonNull(location.getWorld()).dropItem(location, leftOver));
+    }
+
+    /**
+     * Gets the template of an ItemStack.
+     * Returns null if the item stack doesn't have a template.
+     * @param itemStack ItemStack to check
+     * @return Template
+     */
+    public static RunicItemTemplate getItemStackTemplate(ItemStack itemStack) {
+        NBTItem nbtItem = new NBTItem(itemStack);
+        if (!nbtItem.hasNBTData()) return null;
+        if (!nbtItem.hasKey("template-id")) return null;
+        return TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
     }
 
 }
