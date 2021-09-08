@@ -2,6 +2,7 @@ package com.runicrealms.runicitems;
 
 import com.codingforcookies.armorequip.ArmorEquipEvent;
 import com.runicrealms.plugin.character.api.CharacterLoadEvent;
+import com.runicrealms.plugin.events.OffhandEquipEvent;
 import com.runicrealms.runicitems.player.PlayerStatHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -33,25 +34,32 @@ public class PlayerManager implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     // Fire before other armor equip events so checking stats functions properly
-    public void onArmorEquipEvent(ArmorEquipEvent e) {
-        Player player = e.getPlayer();
+    public void onArmorEquipEvent(ArmorEquipEvent event) {
+        Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
         if (!cachedPlayerStats.containsKey(uuid)) return;
-        if (e.isCancelled()) return;
+        if (event.isCancelled()) return;
         Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
-            cachedPlayerStats.get(uuid).updateHelmet();
-            cachedPlayerStats.get(uuid).updateChestplate();
-            cachedPlayerStats.get(uuid).updateLeggings();
-            cachedPlayerStats.get(uuid).updateBoots();
-            cachedPlayerStats.get(uuid).updateOffhand();
+            switch (event.getType()) {
+                case HELMET: cachedPlayerStats.get(uuid).updateHelmet();
+                case CHESTPLATE: cachedPlayerStats.get(uuid).updateChestplate();
+                case LEGGINGS: cachedPlayerStats.get(uuid).updateLeggings();
+                case BOOTS: cachedPlayerStats.get(uuid).updateBoots();
+            }
         });
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerItemHeld(PlayerItemHeldEvent event) {
         if (!cachedPlayerStats.containsKey(event.getPlayer().getUniqueId())) return;
+        if (event.isCancelled()) return;
+        Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(event.getPlayer().getUniqueId()).updateWeapon());
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onOffhandEquip(OffhandEquipEvent event) {
         if (!event.isCancelled()) {
-            Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(event.getPlayer().getUniqueId()).updateWeapon());
+            Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(event.getPlayer().getUniqueId()).updateOffhand());
         }
     }
 
