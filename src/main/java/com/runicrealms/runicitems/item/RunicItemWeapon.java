@@ -43,32 +43,19 @@ public class RunicItemWeapon extends RunicItem {
                                 + entry.getKey().getIcon()
                 );
             }
-            //if (level > 0) {
-                return new ItemLoreSection[]{
-                        (level > 0? new ItemLoreSection(new String[]{
-                                ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level
-                        }) : new ItemLoreSection(new String[]{})),
-                        new ItemLoreSection(new String[]{
-                                ChatColor.RED + "" + damageRange.getMin() + "-" + damageRange.getMax() + " DMG"
-                        }),
-                        new ItemLoreSection(lore),
-                        new ItemLoreSection(new String[]{
-                                rarity.getDisplay(),
-                                ChatColor.GRAY + runicClass.getDisplay()
-                        }),
-                };
-//            } else {
-//                return new ItemLoreSection[]{
-//                        new ItemLoreSection(new String[]{
-//                                ChatColor.RED + "" + damageRange.getMin() + "-" + damageRange.getMax() + " DMG"
-//                        }),
-//                        new ItemLoreSection(lore),
-//                        new ItemLoreSection(new String[]{
-//                                rarity.getDisplay(),
-//                                ChatColor.GRAY + runicClass.getDisplay()
-//                        }),
-//                };
-//            }
+            return new ItemLoreSection[]{
+                    (level > 0? new ItemLoreSection(new String[]{
+                            ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level
+                    }) : new ItemLoreSection(new String[]{})),
+                    new ItemLoreSection(new String[]{
+                            ChatColor.RED + "" + damageRange.getMin() + "-" + damageRange.getMax() + " DMG"
+                    }),
+                    new ItemLoreSection(lore),
+                    new ItemLoreSection(new String[]{
+                            rarity.getDisplay(),
+                            ChatColor.GRAY + runicClass.getDisplay()
+                    }),
+            };
         });
         this.damageRange = damageRange;
         this.stats = stats;

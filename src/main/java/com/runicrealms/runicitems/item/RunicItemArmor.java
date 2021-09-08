@@ -42,48 +42,52 @@ public class RunicItemArmor extends RunicItem {
         super(templateId, displayableItem, tags, data, count, id, () -> {
             List<String> lore = new ArrayList<>();
 
-            Map<Stat, Integer> missingStats = new HashMap<>();
+            Map<Stat, Integer> gemOnlyStats = new HashMap<>();
             for (Gem gem : gems) {
                 for (Stat gemStat : gem.getStats().keySet()) {
                     if (stats.containsKey(gemStat)) continue;
-                        if (!missingStats.containsKey(gemStat)) missingStats.put(gemStat, 0);
-                        missingStats.put(gemStat, missingStats.get(gemStat) + gem.getStats().get(gemStat));
+                    if (!gemOnlyStats.containsKey(gemStat)) gemOnlyStats.put(gemStat, 0);
+                    gemOnlyStats.put(gemStat, gemOnlyStats.get(gemStat) + gem.getStats().get(gemStat));
                 }
             }
 
-            for (Map.Entry<Stat, RunicItemStat> entry : stats.entrySet()) {
-                int finalValue = entry.getValue().getValue();
-                if (finalValue == 0) continue;
-                for (Gem gem : gems) {
-                    if (gem.getStats().containsKey(entry.getKey())) {
-                        finalValue += gem.getStats().get(entry.getKey());
+            for (Stat stat : Stat.values()) {
+                if (stats.containsKey(stat)) {
+
+                    int value = stats.get(stat).getValue();
+                    if (value == 0) continue;
+                    int finalValue = value;
+                    for (Gem gem : gems) {
+                        if (gem.getStats().containsKey(stat)) {
+                            finalValue += gem.getStats().get(stat);
+                        }
                     }
-                }
-                if (finalValue == entry.getValue().getValue()) {
-                    lore.add(entry.getKey().getChatColor()
-                            + (entry.getValue().getValue() < 0 ? "-" : "+")
-                            + entry.getValue().getValue()
-                            + entry.getKey().getIcon());
-                } else {
-                    lore.add("" + ChatColor.GRAY + ChatColor.STRIKETHROUGH
-                            + (entry.getValue().getValue() < 0 ? "-" : "+")
-                            + entry.getValue().getValue() + entry.getKey().getIcon() + ChatColor.RESET + " "
-                            + entry.getKey().getChatColor()
-                            + (finalValue < 0 ? "-" : "+")
-                            + finalValue
-                            + entry.getKey().getIcon()
-                    );
-                }
-            }
-            for (Map.Entry<Stat, Integer> entry : missingStats.entrySet()) {
-                lore.add("" + ChatColor.GRAY + ChatColor.STRIKETHROUGH
-                        + "+0" + entry.getKey().getIcon() + ChatColor.RESET + " "
-                        + entry.getKey().getChatColor()
-                        + (entry.getValue() < 0 ? "-" : "+")
-                        + entry.getValue()
-                        + entry.getKey().getIcon());
-            }
+                    if (finalValue == value) {
+                        lore.add(stat.getChatColor()
+                                + (value < 0 ? "-" : "+")
+                                + value
+                                + stat.getIcon());
+                    } else {
+                        lore.add("" + ChatColor.GRAY + ChatColor.STRIKETHROUGH
+                                + (value < 0 ? "-" : "+")
+                                + value + stat.getIcon() + ChatColor.RESET + " "
+                                + stat.getChatColor()
+                                + (finalValue < 0 ? "-" : "+")
+                                + finalValue
+                                + stat.getIcon()
+                        );
+                    }
 
+                } else if (gemOnlyStats.containsKey(stat)) {
+                    int value = gemOnlyStats.get(stat);
+                    lore.add("" + ChatColor.GRAY + ChatColor.STRIKETHROUGH
+                            + "+0" + stat.getIcon() + ChatColor.RESET + " "
+                            + stat.getChatColor()
+                            + (value < 0 ? "-" : "+")
+                            + value
+                            + stat.getIcon());
+                }
+            }
 
             int finalHealth = health;
             for (Gem gem : gems) if (gem.hasHealth()) finalHealth += gem.getHealth();

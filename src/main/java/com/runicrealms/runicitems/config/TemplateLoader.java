@@ -12,17 +12,16 @@ import com.runicrealms.runicitems.item.template.*;
 import com.runicrealms.runicitems.item.util.ClickTrigger;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
+import com.runicrealms.runicitems.util.StatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class TemplateLoader {
 
@@ -115,14 +114,14 @@ public class TemplateLoader {
 
     private static LinkedHashMap<Stat, RunicItemStatRange> loadStats(FileConfiguration itemConfig) {
         if (itemConfig.contains("stats")) {
-            LinkedHashMap<Stat, RunicItemStatRange> stats = new LinkedHashMap<>();
+            Map<Stat, RunicItemStatRange> stats = new HashMap<>();
             for (String key : itemConfig.getConfigurationSection("stats").getKeys(false)) {
                 stats.put(Stat.getFromIdentifier(key), new RunicItemStatRange(
                         itemConfig.getInt("stats." + key + ".min"),
                         itemConfig.getInt("stats." + key + ".max")
                 ));
-            }
-            return stats;
+            };
+            return StatUtil.sortStatMap(stats);
         }
         return new LinkedHashMap<>();
     }
