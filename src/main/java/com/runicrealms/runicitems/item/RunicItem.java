@@ -1,6 +1,5 @@
 package com.runicrealms.runicitems.item;
 
-import com.runicrealms.plugin.attributes.AttributeUtil;
 import com.runicrealms.plugin.database.Data;
 import com.runicrealms.plugin.utilities.ColorUtil;
 import com.runicrealms.runicitems.ItemManager;
@@ -11,7 +10,6 @@ import com.runicrealms.runicitems.util.DataUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -62,7 +60,6 @@ public abstract class RunicItem {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        scrapeArmor(item); // todo: broken
         ItemMeta meta = item.getItemMeta() != null ? item.getItemMeta() : Bukkit.getItemFactory().getItemMeta(item.getType());
         meta.setDisplayName(ChatColor.WHITE + this.getDisplayableItem().getDisplayName());
         List<String> lore = new ArrayList<>();
@@ -100,17 +97,6 @@ public abstract class RunicItem {
         return item;
     }
 
-    /**
-     * Removes the default 'armor' values from items so they don't display above hotbar.
-     * @param item an ItemStack (from RunicItemArmor)
-     */
-    private void scrapeArmor(ItemStack item) {
-        AttributeUtil.addGenericStat(item, "generic.armor", 0, "head");
-        AttributeUtil.addGenericStat(item, "generic.armor", 0, "chest");
-        AttributeUtil.addGenericStat(item, "generic.armor", 0, "legs");
-        AttributeUtil.addGenericStat(item, "generic.armor", 0, "feet");
-    }
-
     public DisplayableItem getDisplayableItem() {
         return this.displayableItem;
     }
@@ -143,9 +129,10 @@ public abstract class RunicItem {
             section.set(ItemManager.getInventoryPath() + "." + root + ".tags." + count, tag.getIdentifier());
             count++;
         }
-        for (String dataKey : this.data.keySet()) {
+        // This is not needed as item data is static for the template it comes from. Use RunicItemDynamic instead.
+        /*for (String dataKey : this.data.keySet()) {
             section.set(ItemManager.getInventoryPath() + "." + root + ".data." + dataKey, this.data.get(dataKey));
-        }
+        }*/
     }
 
     public Long getId() {

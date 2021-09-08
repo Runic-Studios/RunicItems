@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 
 
 public class ItemManager implements Listener {
@@ -93,8 +94,14 @@ public class ItemManager implements Listener {
             Data data = event.getPlayerCache().getMongoData().getSection("character." + event.getSlot() + ".inventory");
             for (String key : data.getKeys()) {
                 if (!key.equalsIgnoreCase("type")) {
-                    RunicItem item = ItemLoader.loadItem(data.getSection(key), DupeManager.getNextItemId());
-                    if (item != null) event.getPlayer().getInventory().setItem(Integer.parseInt(key), item.generateItem());
+                    try {
+                        RunicItem item = ItemLoader.loadItem(data.getSection(key), DupeManager.getNextItemId());
+                        if (item != null)
+                            event.getPlayer().getInventory().setItem(Integer.parseInt(key), item.generateItem());
+                    } catch (Exception exception) {
+                        Bukkit.getLogger().log(Level.WARNING, "[RunicItems] ERROR loading item " + key + " for player " + event.getPlayer().getUniqueId());
+                        exception.printStackTrace();
+                    }
                 }
             }
         }

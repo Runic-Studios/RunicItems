@@ -44,6 +44,7 @@ public class RunicItems extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new ItemManager(), this);
         Bukkit.getPluginManager().registerEvents(new DupeManager(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerManager(), this);
+        Bukkit.getPluginManager().registerEvents(new GemManager(), this);
         Bukkit.getPluginManager().registerEvents(new SoulboundListener(), this);
         Bukkit.getPluginManager().registerEvents(new GoldPouchListener(), this);
 

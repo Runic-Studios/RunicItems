@@ -11,6 +11,7 @@ import com.runicrealms.runicitems.item.util.RunicItemClass;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ public class RunicItemArmorTemplate extends RunicRarityLevelItemTemplate {
         if (data == null) data = this.data;
         return new RunicItemArmor(
                 this.id, displayableItem, tags, data, count, id,
-                this.health, rolledStats, new ArrayList<>(), this.maxGemSlots,
+                this.health, rolledStats, new LinkedList<>(), this.maxGemSlots,
                 this.level, this.rarity, this.runicClass
         );
     }

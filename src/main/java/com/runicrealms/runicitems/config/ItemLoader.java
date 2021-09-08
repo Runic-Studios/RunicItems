@@ -4,6 +4,7 @@ import com.runicrealms.plugin.database.Data;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.*;
+import com.runicrealms.runicitems.item.stats.Gem;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.runicitems.item.template.*;
@@ -24,14 +25,16 @@ public class ItemLoader {
             int count = section.get("count", Integer.class);
             RunicItemTemplate template = TemplateManager.getTemplateFromId(templateId);
             if (template instanceof RunicItemArmorTemplate) {
-                List<LinkedHashMap<Stat, Integer>> gems = new ArrayList<>();
+                List<Gem> gems = new ArrayList<>();
                 if (section.has("gems")) {
                     for (String gemKey : section.getSection("gems").getKeys()) {
-                        LinkedHashMap<Stat, Integer> gem = new LinkedHashMap<>();
+                        LinkedHashMap<Stat, Integer> gemStats = new LinkedHashMap<>();
                         for (String statKey : section.getSection("gems." + gemKey).getKeys()) {
-                            gem.put(Stat.getFromIdentifier(statKey), section.get("gems." + gemKey + "." + statKey, Integer.class));
+                            if (!statKey.equalsIgnoreCase("health")) {
+                                gemStats.put(Stat.getFromIdentifier(statKey), section.get("gems." + gemKey + "." + statKey, Integer.class));
+                            }
                         }
-                        gems.add(gem);
+                        gems.add(new Gem(gemStats, section.get("gems." + gemKey + ".health", Integer.class)));
                     }
                 }
                 RunicItemArmorTemplate armorTemplate = (RunicItemArmorTemplate) template;

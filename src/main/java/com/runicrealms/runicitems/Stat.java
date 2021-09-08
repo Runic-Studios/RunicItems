@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 
 public enum Stat {
 
+
     /*
     Player stats
      */
@@ -18,6 +19,8 @@ public enum Stat {
      */
     CRIT("critical", "Crit", "CRIT", ChatColor.YELLOW, " CRIT", "Chance to deal a critical strike!"),
     DODGE("dodge", "Dodge", "DODGE", ChatColor.WHITE, " DODGE","Chance to dodge the damage of an attack!");
+
+    public static final String HEALTH_ICON = "❤";
 
     /*
     Combat multipliers

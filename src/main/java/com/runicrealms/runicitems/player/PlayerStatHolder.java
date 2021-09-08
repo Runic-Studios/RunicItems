@@ -37,32 +37,36 @@ public class PlayerStatHolder {
         RunicArtifactAbility ability = null;
         int health = 0;
         if (this.helmet != null) {
-            this.helmet.calculateAddedStats().forEach((stat, value) -> {
+            AddedArmorStats addedStats = this.helmet.calculateAddedStats();
+            addedStats.getStats().forEach((stat, value) -> {
                 if (!stats.containsKey(stat)) stats.put(stat, 0);
                 stats.put(stat, stats.get(stat) + value);
             });
-            health += this.helmet.getHealth();
+            health += addedStats.getHealth();
         }
         if (this.chestplate != null) {
-            this.chestplate.calculateAddedStats().forEach((stat, value) -> {
+            AddedArmorStats addedStats = this.chestplate.calculateAddedStats();
+            addedStats.getStats().forEach((stat, value) -> {
                 if (!stats.containsKey(stat)) stats.put(stat, 0);
                 stats.put(stat, stats.get(stat) + value);
             });
-            health += this.chestplate.getHealth();
+            health += addedStats.getHealth();
         }
         if (this.leggings != null) {
-            this.leggings.calculateAddedStats().forEach((stat, value) -> {
+            AddedArmorStats addedStats = this.leggings.calculateAddedStats();
+            addedStats.getStats().forEach((stat, value) -> {
                 if (!stats.containsKey(stat)) stats.put(stat, 0);
                 stats.put(stat, stats.get(stat) + value);
             });
-            health += this.leggings.getHealth();
+            health += addedStats.getHealth();
         }
         if (this.boots != null) {
-            this.boots.calculateAddedStats().forEach((stat, value) -> {
+            AddedArmorStats addedStats = this.boots.calculateAddedStats();
+            addedStats.getStats().forEach((stat, value) -> {
                 if (!stats.containsKey(stat)) stats.put(stat, 0);
                 stats.put(stat, stats.get(stat) + value);
             });
-            health += this.boots.getHealth();
+            health += addedStats.getHealth();
         }
         if (this.offhand != null) {
             this.offhand.getStats().forEach((stat, roll) -> {
