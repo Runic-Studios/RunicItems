@@ -8,9 +8,14 @@ import co.aikar.commands.annotation.Conditions;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
+import com.runicrealms.plugin.api.RunicCoreAPI;
 import com.runicrealms.runicitems.*;
 import com.runicrealms.runicitems.item.RunicItem;
+import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
+import com.runicrealms.runicitems.item.template.RunicItemArtifactTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
+import com.runicrealms.runicitems.item.template.RunicItemWeaponTemplate;
+import com.runicrealms.runicitems.item.util.RunicItemClass;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -323,17 +328,32 @@ public class RunicItemCommand extends BaseCommand {
     @Conditions("is-player|is-op")
     @Syntax("<player> <item> <item> <item> <item> <item>")
     @CommandCompletion("@online @item-ids @item-ids item-ids item-ids item-ids")
-    public void onCommandPicker(Player player, String[] args) {
-        if (args.length != 6) { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+    public void onCommandPicker(CommandSender sender, String[] args) {
+        if (args.length != 6) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+
+        Player target = Bukkit.getPlayerExact(args[0]);
+        if (target == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+        RunicItemClass playerClass = RunicItemClass.getFromIdentifier(RunicCoreAPI.getPlayerCache(target).getClassName());
+
         for (int i = 1; i < 6; i++) {
             RunicItemTemplate template = TemplateManager.getTemplateFromId(args[i]);
-            if (template == null) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!"));
-                return;
+            if (template == null) continue;
+
+            RunicItemClass itemClass = null;
+            if (template instanceof RunicItemArmorTemplate) {
+                itemClass = ((RunicItemArmorTemplate) template).getRunicClass();
+            } else if (template instanceof RunicItemArtifactTemplate) {
+                itemClass = ((RunicItemArtifactTemplate) template).getRunicClass();
+            } else if (template instanceof RunicItemWeaponTemplate) {
+                itemClass = ((RunicItemWeaponTemplate) template).getRunicClass();
             }
-            RunicItem item = template.generateItem(1, DupeManager.getNextItemId(), null, null);
-            // todo: check the item. match it to a class, then give if matches and return, else continue
-            RunicItemsAPI.addItem(player.getInventory(), item.generateItem());
+
+            if (itemClass == null || !itemClass.equals(playerClass)) continue;
+            RunicItemsAPI.addItem(
+                    target.getInventory(),
+                    template.generateItem(1, DupeManager.getNextItemId(), null, null).generateItem(),
+                    target.getLocation());
+            return;
         }
     }
 
