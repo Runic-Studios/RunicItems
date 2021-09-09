@@ -16,7 +16,7 @@ public class StatUtil {
      */
     public static <T> LinkedHashMap<Stat, T> sortStatMap(Map<Stat, T> stats) {
         LinkedHashMap<Stat, T> sorted = new LinkedHashMap<>();
-        stats.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entry) -> sorted.put(entry.getKey(), entry.getValue());
+        stats.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entry) -> sorted.put(entry.getKey(), entry.getValue()));
         return sorted;
     }
 
