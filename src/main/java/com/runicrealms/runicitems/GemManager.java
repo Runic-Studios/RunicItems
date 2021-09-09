@@ -87,10 +87,7 @@ public class GemManager implements Listener {
 
         if (event.getSlotType() == InventoryType.SlotType.ARMOR) Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
             PlayerStatHolder holder = PlayerManager.getCachedPlayerStats().get(event.getWhoClicked().getUniqueId());
-            holder.updateHelmet();
-            holder.updateChestplate();
-            holder.updateLeggings();
-            holder.updateBoots();
+            holder.updateItems(ArmorType.HELMET, ArmorType.CHESTPLATE, ArmorType.LEGGINGS, ArmorType.BOOTS);
         });
 
         event.setCancelled(true);
