@@ -76,9 +76,7 @@ public class LootManager {
                 return rarityItems.get(i).get(rarity).get(itemNumber);
             }
         }
-        return null; // Will never happen, just read my math its good trust me
-        // future excel here
-        // yeah no this might be broken i dont trust
+        throw new RuntimeException("Could not find script generated loot for levels " + min + "-" + max + " rarity " + rarity.getIdentifier().toUpperCase() + ".");
     }
 
 }
