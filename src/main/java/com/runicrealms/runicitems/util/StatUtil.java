@@ -4,12 +4,7 @@ import com.runicrealms.runicitems.Stat;
 import javafx.util.Pair;
 import org.bukkit.Bukkit;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class StatUtil {
 
@@ -76,10 +71,12 @@ public class StatUtil {
         int index = random.nextInt(tierOptions.size());
         Pair<Integer, int[]> selectedOption = tierOptions.get(index);
         stats.put(mainStat, selectedOption.getKey());
+        List<Stat> statsToChoose = Arrays.asList(Stat.PLAYER_STATS);
         for (int subStatBonus : selectedOption.getValue()) {
-            Stat selectedSubStat = Stat.PLAYER_STATS[random.nextInt(Stat.PLAYER_STATS.length)];;
-            while (selectedSubStat == mainStat || stats.containsKey(selectedSubStat)) selectedSubStat = Stat.PLAYER_STATS[random.nextInt(Stat.PLAYER_STATS.length)];
+            int randomSubStatIndex = random.nextInt(statsToChoose.size());
+            Stat selectedSubStat = statsToChoose.get(randomSubStatIndex);
             stats.put(selectedSubStat, subStatBonus);
+            statsToChoose.remove(randomSubStatIndex);
         }
         return sortStatMap(stats);
     }
