@@ -13,12 +13,14 @@ public enum Stat {
     STRENGTH("strength", "Strength", "STR", ChatColor.RED, "⚔", "Deal more melee weapon damage!"),
     VITALITY("vitality", "Vitality", "VIT", ChatColor.WHITE, "■", "Gain damage reduction and health regen!"),
     WISDOM("wisdom", "Wisdom", "WIS", ChatColor.GREEN, "✸", "Gain more spell healing and mana regen!"),
-    ATTACK_SPEED("attack-speed", "Attack Speed", "ATK SPD", ChatColor.GRAY, "", "Determines the swing speed of your weapon!"),
     /*
     Item-exclusive stats
      */
+    ATTACK_SPEED("attack-speed", "Attack Speed", "ATK SPD", ChatColor.GRAY, " ATK SPD", "Determines the swing speed of your weapon!"),
     CRIT("critical", "Crit", "CRIT", ChatColor.YELLOW, " CRIT", "Chance to deal a critical strike!"),
     DODGE("dodge", "Dodge", "DODGE", ChatColor.WHITE, " DODGE","Chance to dodge the damage of an attack!");
+
+    public static final Stat[] PLAYER_STATS = new Stat[] {DEXTERITY, INTELLIGENCE, STRENGTH, VITALITY, WISDOM};
 
     public static final String HEALTH_ICON = "❤";
 

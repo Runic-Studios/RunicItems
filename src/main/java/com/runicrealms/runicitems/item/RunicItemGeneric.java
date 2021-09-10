@@ -10,8 +10,10 @@ import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 public class RunicItemGeneric extends RunicItem {
 
@@ -31,7 +33,7 @@ public class RunicItemGeneric extends RunicItem {
                 template.getTriggers(), template.getLore()
         );
     }
-
+    
     public List<String> getLore() {
         return this.lore;
     }

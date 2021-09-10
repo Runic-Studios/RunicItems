@@ -4,13 +4,15 @@ import com.runicrealms.plugin.database.Data;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.*;
-import com.runicrealms.runicitems.item.stats.Gem;
+import com.runicrealms.runicitems.item.stats.GemBonus;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.runicitems.item.template.*;
+import com.runicrealms.runicitems.util.StatUtil;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +27,7 @@ public class ItemLoader {
             int count = section.get("count", Integer.class);
             RunicItemTemplate template = TemplateManager.getTemplateFromId(templateId);
             if (template instanceof RunicItemArmorTemplate) {
-                List<Gem> gems = new ArrayList<>();
+                List<GemBonus> gemBonuses = new ArrayList<>();
                 if (section.has("gems")) {
                     for (String gemKey : section.getSection("gems").getKeys()) {
                         LinkedHashMap<Stat, Integer> gemStats = new LinkedHashMap<>();
@@ -34,11 +36,11 @@ public class ItemLoader {
                                 gemStats.put(Stat.getFromIdentifier(statKey), section.get("gems." + gemKey + "." + statKey, Integer.class));
                             }
                         }
-                        gems.add(new Gem(gemStats, section.get("gems." + gemKey + ".health", Integer.class)));
+                        gemBonuses.add(new GemBonus(gemStats, section.get("gems." + gemKey + ".health", Integer.class)));
                     }
                 }
                 RunicItemArmorTemplate armorTemplate = (RunicItemArmorTemplate) template;
-                return new RunicItemArmor(armorTemplate, count, id, loadStats(section, armorTemplate.getStats()), gems);
+                return new RunicItemArmor(armorTemplate, count, id, loadStats(section, armorTemplate.getStats()), gemBonuses);
             } else if (template instanceof RunicItemArtifactTemplate) {
                 RunicItemArtifactTemplate artifactTemplate = (RunicItemArtifactTemplate) template;
                 return new RunicItemArtifact(artifactTemplate, count, id, loadStats(section, artifactTemplate.getStats()));
@@ -56,6 +58,9 @@ public class ItemLoader {
             } else if (template instanceof RunicItemWeaponTemplate) {
                 RunicItemWeaponTemplate weaponTemplate = (RunicItemWeaponTemplate) template;
                 return new RunicItemWeapon(weaponTemplate, count, id, loadStats(section, weaponTemplate.getStats()));
+            } else if (template instanceof RunicItemGemTemplate) {
+                RunicItemGemTemplate gemTemplate = (RunicItemGemTemplate) template;
+                return new RunicItemGem(gemTemplate, count, id, loadGemStats(section), section.has("health") ? section.get("health", Integer.class) : 0);
             }
         } catch (Exception exception) {
             Bukkit.getLogger().log(Level.INFO, "[RunicItems] Error loading item!");
@@ -66,7 +71,7 @@ public class ItemLoader {
     }
 
     private static LinkedHashMap<Stat, RunicItemStat> loadStats(Data section, Map<Stat, RunicItemStatRange> templateStats) {
-        LinkedHashMap<Stat, RunicItemStat> stats = new LinkedHashMap<>();
+        Map<Stat, RunicItemStat> stats = new HashMap<>();
         if (section.has("stats")) {
             Set<String> sectionKeys = section.getSection("stats").getKeys();
             for (Stat templateStatType : templateStats.keySet()) {
@@ -77,7 +82,20 @@ public class ItemLoader {
                 }
             }
         }
-        return stats;
+        return StatUtil.sortStatMap(stats);
+    }
+
+    private static LinkedHashMap<Stat, Integer> loadGemStats(Data section) {
+        Map<Stat, Integer> stats = new HashMap<>();
+        if (section.has("gem-stats")) {
+            Data gemStatsSection = section.getSection("gem-stats");
+            for (String key : gemStatsSection.getKeys()) {
+                Stat stat = Stat.getFromIdentifier(key);
+                if (stat == null) continue;
+                stats.put(stat, gemStatsSection.get(key, Integer.class));
+            }
+        }
+        return StatUtil.sortStatMap(stats);
     }
 
 }

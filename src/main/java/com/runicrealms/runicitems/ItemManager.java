@@ -420,6 +420,8 @@ public class ItemManager implements Listener {
             return RunicItemOffhand.getFromItemStack(itemStack);
         } else if (template instanceof RunicItemWeaponTemplate) {
             return RunicItemWeapon.getFromItemStack(itemStack);
+        } else if (template instanceof RunicItemGemTemplate) {
+            return RunicItemGem.getFromItemStack(itemStack);
         }
         return null;
     }

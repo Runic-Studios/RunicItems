@@ -4,12 +4,12 @@ import com.runicrealms.runicitems.Stat;
 
 import java.util.LinkedHashMap;
 
-public class Gem {
+public class GemBonus {
 
     private final LinkedHashMap<Stat, Integer> stats;
     private int health;
 
-    public Gem(LinkedHashMap<Stat, Integer> stats, int health) {
+    public GemBonus(LinkedHashMap<Stat, Integer> stats, int health) {
         this.stats = stats;
         this.health = health;
     }

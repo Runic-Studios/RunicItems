@@ -81,9 +81,14 @@ public class DupeManager implements Listener {
     public void onInventoryDrag(InventoryDragEvent event) {
         if (event.isCancelled()) return;
         Bukkit.getScheduler().runTaskLater(RunicItems.getInstance(), () -> {
-            event.getNewItems().keySet().forEach(slot -> assignNewDupeId(event.getWhoClicked().getInventory().getItem(slot)));
+            event.getNewItems().keySet().forEach(slot -> {
+                ItemStack item = event.getWhoClicked().getInventory().getItem(slot);
+                if (item == null || item.getType() == Material.AIR) return;
+                assignNewDupeId(item);
+            });
         }, 1L);
         ItemStack item = event.getCursor();
+        if (item == null || item.getType() == Material.AIR) return;
         assignNewDupeId(item);
         event.setCursor(item);
     }

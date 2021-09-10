@@ -3,8 +3,9 @@ package com.runicrealms.runicitems;
 import com.codingforcookies.armorequip.ArmorEquipEvent;
 import com.codingforcookies.armorequip.ArmorType;
 import com.runicrealms.runicitems.item.RunicItemArmor;
-import com.runicrealms.runicitems.item.stats.Gem;
+import com.runicrealms.runicitems.item.RunicItemGem;
 import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
+import com.runicrealms.runicitems.item.template.RunicItemGemTemplate;
 import com.runicrealms.runicitems.player.PlayerStatHolder;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
@@ -19,8 +20,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.LinkedHashMap;
-
 public class GemManager implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -31,24 +30,10 @@ public class GemManager implements Listener {
         if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
         if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) return;
         if (!(RunicItemsAPI.getItemStackTemplate(event.getCurrentItem()) instanceof RunicItemArmorTemplate)) return;
+        if (!(RunicItemsAPI.getItemStackTemplate(event.getCursor()) instanceof RunicItemGemTemplate)) return;
 
         NBTItem gemNbt = new NBTItem(event.getCursor(), true);
         if (!gemNbt.hasNBTData()) return;
-
-        Gem bonuses = new Gem(new LinkedHashMap<>(), 0);
-        for (String key : gemNbt.getKeys()) {
-            if (!key.startsWith("data-gem-")) continue;
-            String type = key.substring("data-gem-".length());
-            Integer value = parseInt(gemNbt.getString(key));
-            if (value == null) continue;
-            if (type.equalsIgnoreCase("health")) {
-                bonuses.setHealth(value);
-            } else {
-                Stat stat = Stat.getFromIdentifier(type);
-                if (stat != null) bonuses.getStats().put(stat, value);
-            }
-        }
-        if (bonuses.getStats().size() == 0 && !bonuses.hasHealth()) return;
 
         if (event.getCursor().getAmount() != 1) {
             event.getWhoClicked().sendMessage(ChatColor.RED + "You can only apply gems one at a time!");
@@ -62,7 +47,9 @@ public class GemManager implements Listener {
             return;
         }
 
-        armor.getGems().add(bonuses);
+        RunicItemGem gemItem = (RunicItemGem) RunicItemsAPI.getRunicItemFromItemStack(event.getCursor());
+
+        armor.getGems().add(gemItem.generateGemBonus());
 
         ItemStack generatedItem = armor.generateItem();
 

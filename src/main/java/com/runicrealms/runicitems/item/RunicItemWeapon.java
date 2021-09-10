@@ -34,7 +34,7 @@ public class RunicItemWeapon extends RunicItem {
                            RunicItemStatRange damageRange, LinkedHashMap<Stat, RunicItemStat> stats,
                            int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(templateId, displayableItem, tags, data, count, id, () -> {
-            List<String> lore = new ArrayList<>();
+            List<String> lore = new LinkedList<>();
             for (Map.Entry<Stat, RunicItemStat> entry : stats.entrySet()) {
                 lore.add(
                         entry.getKey().getChatColor()

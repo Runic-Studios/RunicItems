@@ -41,7 +41,7 @@ public class RunicItemArtifact extends RunicItemWeapon {
                     ability.getTrigger().getDisplay() + " " + ChatColor.RESET + "" + ChatColor.GREEN + ability.getAbilityName(),
                     ChatColor.translateAlternateColorCodes('&', ability.getDescription())
             });
-            List<String> lore = new ArrayList<>();
+            List<String> lore = new LinkedList<>();
             for (Map.Entry<Stat, RunicItemStat> entry : stats.entrySet()) {
                 lore.add(
                         entry.getKey().getChatColor()

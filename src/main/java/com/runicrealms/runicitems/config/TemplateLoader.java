@@ -103,9 +103,14 @@ public class TemplateLoader {
                     itemConfig.contains("author") ? itemConfig.getString("author") : null,
                     itemConfig.getStringList("pages")
             );
-        } else {
-            return null;
+        } else if (itemConfig.getString("type").equalsIgnoreCase("gem")) {
+            Stat mainStat = Stat.getFromIdentifier(itemConfig.getString("main-stat"));
+            if (mainStat != null) return new RunicItemGemTemplate(
+                    id, displayableItem, tags, data,
+                    itemConfig.getInt("tier"), mainStat
+            );
         }
+        return null;
     }
 
     private static RunicItemStatRange loadDamage(FileConfiguration itemConfig) {
