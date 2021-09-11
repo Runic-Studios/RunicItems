@@ -7,19 +7,19 @@ import java.util.LinkedHashMap;
 public class GemBonus {
 
     private final LinkedHashMap<Stat, Integer> stats;
-    private int health;
+    private final int health;
+    private final Stat mainStat;
+    private final int tier;
 
-    public GemBonus(LinkedHashMap<Stat, Integer> stats, int health) {
+    public GemBonus(LinkedHashMap<Stat, Integer> stats, int health, Stat mainStat, int tier) {
         this.stats = stats;
         this.health = health;
+        this.mainStat = mainStat;
+        this.tier = tier;
     }
 
     public LinkedHashMap<Stat, Integer> getStats() {
         return this.stats;
-    }
-
-    public void setHealth(int health) {
-        this.health = health;
     }
 
     public int getHealth() {
@@ -28,6 +28,14 @@ public class GemBonus {
 
     public boolean hasHealth() {
         return this.health != 0;
+    }
+
+    public Stat getMainStat() {
+        return this.mainStat;
+    }
+
+    public int getTier() {
+        return this.tier;
     }
 
 }

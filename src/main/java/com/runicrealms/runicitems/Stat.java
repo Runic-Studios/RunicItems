@@ -23,6 +23,7 @@ public enum Stat {
     public static final Stat[] PLAYER_STATS = new Stat[] {DEXTERITY, INTELLIGENCE, STRENGTH, VITALITY, WISDOM};
 
     public static final String HEALTH_ICON = "❤";
+    public static final String EMPTY_GEM_ICON = "◇";
 
     /*
     Combat multipliers

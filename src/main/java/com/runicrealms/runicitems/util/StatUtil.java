@@ -1,8 +1,8 @@
 package com.runicrealms.runicitems.util;
 
 import com.runicrealms.runicitems.Stat;
+import com.runicrealms.runicitems.item.RunicItemGem;
 import javafx.util.Pair;
-import org.bukkit.Bukkit;
 
 import java.util.*;
 
@@ -10,6 +10,8 @@ public class StatUtil {
 
     // Maps gem tier to a collection of options including the main stat value (pair key) and the sub stat values (pair entry)
     public static final Map<Integer, List<Pair<Integer, int[]>>> GEM_STAT_OPTIONS;
+    // Maps a gem tier to the number of gem slots (notches) it consumes
+    public static final Map<Integer, Integer> GEM_TIER_SLOTS;
 
     static {
         GEM_STAT_OPTIONS = new HashMap<>();
@@ -39,6 +41,13 @@ public class StatUtil {
         tierFive.add(new Pair<>(4, new int[] {2, 2}));
         tierFive.add(new Pair<>(4, new int[] {1, 1, 1, 1}));
         GEM_STAT_OPTIONS.put(5, tierFive);
+
+        GEM_TIER_SLOTS = new HashMap<>();
+        GEM_TIER_SLOTS.put(1, 1);
+        GEM_TIER_SLOTS.put(2, 2);
+        GEM_TIER_SLOTS.put(3, 3);
+        GEM_TIER_SLOTS.put(4, 3);
+        GEM_TIER_SLOTS.put(5, 3);
     }
 
     private static final Random random = new Random();
@@ -71,7 +80,8 @@ public class StatUtil {
         int index = random.nextInt(tierOptions.size());
         Pair<Integer, int[]> selectedOption = tierOptions.get(index);
         stats.put(mainStat, selectedOption.getKey());
-        List<Stat> statsToChoose = Arrays.asList(Stat.PLAYER_STATS);
+        List<Stat> statsToChoose = new ArrayList<>(Arrays.asList(Stat.PLAYER_STATS));
+        statsToChoose.remove(mainStat);
         for (int subStatBonus : selectedOption.getValue()) {
             int randomSubStatIndex = random.nextInt(statsToChoose.size());
             Stat selectedSubStat = statsToChoose.get(randomSubStatIndex);
@@ -79,6 +89,15 @@ public class StatUtil {
             statsToChoose.remove(randomSubStatIndex);
         }
         return sortStatMap(stats);
+    }
+
+    /**
+     * Gets the number of gem slots (notches) that the specified gem will consume.
+     * @param tier Gem tier
+     * @return Number of notches
+     */
+    public static int getGemSlots(int tier) {
+        return GEM_TIER_SLOTS.get(tier);
     }
 
 }

@@ -26,7 +26,7 @@ public class RunicItemGemTemplate extends RunicItemTemplate {
         if (tags == null) tags = this.tags;
         if (data == null) data = this.data;
         return new RunicItemGem(this.id, displayableItem, tags, data, count, id,
-                StatUtil.generateGemBonuses(this.tier, this.mainStat), 0, this.tier);
+                StatUtil.generateGemBonuses(this.tier, this.mainStat), 0, this.tier, this.mainStat);
     }
 
     public int getTier() {

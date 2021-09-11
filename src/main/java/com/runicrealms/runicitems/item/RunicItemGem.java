@@ -24,17 +24,15 @@ import java.util.Set;
 
 public class RunicItemGem extends RunicItem {
 
-    private final LinkedHashMap<Stat, Integer> stats;
-    private final int health;
-    private final int tier;
+    private final GemBonus bonus;
 
     public RunicItemGem(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data,
-                        int count, long id, LinkedHashMap<Stat, Integer> stats, int health, int tier) {
+                        int count, long id, GemBonus bonus) {
         super(templateId, displayableItem, tags, data, count, id, () -> {
             List<String> lore = new ArrayList<>();
 
-            for (Stat stat : stats.keySet()) {
-                int value = stats.get(stat);
+            for (Stat stat : bonus.getStats().keySet()) {
+                int value = bonus.getStats().get(stat);
                 if (value == 0) continue;;
                 lore.add(stat.getChatColor()
                         + (value < 0 ? "-" : "+")
@@ -48,47 +46,33 @@ public class RunicItemGem extends RunicItem {
             };
 
         });
-        this.stats = stats;
-        this.health = health;
-        this.tier = tier;
+        this.bonus = bonus;
     }
 
-    public RunicItemGem(RunicItemGemTemplate template, int count, long id, LinkedHashMap<Stat, Integer> stats, int health) {
-        this(template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id, stats, health, template.getTier());
+    public RunicItemGem(RunicItemGemTemplate template, int count, long id, GemBonus bonus) {
+        this(template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id, bonus);
     }
 
-    public LinkedHashMap<Stat, Integer> getStats() {
-        return this.stats;
+    public GemBonus getBonus() {
+        return this.bonus;
     }
-
-    public int getHealth() {
-        return this.health;
-    }
-
-    public boolean hasHealth() {
-        return this.health != 0;
-    }
-
-    public GemBonus generateGemBonus() {
-        return new GemBonus(this.stats, this.health);
-    }
-
     @Override
     public ItemStack generateItem() {
         ItemStack item = super.generateItem();
         NBTItem nbtItem = new NBTItem(item, true);
-        for (Stat stat : this.stats.keySet()) {
-            nbtItem.setInteger("gem-" + stat.getIdentifier(), this.stats.get(stat));
+        for (Stat stat : this.bonus.getStats().keySet()) {
+            nbtItem.setInteger("gem-" + stat.getIdentifier(), this.bonus.getStats().get(stat));
         }
-        if (this.health != 0) nbtItem.setInteger("gem-health", this.health);
+        if (this.bonus.getHealth() != 0) nbtItem.setInteger("gem-health", this.bonus.getHealth());
+        nbtItem.setString("gem-main", this.bonus.getMainStat().getIdentifier());
         return item;
     }
 
     @Override
     public void addToData(Data section, String root) {
         super.addToData(section, root);
-        for (Stat statType : this.stats.keySet()) {
-            section.set(ItemManager.getInventoryPath() + "." + root + ".gem-stats." + statType.getIdentifier(), this.stats.get(statType));
+        for (Stat statType : this.bonus.getStats().keySet()) {
+            section.set(ItemManager.getInventoryPath() + "." + root + ".gem-stats." + statType.getIdentifier(), this.bonus.getStats().get(statType));
         }
     }
 
@@ -100,11 +84,17 @@ public class RunicItemGem extends RunicItem {
         Set<String> keys = nbtItem.getKeys();
         Map<Stat, Integer> stats = new HashMap<>();
         int health = 0;
+        Stat mainStat = null;
+        int tier = 1;
         for (String key : keys) {
             if (key.startsWith("gem-")) {
                 String statString = key.substring(4);
                 if (statString.equalsIgnoreCase("health")) {
                     health = nbtItem.getInteger(key);
+                } else if (statString.equalsIgnoreCase("main")) {
+                    mainStat = Stat.getFromIdentifier(nbtItem.getString(key));
+                } else if (statString.equalsIgnoreCase("tier")) {
+                    tier = nbtItem.getInteger(key);
                 } else {
                     Stat stat = Stat.getFromIdentifier(statString);
                     if (stat == null) continue;
@@ -112,7 +102,7 @@ public class RunicItemGem extends RunicItem {
                 }
             }
         }
-        return new RunicItemGem(template, item.getAmount(), nbtItem.getInteger("id"), StatUtil.sortStatMap(stats), health);
+        return new RunicItemGem(template, item.getAmount(), nbtItem.getInteger("id"), new GemBonus(StatUtil.sortStatMap(stats), health, mainStat, tier));
     }
 
 }

@@ -14,6 +14,7 @@ import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
 import com.runicrealms.runicitems.player.AddedArmorStats;
+import com.runicrealms.runicitems.util.StatUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import javafx.util.Pair;
 import org.bukkit.ChatColor;
@@ -99,11 +100,27 @@ public class RunicItemArmor extends RunicItem {
             }
 
             if (level > 0) {
+                    StringBuilder gemTextBuilder = new StringBuilder(ChatColor.GRAY.toString())
+                            .append(ChatColor.WHITE)
+                            .append("Gem Notches: ")
+                            .append("[ ");
+                    int counter = 0;
+                    for (GemBonus gemBonus : gemBonuses) {
+                        for (int i = 0; i < StatUtil.getGemSlots(gemBonus))
+                        gemTextBuilder.append(gemBonus.getMainStat().getChatColor()).append(gemBonus.getMainStat().getIcon()).append(" ");
+                        counter++;
+                    }
+                    gemTextBuilder.append(ChatColor.DARK_GRAY);
+                    for (int i = counter; i < maxGemSlots; i++) {
+                        gemTextBuilder.append(Stat.EMPTY_GEM_ICON).append(" ");
+                    }
+                    gemTextBuilder.append(ChatColor.GRAY).append("]");
                 return new ItemLoreSection[] {
                         (maxGemSlots > 0
                                 ? new ItemLoreSection(new String[] {
                                 ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
-                                ChatColor.GRAY + "[" + ChatColor.WHITE + gemBonuses.size() + ChatColor.GRAY + "/" + ChatColor.WHITE + maxGemSlots + ChatColor.GRAY + "] Gems",})
+                                //ChatColor.GRAY + "[" + ChatColor.WHITE + gemBonuses.size() + ChatColor.GRAY + "/" + ChatColor.WHITE + maxGemSlots + ChatColor.GRAY + "] Gem Notches",
+                                gemTextBuilder.toString()})
                                 : new ItemLoreSection(new String[]{
                                 ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
                         })),
@@ -221,6 +238,7 @@ public class RunicItemArmor extends RunicItem {
                 nbtItem.setInteger("gem-" + count + "-" + statType.getIdentifier(), gemBonus.getStats().get(statType));
             }
             nbtItem.setInteger("gem-" + count + "-health", gemBonus.getHealth());
+            nbtItem.setString("gem-" + count + "-main", gemBonus.getMainStat().getIdentifier());
             count++;
         }
         return item;
@@ -264,12 +282,14 @@ public class RunicItemArmor extends RunicItem {
                 int gemNumber = Integer.parseInt(split[1]);
 
                 while (gemBonuses.size() <= gemNumber) {
-                    gemBonuses.add(new GemBonus(new LinkedHashMap<>(), 0));
+                    gemBonuses.add(new GemBonus(new LinkedHashMap<>(), 0, null));
                 }
 
                 String statName = split[2];
                 if (statName.equalsIgnoreCase("health")) {
                     gemBonuses.get(gemNumber).setHealth(nbtItem.getInteger(key));
+                } else if (statName.equalsIgnoreCase("main")) {
+                    gemBonuses.get(gemNumber).setMainStat(Stat.getFromIdentifier(split[2]));
                 } else {
                     gemBonuses.get(gemNumber).getStats().put(Stat.getFromIdentifier(split[2]), nbtItem.getInteger(key));
                 }

@@ -7,6 +7,7 @@ import com.runicrealms.runicitems.item.RunicItemGem;
 import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemGemTemplate;
 import com.runicrealms.runicitems.player.PlayerStatHolder;
+import com.runicrealms.runicitems.util.StatUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -41,13 +42,12 @@ public class GemManager implements Listener {
         }
 
         RunicItemArmor armor = (RunicItemArmor) RunicItemsAPI.getRunicItemFromItemStack(event.getCurrentItem());
+        RunicItemGem gemItem = (RunicItemGem) RunicItemsAPI.getRunicItemFromItemStack(event.getCursor());
 
-        if (armor.getGems().size() >= armor.getMaxGemSlots()) {
-            event.getWhoClicked().sendMessage(ChatColor.RED + "This item doesn't have any free gem slots!");
+        if (armor.getGems().size() + StatUtil.getGemSlots(gemItem.getTier()) > armor.getMaxGemSlots()) {
+            event.getWhoClicked().sendMessage(ChatColor.RED + "This item doesn't have enough free gem notches!");
             return;
         }
-
-        RunicItemGem gemItem = (RunicItemGem) RunicItemsAPI.getRunicItemFromItemStack(event.getCursor());
 
         armor.getGems().add(gemItem.generateGemBonus());
 
