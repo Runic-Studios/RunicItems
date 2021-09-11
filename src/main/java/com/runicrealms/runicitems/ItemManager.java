@@ -55,7 +55,7 @@ public class ItemManager implements Listener {
     public ItemManager() {
         Bukkit.getScheduler().runTaskTimer(RunicItems.getInstance(), () -> {
             tickCounter++;
-            if (tickCounter >= 20) {
+            if (tickCounter >= 10) {
                 tickCounter = 0;
             }
         }, 0L, 1L);
@@ -293,11 +293,14 @@ public class ItemManager implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPickup(PlayerAttemptPickupItemEvent event) {
 
-        if (!event.getFlyAtPlayer()) return;
-
-        if (tickCounter != 0) return;
+        //if (!event.getFlyAtPlayer()) return;
 
         if (event.isCancelled()) return;
+
+        if (tickCounter != 0) {
+            event.setCancelled(true);
+            return;
+        }
 
         event.setCancelled(true);
 

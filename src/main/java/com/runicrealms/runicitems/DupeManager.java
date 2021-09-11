@@ -54,7 +54,7 @@ public class DupeManager implements Listener {
 
             if (event.getAction() == InventoryAction.DROP_ALL_CURSOR
                     || event.getAction() == InventoryAction.DROP_ONE_CURSOR) {
-                if (checkInventoryForDupes(event.getClickedInventory(), event.getCursor(), CurrentItemType.CURSOR, event, player)) return;
+                if (checkInventoryForDupes(event.getWhoClicked().getInventory(), event.getCursor(), CurrentItemType.CURSOR, event, player)) return;
             } else if (event.getAction() == InventoryAction.DROP_ALL_SLOT
                     || event.getAction() == InventoryAction.DROP_ONE_SLOT) {
                 if (checkInventoryForDupes(event.getClickedInventory(), event.getCurrentItem(), CurrentItemType.CURRENT, event, player)) return;
