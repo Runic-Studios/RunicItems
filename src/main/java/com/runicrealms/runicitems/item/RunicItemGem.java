@@ -17,7 +17,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +40,7 @@ public class RunicItemGem extends RunicItem {
             }
 
             return new ItemLoreSection[] {
+                    new ItemLoreSection(new String[] {ChatColor.GRAY + "Gem Slots Required: " + ChatColor.WHITE + StatUtil.getGemSlots(bonus.getTier())}),
                     new ItemLoreSection(new String[] {ChatColor.GRAY + "Drag and click on armor to apply this gem."}),
                     new ItemLoreSection(lore)
             };
@@ -65,6 +65,7 @@ public class RunicItemGem extends RunicItem {
         }
         if (this.bonus.getHealth() != 0) nbtItem.setInteger("gem-health", this.bonus.getHealth());
         nbtItem.setString("gem-main", this.bonus.getMainStat().getIdentifier());
+        nbtItem.setInteger("gem-tier", this.bonus.getTier());
         return item;
     }
 

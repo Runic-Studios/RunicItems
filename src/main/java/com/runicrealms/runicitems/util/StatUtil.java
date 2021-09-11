@@ -10,7 +10,7 @@ public class StatUtil {
 
     // Maps gem tier to a collection of options including the main stat value (pair key) and the sub stat values (pair entry)
     public static final Map<Integer, List<Pair<Integer, int[]>>> GEM_STAT_OPTIONS;
-    // Maps a gem tier to the number of gem slots (notches) it consumes
+    // Maps a gem tier to the number of gem slots (slots) it consumes
     public static final Map<Integer, Integer> GEM_TIER_SLOTS;
 
     static {
@@ -45,7 +45,7 @@ public class StatUtil {
         GEM_TIER_SLOTS = new HashMap<>();
         GEM_TIER_SLOTS.put(1, 1);
         GEM_TIER_SLOTS.put(2, 2);
-        GEM_TIER_SLOTS.put(3, 3);
+        GEM_TIER_SLOTS.put(3, 2);
         GEM_TIER_SLOTS.put(4, 3);
         GEM_TIER_SLOTS.put(5, 3);
     }
@@ -92,9 +92,9 @@ public class StatUtil {
     }
 
     /**
-     * Gets the number of gem slots (notches) that the specified gem will consume.
+     * Gets the number of gem slots (slots) that the specified gem will consume.
      * @param tier Gem tier
-     * @return Number of notches
+     * @return Number of slots
      */
     public static int getGemSlots(int tier) {
         return GEM_TIER_SLOTS.get(tier);

@@ -17,6 +17,7 @@ import com.runicrealms.runicitems.player.AddedArmorStats;
 import com.runicrealms.runicitems.util.StatUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import javafx.util.Pair;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -101,25 +102,25 @@ public class RunicItemArmor extends RunicItem {
 
             if (level > 0) {
                     StringBuilder gemTextBuilder = new StringBuilder(ChatColor.GRAY.toString())
+                            .append("Gem Slots: ")
                             .append(ChatColor.WHITE)
-                            .append("Gem Notches: ")
                             .append("[ ");
                     int counter = 0;
                     for (GemBonus gemBonus : gemBonuses) {
-                        for (int i = 0; i < StatUtil.getGemSlots(gemBonus))
-                        gemTextBuilder.append(gemBonus.getMainStat().getChatColor()).append(gemBonus.getMainStat().getIcon()).append(" ");
-                        counter++;
+                        for (int i = 0; i < StatUtil.getGemSlots(gemBonus.getTier()); i++) {
+                            gemTextBuilder.append(gemBonus.getMainStat().getChatColor()).append(gemBonus.getMainStat().getIcon()).append(" ");
+                            counter++;
+                        }
                     }
                     gemTextBuilder.append(ChatColor.DARK_GRAY);
                     for (int i = counter; i < maxGemSlots; i++) {
                         gemTextBuilder.append(Stat.EMPTY_GEM_ICON).append(" ");
                     }
-                    gemTextBuilder.append(ChatColor.GRAY).append("]");
+                    gemTextBuilder.append(ChatColor.WHITE).append("]");
                 return new ItemLoreSection[] {
                         (maxGemSlots > 0
                                 ? new ItemLoreSection(new String[] {
                                 ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
-                                //ChatColor.GRAY + "[" + ChatColor.WHITE + gemBonuses.size() + ChatColor.GRAY + "/" + ChatColor.WHITE + maxGemSlots + ChatColor.GRAY + "] Gem Notches",
                                 gemTextBuilder.toString()})
                                 : new ItemLoreSection(new String[]{
                                 ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
@@ -212,9 +213,11 @@ public class RunicItemArmor extends RunicItem {
         int count = 0;
         for (GemBonus gemBonus : this.gemBonuses) {
             for (Stat statType : gemBonus.getStats().keySet()) {
-                section.set(ItemManager.getInventoryPath() + "." + root + ".gems." + count + "." + statType.toString().toLowerCase(), gemBonus.getStats().get(statType));
+                section.set(ItemManager.getInventoryPath() + "." + root + ".gems." + count + "." + statType.getIdentifier(), gemBonus.getStats().get(statType));
             }
-            section.set(ItemManager.getInventoryPath() + "." + root + ".gems." + count + ".health", gemBonus.getHealth());
+            if (gemBonus.getHealth() != 0) section.set(ItemManager.getInventoryPath() + "." + root + ".gems." + count + ".health", gemBonus.getHealth());
+            section.set(ItemManager.getInventoryPath() + "." + root + ".gems." + count + ".tier", gemBonus.getTier());
+            section.set(ItemManager.getInventoryPath() + "." + root + ".gems." + count + ".main", gemBonus.getMainStat().getIdentifier());
             count++;
         }
     }
@@ -237,8 +240,9 @@ public class RunicItemArmor extends RunicItem {
             for (Stat statType : gemBonus.getStats().keySet()) {
                 nbtItem.setInteger("gem-" + count + "-" + statType.getIdentifier(), gemBonus.getStats().get(statType));
             }
-            nbtItem.setInteger("gem-" + count + "-health", gemBonus.getHealth());
+            if (gemBonus.getHealth() != 0) nbtItem.setInteger("gem-" + count + "-health", gemBonus.getHealth());
             nbtItem.setString("gem-" + count + "-main", gemBonus.getMainStat().getIdentifier());
+            nbtItem.setInteger("gem-" + count + "-tier", gemBonus.getTier());
             count++;
         }
         return item;
@@ -273,27 +277,39 @@ public class RunicItemArmor extends RunicItem {
             stats.put(stat.getKey(), stat.getValue());
         }
 
-        List<GemBonus> gemBonuses = new ArrayList<>();
+        Map<Integer, LinkedHashMap<Stat, Integer>> gemStats = new HashMap<>();
+        Map<Integer, Integer> gemHealth = new HashMap<>();
+        Map<Integer, Stat> gemMainStat = new HashMap<>();
+        Map<Integer, Integer> gemTier = new HashMap<>();
 
         for (String key : keys) {
             String[] split = key.split("-");
             if (split[0].equals("gem")) {;
 
                 int gemNumber = Integer.parseInt(split[1]);
-
-                while (gemBonuses.size() <= gemNumber) {
-                    gemBonuses.add(new GemBonus(new LinkedHashMap<>(), 0, null));
-                }
+                if (!gemStats.containsKey(gemNumber)) gemStats.put(gemNumber, new LinkedHashMap<>());
 
                 String statName = split[2];
                 if (statName.equalsIgnoreCase("health")) {
-                    gemBonuses.get(gemNumber).setHealth(nbtItem.getInteger(key));
+                    gemHealth.put(gemNumber, nbtItem.getInteger(key));
                 } else if (statName.equalsIgnoreCase("main")) {
-                    gemBonuses.get(gemNumber).setMainStat(Stat.getFromIdentifier(split[2]));
+                    gemMainStat.put(gemNumber, Stat.getFromIdentifier(nbtItem.getString(key)));
+                } else if (statName.equalsIgnoreCase("tier")) {
+                    gemTier.put(gemNumber, nbtItem.getInteger(key));
                 } else {
-                    gemBonuses.get(gemNumber).getStats().put(Stat.getFromIdentifier(split[2]), nbtItem.getInteger(key));
+                    gemStats.get(gemNumber).put(Stat.getFromIdentifier(split[2]), nbtItem.getInteger(key));
                 }
             }
+        }
+
+        List<GemBonus> gemBonuses = new ArrayList<>();
+        for (Integer gemNumber : gemStats.keySet()) {
+            gemBonuses
+                    .add(new GemBonus(
+                            gemStats.get(gemNumber),
+                            gemHealth.getOrDefault(gemNumber, 0),
+                            gemMainStat.get(gemNumber),
+                            gemTier.get(gemNumber)));
         }
 
         return new RunicItemArmor(template, item.getAmount(), nbtItem.getInteger("id"), stats, gemBonuses);

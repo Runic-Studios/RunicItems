@@ -35,14 +35,16 @@ public class LootManager {
     public static void sortItems(Map<String, RunicItemTemplate> templates) {
         for (Map.Entry<String, RunicItemTemplate> entry : templates.entrySet()) {
             if (entry.getValue() instanceof RunicRarityLevelItemTemplate) {
-                RunicRarityLevelItemTemplate template = (RunicRarityLevelItemTemplate) entry.getValue();
-                if (!rarityItems.containsKey(template.getLevel())) {
-                    rarityItems.put(template.getLevel(), new HashMap<>());
+                if (entry.getKey().startsWith("script")) {
+                    RunicRarityLevelItemTemplate template = (RunicRarityLevelItemTemplate) entry.getValue();
+                    if (!rarityItems.containsKey(template.getLevel())) {
+                        rarityItems.put(template.getLevel(), new HashMap<>());
+                    }
+                    if (!rarityItems.get(template.getLevel()).containsKey(template.getRarity())) {
+                        rarityItems.get(template.getLevel()).put(template.getRarity(), new LinkedList<>());
+                    }
+                    rarityItems.get(template.getLevel()).get(template.getRarity()).add(template);
                 }
-                if (!rarityItems.get(template.getLevel()).containsKey(template.getRarity())) {
-                    rarityItems.get(template.getLevel()).put(template.getRarity(), new LinkedList<>());
-                }
-                rarityItems.get(template.getLevel()).get(template.getRarity()).add(template);
             }
         }
     }

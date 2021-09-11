@@ -2,9 +2,9 @@ package com.runicrealms.runicitems.item.template;
 
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.item.RunicItemGem;
+import com.runicrealms.runicitems.item.stats.GemBonus;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
-import com.runicrealms.runicitems.util.StatUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -25,8 +25,7 @@ public class RunicItemGemTemplate extends RunicItemTemplate {
     public RunicItemGem generateItem(int count, long id, List<RunicItemTag> tags, Map<String, String> data) {
         if (tags == null) tags = this.tags;
         if (data == null) data = this.data;
-        return new RunicItemGem(this.id, displayableItem, tags, data, count, id,
-                StatUtil.generateGemBonuses(this.tier, this.mainStat), 0, this.tier, this.mainStat);
+        return new RunicItemGem(this.id, displayableItem, tags, data, count, id, new GemBonus(this.mainStat, this.tier));
     }
 
     public int getTier() {

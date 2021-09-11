@@ -32,14 +32,17 @@ public class ItemLoader {
                     for (String gemKey : section.getSection("gems").getKeys()) {
                         LinkedHashMap<Stat, Integer> gemStats = new LinkedHashMap<>();
                         for (String statKey : section.getSection("gems." + gemKey).getKeys()) {
-                            if (!statKey.equalsIgnoreCase("health") && !statKey.equalsIgnoreCase("main")) {
+                            if (!statKey.equalsIgnoreCase("health")
+                                    && !statKey.equalsIgnoreCase("main")
+                                    && !statKey.equalsIgnoreCase("tier")) {
                                 gemStats.put(Stat.getFromIdentifier(statKey), section.get("gems." + gemKey + "." + statKey, Integer.class));
                             }
                         }
                         gemBonuses.add(new GemBonus(
                                 gemStats,
-                                section.get("gems." + gemKey + ".health", Integer.class),
-                                Stat.getFromIdentifier(section.get("gems.main", String.class))));
+                                section.has("gems." + gemKey + ".health") ? section.get("gems." + gemKey + ".health", Integer.class) : 0,
+                                Stat.getFromIdentifier(section.get("gems." + gemKey + ".main", String.class)),
+                                section.get("gems." + gemKey + ".tier", Integer.class)));
                     }
                 }
                 RunicItemArmorTemplate armorTemplate = (RunicItemArmorTemplate) template;
@@ -63,10 +66,11 @@ public class ItemLoader {
                 return new RunicItemWeapon(weaponTemplate, count, id, loadStats(section, weaponTemplate.getStats()));
             } else if (template instanceof RunicItemGemTemplate) {
                 RunicItemGemTemplate gemTemplate = (RunicItemGemTemplate) template;
-                return new RunicItemGem(gemTemplate, count, id,
+                return new RunicItemGem(gemTemplate, count, id, new GemBonus(
                         loadGemStats(section),
                         section.has("health") ? section.get("health", Integer.class) : 0,
-                        Stat.getFromIdentifier(section.get("main", String.class)));
+                        gemTemplate.getMainStat(),
+                        gemTemplate.getTier()));
             }
         } catch (Exception exception) {
             Bukkit.getLogger().log(Level.INFO, "[RunicItems] Error loading item!");

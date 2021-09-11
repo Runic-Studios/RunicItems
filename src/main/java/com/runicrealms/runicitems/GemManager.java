@@ -44,12 +44,12 @@ public class GemManager implements Listener {
         RunicItemArmor armor = (RunicItemArmor) RunicItemsAPI.getRunicItemFromItemStack(event.getCurrentItem());
         RunicItemGem gemItem = (RunicItemGem) RunicItemsAPI.getRunicItemFromItemStack(event.getCursor());
 
-        if (armor.getGems().size() + StatUtil.getGemSlots(gemItem.getTier()) > armor.getMaxGemSlots()) {
-            event.getWhoClicked().sendMessage(ChatColor.RED + "This item doesn't have enough free gem notches!");
+        if (armor.getGems().size() + StatUtil.getGemSlots(gemItem.getBonus().getTier()) > armor.getMaxGemSlots()) {
+            event.getWhoClicked().sendMessage(ChatColor.RED + "This item doesn't have enough free gem slots!");
             return;
         }
 
-        armor.getGems().add(gemItem.generateGemBonus());
+        armor.getGems().add(gemItem.getBonus());
 
         ItemStack generatedItem = armor.generateItem();
 

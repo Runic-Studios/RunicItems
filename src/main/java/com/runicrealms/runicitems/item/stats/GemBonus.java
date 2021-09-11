@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item.stats;
 
 import com.runicrealms.runicitems.Stat;
+import com.runicrealms.runicitems.util.StatUtil;
 
 import java.util.LinkedHashMap;
 
@@ -14,6 +15,13 @@ public class GemBonus {
     public GemBonus(LinkedHashMap<Stat, Integer> stats, int health, Stat mainStat, int tier) {
         this.stats = stats;
         this.health = health;
+        this.mainStat = mainStat;
+        this.tier = tier;
+    }
+
+    public GemBonus(Stat mainStat, int tier) {
+        this.stats = StatUtil.generateGemBonuses(tier, mainStat);
+        this.health = 0;
         this.mainStat = mainStat;
         this.tier = tier;
     }
