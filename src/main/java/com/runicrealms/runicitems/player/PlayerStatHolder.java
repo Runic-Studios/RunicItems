@@ -60,7 +60,6 @@ public class PlayerStatHolder {
                 if (!stats.containsKey(stat)) stats.put(stat, 0);
                 stats.put(stat, stats.get(stat) + value);
             });
-            Bukkit.broadcastMessage(addedStats.getHealth() + "");
             health += addedStats.getHealth();
         }
         if (this.leggings != null) {
