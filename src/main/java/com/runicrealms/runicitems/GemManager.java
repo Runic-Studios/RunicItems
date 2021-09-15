@@ -4,6 +4,7 @@ import com.codingforcookies.armorequip.ArmorEquipEvent;
 import com.codingforcookies.armorequip.ArmorType;
 import com.runicrealms.runicitems.item.RunicItemArmor;
 import com.runicrealms.runicitems.item.RunicItemGem;
+import com.runicrealms.runicitems.item.stats.GemBonus;
 import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemGemTemplate;
 import com.runicrealms.runicitems.player.PlayerStatHolder;
@@ -44,7 +45,10 @@ public class GemManager implements Listener {
         RunicItemArmor armor = (RunicItemArmor) RunicItemsAPI.getRunicItemFromItemStack(event.getCurrentItem());
         RunicItemGem gemItem = (RunicItemGem) RunicItemsAPI.getRunicItemFromItemStack(event.getCursor());
 
-        if (armor.getGems().size() + StatUtil.getGemSlots(gemItem.getBonus().getTier()) > armor.getMaxGemSlots()) {
+        int gemSlotsUsed = 0;
+        for (GemBonus gem : armor.getGems()) gemSlotsUsed += StatUtil.getGemSlots(gem.getTier());
+
+        if (gemSlotsUsed + StatUtil.getGemSlots(gemItem.getBonus().getTier()) > armor.getMaxGemSlots()) {
             event.getWhoClicked().sendMessage(ChatColor.RED + "This item doesn't have enough free gem slots!");
             return;
         }
