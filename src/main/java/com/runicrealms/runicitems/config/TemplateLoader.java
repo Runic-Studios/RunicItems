@@ -19,9 +19,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
 import java.util.*;
-import java.util.function.Function;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 public class TemplateLoader {
 
@@ -121,6 +119,7 @@ public class TemplateLoader {
         if (itemConfig.contains("stats")) {
             Map<Stat, RunicItemStatRange> stats = new HashMap<>();
             for (String key : itemConfig.getConfigurationSection("stats").getKeys(false)) {
+                if (Stat.getFromIdentifier(key) == null) continue; // typos or removed stats
                 stats.put(Stat.getFromIdentifier(key), new RunicItemStatRange(
                         itemConfig.getInt("stats." + key + ".min"),
                         itemConfig.getInt("stats." + key + ".max")
