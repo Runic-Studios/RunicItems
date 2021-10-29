@@ -4,6 +4,7 @@ import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.AbilityManager;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
+import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.RunicItemDynamic;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
@@ -19,19 +20,21 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
 import java.util.*;
-import java.util.function.Function;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 public class TemplateLoader {
 
     public static void loadTemplates() {
-        File folder = new File(RunicItems.getInstance().getDataFolder(), "items");
+        File itemsFolder = new File(RunicItems.getInstance().getDataFolder(), "items");
+        File scriptFolder = new File(RunicItems.getInstance().getDataFolder(), "script");
         Map<String, RunicItemTemplate> templates = new HashMap<>();
-        for (File file : folder.listFiles()) {
+        Map<File, File> templateFiles = new HashMap<>();
+        for (File file : itemsFolder.listFiles()) templateFiles.put(file, itemsFolder);
+        for (File file : scriptFolder.listFiles()) templateFiles.put(file, scriptFolder);
+        for (File file : templateFiles.keySet()) {
             //Bukkit.getLogger().log(Level.INFO, "[RunicItems] Loading template " + file.getName());
             FileConfiguration itemConfig;
-            itemConfig = ConfigUtil.getYamlConfigFile(file.getName(), folder);
+            itemConfig = ConfigUtil.getYamlConfigFile(file.getName(), templateFiles.get(file));
             RunicItemTemplate template;
             template = loadTemplate(itemConfig);
             if (template == null) {
@@ -121,6 +124,7 @@ public class TemplateLoader {
         if (itemConfig.contains("stats")) {
             Map<Stat, RunicItemStatRange> stats = new HashMap<>();
             for (String key : itemConfig.getConfigurationSection("stats").getKeys(false)) {
+                if (Stat.getFromIdentifier(key) == null) continue; // typos or removed stats
                 stats.put(Stat.getFromIdentifier(key), new RunicItemStatRange(
                         itemConfig.getInt("stats." + key + ".min"),
                         itemConfig.getInt("stats." + key + ".max")

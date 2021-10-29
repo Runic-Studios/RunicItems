@@ -15,6 +15,7 @@ import de.tr7zw.nbtapi.NBTItem;
 import javafx.util.Pair;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
@@ -39,10 +40,10 @@ public class RunicItemOffhand extends RunicItem {
             }
             return new ItemLoreSection[] {
                     new ItemLoreSection(new String[] {
-                            rarity.getDisplay(),
                             ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
                     }),
-                    new ItemLoreSection(lore)
+                    new ItemLoreSection(lore),
+                    new ItemLoreSection(Collections.singletonList(rarity.getDisplay())),
             };
         });
         this.stats = stats;
@@ -81,6 +82,11 @@ public class RunicItemOffhand extends RunicItem {
     @Override
     public ItemStack generateItem() {
         ItemStack item = super.generateItem();
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(this.getRarity().getChatColor() + this.getDisplayableItem().getDisplayName()); // apply rarity color
+            item.setItemMeta(meta);
+        }
         NBTItem nbtItem = new NBTItem(item, true);
         int count = 0;
         for (Stat statType : this.stats.keySet()) {

@@ -17,7 +17,6 @@ import com.runicrealms.runicitems.player.AddedArmorStats;
 import com.runicrealms.runicitems.util.StatUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import javafx.util.Pair;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -112,7 +111,7 @@ public class RunicItemArmor extends RunicItem {
                             counter++;
                         }
                     }
-                    gemTextBuilder.append(ChatColor.DARK_GRAY);
+                    gemTextBuilder.append(ChatColor.GRAY);
                     for (int i = counter; i < maxGemSlots; i++) {
                         gemTextBuilder.append(Stat.EMPTY_GEM_ICON).append(" ");
                     }

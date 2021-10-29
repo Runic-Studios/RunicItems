@@ -1,7 +1,7 @@
 package com.runicrealms.runicitems;
 
-import com.codingforcookies.armorequip.ArmorEquipEvent;
-import com.codingforcookies.armorequip.ArmorType;
+import com.runicrealms.plugin.enums.ArmorType;
+import com.runicrealms.plugin.events.ArmorEquipEvent;
 import com.runicrealms.runicitems.item.RunicItemArmor;
 import com.runicrealms.runicitems.item.RunicItemGem;
 import com.runicrealms.runicitems.item.stats.GemBonus;

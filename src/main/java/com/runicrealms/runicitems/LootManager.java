@@ -35,6 +35,7 @@ public class LootManager {
         for (int i = 0; i < 4; i++) RARITY_ARMOR_WEAPON_DISTRIB_WEIGHTED.add(RarityItemType.ARMOR);
         RARITY_ARMOR_WEAPON_DISTRIB_WEIGHTED.add(RarityItemType.WEAPON);
     }
+
     // Maps level to a mapping between rarities and a list of available templates
     private static final Map<Integer, Map<RunicItemRarity, List<RunicRarityLevelItemTemplate>>> armorItems = new HashMap<>();
     // This includes artifacts because artifact instanceof weapon
@@ -59,7 +60,8 @@ public class LootManager {
                     }
                     if (rarityItems == null) continue;
 
-                    if (!rarityItems.containsKey(template.getLevel())) rarityItems.put(template.getLevel(), new HashMap<>());
+                    if (!rarityItems.containsKey(template.getLevel()))
+                        rarityItems.put(template.getLevel(), new HashMap<>());
                     if (!rarityItems.get(template.getLevel()).containsKey(template.getRarity())) {
                         rarityItems.get(template.getLevel()).put(template.getRarity(), new LinkedList<>());
                     }
@@ -80,6 +82,7 @@ public class LootManager {
 
     /**
      * Gets a random item in level range, INCLUSIVE.
+     *
      * @param min - minimum levels
      * @param max - maximum level
      * @return random item
@@ -88,7 +91,7 @@ public class LootManager {
         int amount = 0;
         RunicItemRarity rarity = rollRarity();
 
-        Map<Integer, Map<RunicItemRarity, List<RunicRarityLevelItemTemplate>>> rarityItems = null;
+        Map<Integer, Map<RunicItemRarity, List<RunicRarityLevelItemTemplate>>> rarityItems;
         switch (RARITY_ARMOR_WEAPON_DISTRIB_WEIGHTED.get(random.nextInt(RARITY_ARMOR_WEAPON_DISTRIB_WEIGHTED.size()))) {
             case ARMOR:
                 rarityItems = armorItems;

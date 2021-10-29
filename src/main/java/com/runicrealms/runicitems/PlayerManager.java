@@ -1,9 +1,8 @@
 package com.runicrealms.runicitems;
 
-import com.codingforcookies.armorequip.ArmorEquipEvent;
-import com.codingforcookies.armorequip.ArmorType;
 import com.runicrealms.plugin.character.api.CharacterLoadEvent;
-import com.runicrealms.plugin.events.OffhandEquipEvent;
+import com.runicrealms.plugin.enums.ArmorType;
+import com.runicrealms.plugin.events.ArmorEquipEvent;
 import com.runicrealms.runicitems.player.PlayerStatHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -46,6 +45,7 @@ public class PlayerManager implements Listener {
                 case CHESTPLATE: cachedPlayerStats.get(uuid).updateItems(ArmorType.CHESTPLATE);
                 case LEGGINGS: cachedPlayerStats.get(uuid).updateItems(ArmorType.LEGGINGS);
                 case BOOTS: cachedPlayerStats.get(uuid).updateItems(ArmorType.BOOTS);
+                case OFFHAND: cachedPlayerStats.get(uuid).updateOffhand();
             }
         });
     }
@@ -55,13 +55,6 @@ public class PlayerManager implements Listener {
         if (!cachedPlayerStats.containsKey(event.getPlayer().getUniqueId())) return;
         if (event.isCancelled()) return;
         Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(event.getPlayer().getUniqueId()).updateWeapon());
-    }
-
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onOffhandEquip(OffhandEquipEvent event) {
-        if (!event.isCancelled()) {
-            Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(event.getPlayer().getUniqueId()).updateOffhand());
-        }
     }
 
     public static Map<UUID, PlayerStatHolder> getCachedPlayerStats() {

@@ -4,7 +4,6 @@ import org.bukkit.ChatColor;
 
 public enum Stat {
 
-
     /*
     Player stats
      */
@@ -16,11 +15,11 @@ public enum Stat {
     /*
     Item-exclusive stats
      */
-    ATTACK_SPEED("attack-speed", "Attack Speed", "ATK SPD", ChatColor.GRAY, " ATK SPD", "Determines the swing speed of your weapon!"),
-    CRIT("critical", "Crit", "CRIT", ChatColor.YELLOW, " CRIT", "Chance to deal a critical strike!"),
-    DODGE("dodge", "Dodge", "DODGE", ChatColor.WHITE, " DODGE","Chance to dodge the damage of an attack!");
+    ATTACK_SPEED("attack-speed", "Attack Speed", "ATK SPD", ChatColor.GRAY, " ATK SPD", "Determines the swing speed of your weapon!");
+//    CRIT("critical", "Crit", "CRIT", ChatColor.YELLOW, " CRIT", "Chance to deal a critical strike!"),
+//    DODGE("dodge", "Dodge", "DODGE", ChatColor.WHITE, " DODGE","Chance to dodge the damage of an attack!");
 
-    public static final Stat[] PLAYER_STATS = new Stat[] {DEXTERITY, INTELLIGENCE, STRENGTH, VITALITY, WISDOM};
+    public static final Stat[] PLAYER_STATS = new Stat[]{DEXTERITY, INTELLIGENCE, STRENGTH, VITALITY, WISDOM};
 
     public static final String HEALTH_ICON = "❤";
     public static final String EMPTY_GEM_ICON = "◇";
@@ -129,6 +128,7 @@ public enum Stat {
 
     /**
      * Returns the enum value of a stat from its string
+     *
      * @param identifier of stat (not case sensitive)
      * @return enum of stat
      */

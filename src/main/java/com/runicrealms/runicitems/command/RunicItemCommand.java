@@ -65,7 +65,6 @@ public class RunicItemCommand extends BaseCommand {
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
         RunicItemsAPI.addItem(player.getInventory(), item.generateItem());
-        player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dGiven you &5" + count + "x &r" + item.getDisplayableItem().getDisplayName()));
     }
 
     @Subcommand("get-range")
@@ -158,7 +157,6 @@ public class RunicItemCommand extends BaseCommand {
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
         RunicItemsAPI.addItem(target.getInventory(), item.generateItem());
-        target.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dGiven you &5" + count + "x &r" + item.getDisplayableItem().getDisplayName()));
     }
 
     @Subcommand("give-range")
@@ -181,7 +179,6 @@ public class RunicItemCommand extends BaseCommand {
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
         RunicItemsAPI.addItem(target.getInventory(), item.generateItem());
         RunicItemsAPI.addItem(target.getInventory(), item.generateItem());
-        target.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dGiven you &5" + count + "x &r" + item.getDisplayableItem().getDisplayName()));
     }
 
     @Subcommand("clear|c")

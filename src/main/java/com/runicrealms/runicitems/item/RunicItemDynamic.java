@@ -20,7 +20,7 @@ import java.util.*;
  * This is the class that actually gets the RunicItemDynamic from template
  * RunicItemDynamic is a type of RunicItemGeneric that needs to dynamically update its NBT/Lore
  * during runtime.
- *
+ * <p>
  * This includes gold pouches, gathering tools, etc.
  */
 public class RunicItemDynamic extends RunicItemGeneric {
@@ -54,9 +54,9 @@ public class RunicItemDynamic extends RunicItemGeneric {
     /**
      * This constructor gets called when a character loads into the server, and grabs the item data from the database
      *
-     * @param template the cached YAML template to load basic item info from
-     * @param count the number of item from database
-     * @param id the template id from the database
+     * @param template     the cached YAML template to load basic item info from
+     * @param count        the number of item from database
+     * @param id           the template id from the database
      * @param dynamicField an integer that can store a dynamic value (e.g. current coins for gold pouch)
      */
     public RunicItemDynamic(RunicItemDynamicTemplate template, int count, long id, int dynamicField) {
@@ -103,6 +103,28 @@ public class RunicItemDynamic extends RunicItemGeneric {
     }
 
     /**
+     * Updates the NBT/Lore of our associated ItemStack to our current dynamic field value
+     *
+     * @param itemStack associated w/ our RunicItem
+     * @return the ItemStack w/ updated NBT
+     */
+    public ItemStack updateItemStack(ItemStack itemStack) {
+        ItemMeta meta = itemStack.getItemMeta();
+        String dynamicLore = ColorUtil.format(this.getData().get("dynamicLore") != null ? this.getData().get("dynamicLore") : "");
+        if (this.getDynamicField() > 0) {
+            meta.setDisplayName
+                    (
+                            this.getDisplayableItem().getDisplayName() + " " +
+                                    ChatColor.WHITE + this.getDynamicField() + dynamicLore
+                    ); // show dynamic data
+        }
+        itemStack.setItemMeta(meta);
+        NBTItem nbtItem = new NBTItem(itemStack, true);
+        nbtItem.setInteger(DYNAMIC_FIELD_STRING, this.getDynamicField());
+        return itemStack;
+    }
+
+    /**
      * Implements custom dynamic functionality by modifying our dynamic field from NBT
      *
      * @param item the dynamic ItemStack
@@ -111,7 +133,8 @@ public class RunicItemDynamic extends RunicItemGeneric {
     public static RunicItemDynamic getFromItemStack(ItemStack item) {
         NBTItem nbtItem = new NBTItem(item);
         RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
-        if (!(uncastedTemplate instanceof RunicItemDynamicTemplate)) throw new IllegalArgumentException("ItemStack is not a dynamic item!");
+        if (!(uncastedTemplate instanceof RunicItemDynamicTemplate))
+            throw new IllegalArgumentException("ItemStack is not a dynamic item!");
         RunicItemDynamicTemplate template = (RunicItemDynamicTemplate) uncastedTemplate;
         return new RunicItemDynamic(template, item.getAmount(), nbtItem.getInteger("id"), nbtItem.getInteger(DYNAMIC_FIELD_STRING));
     }

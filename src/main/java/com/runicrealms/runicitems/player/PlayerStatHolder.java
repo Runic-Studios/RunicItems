@@ -1,7 +1,6 @@
 package com.runicrealms.runicitems.player;
 
-import com.codingforcookies.armorequip.ArmorEquipEvent;
-import com.codingforcookies.armorequip.ArmorType;
+import com.runicrealms.plugin.enums.ArmorType;
 import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.item.*;
@@ -10,7 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
