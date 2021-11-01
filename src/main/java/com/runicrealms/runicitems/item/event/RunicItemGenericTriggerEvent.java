@@ -3,12 +3,14 @@ package com.runicrealms.runicitems.item.event;
 import com.runicrealms.runicitems.item.RunicItemGeneric;
 import com.runicrealms.runicitems.item.util.ClickTrigger;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 
-public class RunicItemGenericTriggerEvent extends Event {
+public class RunicItemGenericTriggerEvent extends Event implements Cancellable {
 
+    private boolean isCancelled;
     private final Player player;
     private final RunicItemGeneric item;
     private final ItemStack itemStack;
@@ -19,11 +21,12 @@ public class RunicItemGenericTriggerEvent extends Event {
 
     /**
      * Calls a RunicItemGenericTriggerEvent, for use with built-in item tags and data.
-     * @param player player who triggered the item
-     * @param item runic item
+     *
+     * @param player    player who triggered the item
+     * @param item      runic item
      * @param itemStack reference to item stack
-     * @param trigger click of ClickTrigger enum
-     * @param action which action was taken
+     * @param trigger   click of ClickTrigger enum
+     * @param action    which action was taken
      */
     public RunicItemGenericTriggerEvent(Player player, RunicItemGeneric item, ItemStack itemStack, ClickTrigger trigger, String action) {
         this.player = player;
@@ -39,6 +42,16 @@ public class RunicItemGenericTriggerEvent extends Event {
 
     public static HandlerList getHandlerList() {
         return handlers;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return this.isCancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean b) {
+        this.isCancelled = b;
     }
 
     public Player getPlayer() {
