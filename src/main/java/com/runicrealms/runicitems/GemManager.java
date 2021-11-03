@@ -28,7 +28,8 @@ public class GemManager implements Listener {
     public void onGemApply(InventoryClickEvent event) {
 
         if (event.isCancelled()) return;
-        if (event.getAction() != InventoryAction.SWAP_WITH_CURSOR) return;
+        // Nothing inventory action is when you click on armor in armor slots
+        if (!(event.getAction() == InventoryAction.SWAP_WITH_CURSOR || event.getAction() == InventoryAction.NOTHING)) return;
         if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
         if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) return;
         if (!(RunicItemsAPI.getItemStackTemplate(event.getCurrentItem()) instanceof RunicItemArmorTemplate)) return;
