@@ -40,108 +40,7 @@ public class RunicItemArmor extends RunicItem {
     public RunicItemArmor(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
                           int health, LinkedHashMap<Stat, RunicItemStat> stats, List<GemBonus> gemBonuses, int maxGemSlots,
                           int level, RunicItemRarity rarity, RunicItemClass runicClass) {
-        super(templateId, displayableItem, tags, data, count, id, () -> {
-            List<String> lore = new LinkedList<>();
-
-            Map<Stat, Integer> gemOnlyStats = new HashMap<>();
-            for (GemBonus gemBonus : gemBonuses) {
-                for (Stat gemStat : gemBonus.getStats().keySet()) {
-                    if (stats.containsKey(gemStat)) continue;
-                    if (!gemOnlyStats.containsKey(gemStat)) gemOnlyStats.put(gemStat, 0);
-                    gemOnlyStats.put(gemStat, gemOnlyStats.get(gemStat) + gemBonus.getStats().get(gemStat));
-                }
-            }
-
-            for (Stat stat : Stat.values()) {
-                if (stats.containsKey(stat)) {
-
-                    int value = stats.get(stat).getValue();
-                    if (value == 0) continue;
-                    int finalValue = value;
-                    for (GemBonus gemBonus : gemBonuses) {
-                        if (gemBonus.getStats().containsKey(stat)) {
-                            finalValue += gemBonus.getStats().get(stat);
-                        }
-                    }
-                    if (finalValue == value) {
-                        lore.add(stat.getChatColor()
-                                + (value < 0 ? "-" : "+")
-                                + value
-                                + stat.getIcon());
-                    } else {
-                        lore.add("" + ChatColor.GRAY + ChatColor.STRIKETHROUGH
-                                + (value < 0 ? "-" : "+")
-                                + value + (stat.getIcon().length() == 1 ? stat.getIcon() : "") + ChatColor.RESET + " "
-                                + stat.getChatColor()
-                                + (finalValue < 0 ? "-" : "+")
-                                + finalValue
-                                + stat.getIcon()
-                        );
-                    }
-
-                } else if (gemOnlyStats.containsKey(stat)) {
-                    int value = gemOnlyStats.get(stat);
-                    lore.add("" + ChatColor.GRAY + ChatColor.STRIKETHROUGH
-                            + "+0" + (stat.getIcon().length() == 1 ? stat.getIcon() : "") + ChatColor.RESET + " "
-                            + stat.getChatColor()
-                            + (value < 0 ? "-" : "+")
-                            + value
-                            + stat.getIcon());
-                }
-            }
-
-            int finalHealth = health;
-            for (GemBonus gemBonus : gemBonuses) if (gemBonus.hasHealth()) finalHealth += gemBonus.getHealth();
-            String healthString;
-            if (finalHealth == health) {
-                healthString = ChatColor.RED + "" + health + Stat.HEALTH_ICON;
-            } else {
-                healthString = "" + ChatColor.GRAY + ChatColor.STRIKETHROUGH + health + Stat.HEALTH_ICON + ChatColor.RESET + " " + ChatColor.RED + finalHealth + Stat.HEALTH_ICON;
-            }
-
-            if (level > 0) {
-                    StringBuilder gemTextBuilder = new StringBuilder(ChatColor.GRAY.toString())
-                            .append("Gem Slots: ")
-                            .append(ChatColor.WHITE)
-                            .append("[ ");
-                    int counter = 0;
-                    for (GemBonus gemBonus : gemBonuses) {
-                        for (int i = 0; i < StatUtil.getGemSlots(gemBonus.getTier()); i++) {
-                            gemTextBuilder.append(gemBonus.getMainStat().getChatColor()).append(gemBonus.getMainStat().getIcon()).append(" ");
-                            counter++;
-                        }
-                    }
-                    gemTextBuilder.append(ChatColor.GRAY);
-                    for (int i = counter; i < maxGemSlots; i++) {
-                        gemTextBuilder.append(Stat.EMPTY_GEM_ICON).append(" ");
-                    }
-                    gemTextBuilder.append(ChatColor.WHITE).append("]");
-                return new ItemLoreSection[] {
-                        (maxGemSlots > 0
-                                ? new ItemLoreSection(new String[] {
-                                ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
-                                gemTextBuilder.toString()})
-                                : new ItemLoreSection(new String[]{
-                                ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
-                        })),
-                        new ItemLoreSection(new String[] {healthString}),
-                        new ItemLoreSection(lore),
-                        new ItemLoreSection(new String[] {
-                                rarity.getDisplay(),
-                                ChatColor.GRAY + runicClass.getDisplay()
-                        }),
-                };
-            } else {
-                return new ItemLoreSection[] {
-                        new ItemLoreSection(new String[] {healthString}),
-                        new ItemLoreSection(lore),
-                        new ItemLoreSection(new String[] {
-                                rarity.getDisplay(),
-                                ChatColor.GRAY + runicClass.getDisplay()
-                        }),
-                };
-            }
-        });
+        super(templateId, displayableItem, tags, data, count, id, () -> new ItemLoreSection[0]);
         this.rarity = rarity;
         this.level = level;
         this.health = health;
@@ -149,6 +48,7 @@ public class RunicItemArmor extends RunicItem {
         this.stats = stats;
         this.maxGemSlots = maxGemSlots;
         this.runicClass = runicClass;
+        this.setLoreSectionGenerator(false);
     }
 
     public RunicItemArmor(RunicItemArmorTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats, List<GemBonus> gemBonuses) {
@@ -314,4 +214,114 @@ public class RunicItemArmor extends RunicItem {
         return new RunicItemArmor(template, item.getAmount(), nbtItem.getInteger("id"), stats, gemBonuses);
     }
 
+    /**
+     *
+     * @param isMenuItemDisplay
+     * @return
+     */
+    public void setLoreSectionGenerator(boolean isMenuItemDisplay) {
+
+        List<String> lore = new LinkedList<>();
+
+        Map<Stat, Integer> gemOnlyStats = new HashMap<>();
+        for (GemBonus gemBonus : gemBonuses) {
+            for (Stat gemStat : gemBonus.getStats().keySet()) {
+                if (stats.containsKey(gemStat)) continue;
+                if (!gemOnlyStats.containsKey(gemStat)) gemOnlyStats.put(gemStat, 0);
+                gemOnlyStats.put(gemStat, gemOnlyStats.get(gemStat) + gemBonus.getStats().get(gemStat));
+            }
+        }
+
+        for (Stat stat : Stat.values()) {
+            if (stats.get(stat) != null && stats.get(stat).getValue() == 0) continue;
+            if (isMenuItemDisplay && stats.containsKey(stat)) {
+                lore.add(stat.getChatColor() + "+" + stats.get(stat).getRange().getMin() +
+                        "-" + stats.get(stat).getRange().getMax() + stat.getIcon());
+            } else if (stats.containsKey(stat)) {
+                int value = stats.get(stat).getValue();
+                int finalValue = value;
+                for (GemBonus gemBonus : gemBonuses) {
+                    if (gemBonus.getStats().containsKey(stat)) {
+                        finalValue += gemBonus.getStats().get(stat);
+                    }
+                }
+                if (finalValue == value) {
+                    lore.add(stat.getChatColor()
+                            + (value < 0 ? "-" : "+")
+                            + value
+                            + stat.getIcon());
+                } else {
+                    lore.add("" + ChatColor.GRAY + ChatColor.STRIKETHROUGH
+                            + (value < 0 ? "-" : "+")
+                            + value + (stat.getIcon().length() == 1 ? stat.getIcon() : "") + ChatColor.RESET + " "
+                            + stat.getChatColor()
+                            + (finalValue < 0 ? "-" : "+")
+                            + finalValue
+                            + stat.getIcon()
+                    );
+                }
+
+            } else if (gemOnlyStats.containsKey(stat)) {
+                int value = gemOnlyStats.get(stat);
+                lore.add("" + ChatColor.GRAY + ChatColor.STRIKETHROUGH
+                        + "+0" + (stat.getIcon().length() == 1 ? stat.getIcon() : "") + ChatColor.RESET + " "
+                        + stat.getChatColor()
+                        + (value < 0 ? "-" : "+")
+                        + value
+                        + stat.getIcon());
+            }
+        }
+
+        int finalHealth = health;
+        for (GemBonus gemBonus : gemBonuses) if (gemBonus.hasHealth()) finalHealth += gemBonus.getHealth();
+        String healthString;
+        if (finalHealth == health) {
+            healthString = ChatColor.RED + "" + health + Stat.HEALTH_ICON;
+        } else {
+            healthString = "" + ChatColor.GRAY + ChatColor.STRIKETHROUGH + health + Stat.HEALTH_ICON + ChatColor.RESET + " " + ChatColor.RED + finalHealth + Stat.HEALTH_ICON;
+        }
+
+        if (level > 0) {
+            StringBuilder gemTextBuilder = new StringBuilder(ChatColor.GRAY.toString())
+                    .append("Gem Slots: ")
+                    .append(ChatColor.WHITE)
+                    .append("[ ");
+            int counter = 0;
+            for (GemBonus gemBonus : gemBonuses) {
+                for (int i = 0; i < StatUtil.getGemSlots(gemBonus.getTier()); i++) {
+                    gemTextBuilder.append(gemBonus.getMainStat().getChatColor()).append(gemBonus.getMainStat().getIcon()).append(" ");
+                    counter++;
+                }
+            }
+            gemTextBuilder.append(ChatColor.GRAY);
+            for (int i = counter; i < maxGemSlots; i++) {
+                gemTextBuilder.append(Stat.EMPTY_GEM_ICON).append(" ");
+            }
+            gemTextBuilder.append(ChatColor.WHITE).append("]");
+            this.loreSectionGenerator = () -> new ItemLoreSection[]{
+                    (maxGemSlots > 0
+                            ? new ItemLoreSection(new String[]{
+                            ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
+                            gemTextBuilder.toString()})
+                            : new ItemLoreSection(new String[]{
+                            ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
+                    })),
+                    new ItemLoreSection(new String[]{healthString}),
+                    new ItemLoreSection(lore),
+                    new ItemLoreSection(new String[]{
+                            rarity.getDisplay(),
+                            ChatColor.GRAY + runicClass.getDisplay()
+                    }),
+            };
+        } else {
+            this.loreSectionGenerator = () -> new ItemLoreSection[]{
+                    new ItemLoreSection(new String[]{healthString}),
+                    new ItemLoreSection(lore),
+                    new ItemLoreSection(new String[]{
+                            rarity.getDisplay(),
+                            ChatColor.GRAY + runicClass.getDisplay()
+                    }),
+            };
+        }
+    }
 }
