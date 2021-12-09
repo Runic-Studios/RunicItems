@@ -2,7 +2,6 @@ package com.runicrealms.runicitems.item.event;
 
 import com.runicrealms.runicitems.item.RunicItemArtifact;
 import com.runicrealms.runicitems.item.util.RunicArtifactAbilityTrigger;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -27,7 +26,6 @@ public class RunicItemArtifactTriggerEvent extends Event implements Cancellable 
      */
     public RunicItemArtifactTriggerEvent(Player player, RunicItemArtifact runicItemArtifact, ItemStack itemStack,
                                          RunicArtifactAbilityTrigger abilityTrigger) {
-        Bukkit.broadcastMessage("runic ability triggered");
         this.player = player;
         this.runicItemArtifact = runicItemArtifact;
         this.itemStack = itemStack;
