@@ -1,7 +1,7 @@
 package com.runicrealms.runicitems;
 
+import com.runicrealms.plugin.ArmorType;
 import com.runicrealms.plugin.character.api.CharacterLoadEvent;
-import com.runicrealms.plugin.enums.ArmorType;
 import com.runicrealms.plugin.events.ArmorEquipEvent;
 import com.runicrealms.runicitems.player.PlayerStatHolder;
 import org.bukkit.Bukkit;
@@ -41,11 +41,16 @@ public class PlayerManager implements Listener {
         if (event.isCancelled()) return;
         Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
             switch (event.getType()) {
-                case HELMET: cachedPlayerStats.get(uuid).updateItems(ArmorType.HELMET);
-                case CHESTPLATE: cachedPlayerStats.get(uuid).updateItems(ArmorType.CHESTPLATE);
-                case LEGGINGS: cachedPlayerStats.get(uuid).updateItems(ArmorType.LEGGINGS);
-                case BOOTS: cachedPlayerStats.get(uuid).updateItems(ArmorType.BOOTS);
-                case OFFHAND: cachedPlayerStats.get(uuid).updateOffhand();
+                case HELMET:
+                    cachedPlayerStats.get(uuid).updateItems(ArmorType.HELMET);
+                case CHESTPLATE:
+                    cachedPlayerStats.get(uuid).updateItems(ArmorType.CHESTPLATE);
+                case LEGGINGS:
+                    cachedPlayerStats.get(uuid).updateItems(ArmorType.LEGGINGS);
+                case BOOTS:
+                    cachedPlayerStats.get(uuid).updateItems(ArmorType.BOOTS);
+                case OFFHAND:
+                    cachedPlayerStats.get(uuid).updateOffhand();
             }
         });
     }
