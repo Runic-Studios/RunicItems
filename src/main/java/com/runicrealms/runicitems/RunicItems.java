@@ -6,10 +6,7 @@ import com.runicrealms.runicitems.command.RunicItemCommand;
 import com.runicrealms.runicitems.config.AbilityLoader;
 import com.runicrealms.runicitems.config.ConfigUtil;
 import com.runicrealms.runicitems.config.TemplateLoader;
-import com.runicrealms.runicitems.listeners.ArtifactOnCastListener;
-import com.runicrealms.runicitems.listeners.ArtifactOnKillListener;
-import com.runicrealms.runicitems.listeners.GoldPouchListener;
-import com.runicrealms.runicitems.listeners.SoulboundListener;
+import com.runicrealms.runicitems.listeners.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -50,6 +47,7 @@ public class RunicItems extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new SoulboundListener(), this);
         Bukkit.getPluginManager().registerEvents(new GoldPouchListener(), this);
         Bukkit.getPluginManager().registerEvents(new ArtifactOnCastListener(), this);
+        Bukkit.getPluginManager().registerEvents(new ArtifactOnHitListener(), this);
         Bukkit.getPluginManager().registerEvents(new ArtifactOnKillListener(), this);
 
         // Register Commands
