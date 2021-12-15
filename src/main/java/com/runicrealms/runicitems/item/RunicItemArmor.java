@@ -114,7 +114,8 @@ public class RunicItemArmor extends RunicItem {
             for (Stat statType : gemBonus.getStats().keySet()) {
                 section.set(ItemManager.getInventoryPath() + "." + root + ".gems." + count + "." + statType.getIdentifier(), gemBonus.getStats().get(statType));
             }
-            if (gemBonus.getHealth() != 0) section.set(ItemManager.getInventoryPath() + "." + root + ".gems." + count + ".health", gemBonus.getHealth());
+            if (gemBonus.getHealth() != 0)
+                section.set(ItemManager.getInventoryPath() + "." + root + ".gems." + count + ".health", gemBonus.getHealth());
             section.set(ItemManager.getInventoryPath() + "." + root + ".gems." + count + ".tier", gemBonus.getTier());
             section.set(ItemManager.getInventoryPath() + "." + root + ".gems." + count + ".main", gemBonus.getMainStat().getIdentifier());
             count++;
@@ -150,7 +151,8 @@ public class RunicItemArmor extends RunicItem {
     public static RunicItemArmor getFromItemStack(ItemStack item) {
         NBTItem nbtItem = new NBTItem(item);
         RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
-        if (!(uncastedTemplate instanceof RunicItemArmorTemplate)) throw new IllegalArgumentException("ItemStack is not an armor item!");
+        if (!(uncastedTemplate instanceof RunicItemArmorTemplate))
+            throw new IllegalArgumentException("ItemStack is not an armor item!");
         RunicItemArmorTemplate template = (RunicItemArmorTemplate) uncastedTemplate;
         Set<String> keys = nbtItem.getKeys();
         int amountOfStats = 0;
@@ -183,7 +185,8 @@ public class RunicItemArmor extends RunicItem {
 
         for (String key : keys) {
             String[] split = key.split("-");
-            if (split[0].equals("gem")) {;
+            if (split[0].equals("gem")) {
+                ;
 
                 int gemNumber = Integer.parseInt(split[1]);
                 if (!gemStats.containsKey(gemNumber)) gemStats.put(gemNumber, new LinkedHashMap<>());
@@ -215,7 +218,6 @@ public class RunicItemArmor extends RunicItem {
     }
 
     /**
-     *
      * @param isMenuItemDisplay
      * @return
      */
@@ -317,10 +319,7 @@ public class RunicItemArmor extends RunicItem {
             this.loreSectionGenerator = () -> new ItemLoreSection[]{
                     new ItemLoreSection(new String[]{healthString}),
                     new ItemLoreSection(lore),
-                    new ItemLoreSection(new String[]{
-                            rarity.getDisplay(),
-                            ChatColor.GRAY + runicClass.getDisplay()
-                    }),
+                    new ItemLoreSection(new String[]{rarity.getDisplay(), ChatColor.GRAY + runicClass.getDisplay()}),
             };
         }
     }

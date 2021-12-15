@@ -1,5 +1,6 @@
 package com.runicrealms.runicitems.item.util;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
@@ -18,7 +19,8 @@ public class ItemLoreSection {
         this.lore = lore;
     }
 
-    public ItemLoreSection() {}
+    public ItemLoreSection() {
+    }
 
     public List<String> getLore() {
         return this.lore;
@@ -35,7 +37,11 @@ public class ItemLoreSection {
     public static ItemLoreSection combine(String separator, ItemLoreSection... loreSections) {
         List<String> newLore = new ArrayList<>();
         for (ItemLoreSection section : loreSections) {
-            newLore.add(separator);
+            for (String s : section.getLore()) {
+                Bukkit.broadcastMessage(s);
+            }
+            if (!section.getLore().contains(""))
+                newLore.add(separator);
             newLore.addAll(section.getLore());
         }
         return new ItemLoreSection(newLore);

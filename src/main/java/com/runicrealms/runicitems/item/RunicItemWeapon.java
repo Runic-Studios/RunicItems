@@ -44,17 +44,10 @@ public class RunicItemWeapon extends RunicItem {
                 );
             }
             return new ItemLoreSection[]{
-                    (level > 0? new ItemLoreSection(new String[]{
-                            ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level
-                    }) : new ItemLoreSection(new String[]{})),
-                    new ItemLoreSection(new String[]{
-                            ChatColor.RED + "" + damageRange.getMin() + "-" + damageRange.getMax() + " DMG"
-                    }),
+                    (level > 0 ? new ItemLoreSection(new String[]{ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level}) : new ItemLoreSection(new String[]{""})),
+                    new ItemLoreSection(new String[]{ChatColor.RED + "" + damageRange.getMin() + "-" + damageRange.getMax() + " DMG"}),
                     new ItemLoreSection(lore),
-                    new ItemLoreSection(new String[]{
-                            rarity.getDisplay(),
-                            ChatColor.GRAY + runicClass.getDisplay()
-                    }),
+                    new ItemLoreSection(new String[]{rarity.getDisplay(), ChatColor.GRAY + runicClass.getDisplay()}),
             };
         });
         this.damageRange = damageRange;
@@ -129,7 +122,8 @@ public class RunicItemWeapon extends RunicItem {
     public static RunicItemWeapon getFromItemStack(ItemStack item) {
         NBTItem nbtItem = new NBTItem(item);
         RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
-        if (!(uncastedTemplate instanceof RunicItemWeaponTemplate)) throw new IllegalArgumentException("ItemStack is not a weapon item!");
+        if (!(uncastedTemplate instanceof RunicItemWeaponTemplate))
+            throw new IllegalArgumentException("ItemStack is not a weapon item!");
         RunicItemWeaponTemplate template = (RunicItemWeaponTemplate) uncastedTemplate;
         Set<String> keys = nbtItem.getKeys();
         int amountOfStats = 0;

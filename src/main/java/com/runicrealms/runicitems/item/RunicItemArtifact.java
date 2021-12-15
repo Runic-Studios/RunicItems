@@ -25,15 +25,9 @@ public class RunicItemArtifact extends RunicItemWeapon {
                              RunicArtifactAbility ability, RunicItemStatRange damageRange, LinkedHashMap<Stat, RunicItemStat> stats,
                              int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(templateId, displayableItem, tags, data, count, id, damageRange, stats, level, rarity, runicClass, () -> {
-            ItemLoreSection[] sections = new ItemLoreSection[3 + (stats.size() > 0 ? 1 : 0)];
-            sections[0] = new ItemLoreSection(new String[]{
-                    ChatColor.GRAY + "Req Class " + ChatColor.WHITE + runicClass.getDisplay(),
-                    ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
-                    rarity.getDisplay()
-            });
-            sections[1] = new ItemLoreSection(new String[]{
-                    ChatColor.RED + "+ " + damageRange.getMin() + "-" + damageRange.getMax() + Stat.STRENGTH.getIcon()
-            });
+            ItemLoreSection[] sections = new ItemLoreSection[4 + (stats.size() > 0 ? 1 : 0)];
+            sections[0] = new ItemLoreSection(new String[]{ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level});
+            sections[1] = new ItemLoreSection(new String[]{ChatColor.RED + "" + damageRange.getMin() + "-" + damageRange.getMax() + " DMG"});
             List<String> formattedDescription = new ArrayList<>(Collections.singleton
                     (
                             ability.getTrigger().getDisplay() + " " + ChatColor.RESET +
@@ -52,8 +46,9 @@ public class RunicItemArtifact extends RunicItemWeapon {
                                 + entry.getKey().getIcon()
                 );
             }
+            sections[3] = new ItemLoreSection(new String[]{rarity.getDisplay(), ChatColor.GRAY + runicClass.getDisplay()});
             if (stats.size() > 0) {
-                sections[3] = new ItemLoreSection(lore);
+                sections[4] = new ItemLoreSection(lore);
             }
             return sections;
         });
