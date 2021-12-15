@@ -18,7 +18,7 @@ public class ArtifactOnKillListener implements Listener {
         if (!(e.getKiller() instanceof Player)) return;
         Player killer = (Player) e.getKiller();
         ItemStack itemStack = killer.getInventory().getItemInMainHand();
-        ArtifactUtil.checkForArtifactTrigger(killer, itemStack, RunicArtifactAbilityTrigger.ON_KILL);
+        ArtifactUtil.checkForArtifactTrigger(killer, itemStack, RunicArtifactAbilityTrigger.ON_KILL, e.getEntity());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST) // last
@@ -28,6 +28,6 @@ public class ArtifactOnKillListener implements Listener {
         if (!(e.getKiller()[0] instanceof Player)) return;
         Player killer = (Player) e.getKiller()[0];
         ItemStack itemStack = killer.getInventory().getItemInMainHand();
-        ArtifactUtil.checkForArtifactTrigger(killer, itemStack, RunicArtifactAbilityTrigger.ON_KILL);
+        ArtifactUtil.checkForArtifactTrigger(killer, itemStack, RunicArtifactAbilityTrigger.ON_KILL, e.getVictim());
     }
 }

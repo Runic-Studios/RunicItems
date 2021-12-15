@@ -15,6 +15,6 @@ public class ArtifactOnHitListener implements Listener {
         if (e.isCancelled()) return;
         if (!e.isAutoAttack()) return;
         ItemStack itemStack = e.getPlayer().getInventory().getItemInMainHand();
-        ArtifactUtil.checkForArtifactTrigger(e.getPlayer(), itemStack, RunicArtifactAbilityTrigger.ON_HIT);
+        ArtifactUtil.checkForArtifactTrigger(e.getPlayer(), itemStack, RunicArtifactAbilityTrigger.ON_HIT, e.getVictim());
     }
 }

@@ -6,6 +6,7 @@ import com.runicrealms.runicitems.item.RunicItemArtifact;
 import com.runicrealms.runicitems.item.event.RunicItemArtifactTriggerEvent;
 import com.runicrealms.runicitems.item.util.RunicArtifactAbilityTrigger;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -17,8 +18,10 @@ public class ArtifactUtil {
      * @param player      the player who triggered the check
      * @param itemStack   the itemStack in the player's hand
      * @param triggerType the type of trigger to be fired
+     * @param victim      optional parameter of entity involved (on-hit, on-kill)
      */
-    public static void checkForArtifactTrigger(Player player, ItemStack itemStack, RunicArtifactAbilityTrigger triggerType) {
+    public static void checkForArtifactTrigger(Player player, ItemStack itemStack,
+                                               RunicArtifactAbilityTrigger triggerType, Entity... victim) {
         RunicItem runicItem = RunicItemsAPI.getRunicItemFromItemStack(itemStack);
         if (runicItem == null) return;
         if (!(runicItem instanceof RunicItemArtifact)) return;
@@ -30,7 +33,8 @@ public class ArtifactUtil {
                         player,
                         artifact,
                         itemStack,
-                        abilityTrigger
+                        abilityTrigger,
+                        victim
                 )
         );
     }
