@@ -207,16 +207,16 @@ public class RunicItemArmor extends RunicItem {
     public void addToData(Data section, String root) {
         super.addToData(section, root);
         for (Stat statType : this.stats.keySet()) {
-            section.set(ItemManager.getInventoryPath() + "." + root + ".stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
+            section.set(root + ".stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
         }
         int count = 0;
         for (GemBonus gemBonus : this.gemBonuses) {
             for (Stat statType : gemBonus.getStats().keySet()) {
-                section.set(ItemManager.getInventoryPath() + "." + root + ".gems." + count + "." + statType.getIdentifier(), gemBonus.getStats().get(statType));
+                section.set(root + ".gems." + count + "." + statType.getIdentifier(), gemBonus.getStats().get(statType));
             }
-            if (gemBonus.getHealth() != 0) section.set(ItemManager.getInventoryPath() + "." + root + ".gems." + count + ".health", gemBonus.getHealth());
-            section.set(ItemManager.getInventoryPath() + "." + root + ".gems." + count + ".tier", gemBonus.getTier());
-            section.set(ItemManager.getInventoryPath() + "." + root + ".gems." + count + ".main", gemBonus.getMainStat().getIdentifier());
+            if (gemBonus.getHealth() != 0) section.set(root + ".gems." + count + ".health", gemBonus.getHealth());
+            section.set(root + ".gems." + count + ".tier", gemBonus.getTier());
+            section.set(root + ".gems." + count + ".main", gemBonus.getMainStat().getIdentifier());
             count++;
         }
     }

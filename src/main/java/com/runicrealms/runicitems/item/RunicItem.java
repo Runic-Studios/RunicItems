@@ -122,11 +122,11 @@ public abstract class RunicItem {
     }
 
     public void addToData(Data section, String root) {
-        section.set(ItemManager.getInventoryPath() + "." + root + ".template-id", this.templateId);
-        section.set(ItemManager.getInventoryPath() + "." + root + ".count", this.count);
+        section.set(root + ".template-id", this.templateId);
+        section.set(root + ".count", this.count);
         int count = 0;
         for (RunicItemTag tag : this.tags) {
-            section.set(ItemManager.getInventoryPath() + "." + root + ".tags." + count, tag.getIdentifier());
+            section.set(root + ".tags." + count, tag.getIdentifier());
             count++;
         }
         // This is not needed as item data is static for the template it comes from. Use RunicItemDynamic instead.

@@ -48,8 +48,6 @@ import java.util.logging.Level;
 
 public class ItemManager implements Listener {
 
-    private static final String INVENTORY_PATH = "inventory";
-
     private static int tickCounter = 0;
 
     public ItemManager() {
@@ -113,14 +111,14 @@ public class ItemManager implements Listener {
         //if (RunicItems.isDatabaseLoadingEnabled()) {
         ItemStack[] contents = event.getPlayer().getInventory().getContents();
         MongoDataSection character = event.getMongoDataSection();
-        character.remove(INVENTORY_PATH); // removes all stored inventory stuffs
-        character.set(INVENTORY_PATH + ".type", "runicitems");
+        character.remove("inventory"); // removes all stored inventory stuffs
+        character.set("inventory.type", "runicitems");
         character.save();
         for (int i = 0; i < contents.length; i++) {
             if (contents[i] != null) {
                 RunicItem runicItem = getRunicItemFromItemStack(contents[i]);
                 if (runicItem != null) {
-                    runicItem.addToData(character, i + "");
+                    runicItem.addToData(character, "inventory." + i);
                 }
             }
         }
@@ -429,7 +427,4 @@ public class ItemManager implements Listener {
         return null;
     }
 
-    public static String getInventoryPath() {
-        return INVENTORY_PATH;
-    }
 }

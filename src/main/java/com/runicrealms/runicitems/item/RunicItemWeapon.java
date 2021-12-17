@@ -107,7 +107,7 @@ public class RunicItemWeapon extends RunicItem {
     public void addToData(Data section, String root) {
         super.addToData(section, root);
         for (Stat statType : this.stats.keySet()) {
-            section.set(ItemManager.getInventoryPath() + "." + root + ".stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
+            section.set(root + ".stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
         }
     }
 

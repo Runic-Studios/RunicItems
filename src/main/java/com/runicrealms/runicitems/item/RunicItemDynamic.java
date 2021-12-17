@@ -81,7 +81,7 @@ public class RunicItemDynamic extends RunicItemGeneric {
     @Override
     public void addToData(Data section, String root) {
         super.addToData(section, root);
-        section.set(ItemManager.getInventoryPath() + "." + root + "." + DYNAMIC_FIELD_STRING, this.getDynamicField());
+        section.set(root + "." + DYNAMIC_FIELD_STRING, this.getDynamicField());
     }
 
     @Override
