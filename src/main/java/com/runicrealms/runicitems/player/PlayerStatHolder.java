@@ -1,6 +1,6 @@
 package com.runicrealms.runicitems.player;
 
-import com.runicrealms.plugin.enums.ArmorType;
+import com.runicrealms.plugin.ArmorType;
 import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.item.*;

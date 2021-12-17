@@ -40,9 +40,12 @@ public class RunicItemGem extends RunicItem {
             }
 
             return new ItemLoreSection[] {
-                    new ItemLoreSection(new String[] {ChatColor.GRAY + "Gem Slots Required: " + ChatColor.WHITE + StatUtil.getGemSlots(bonus.getTier())}),
-                    new ItemLoreSection(new String[] {ChatColor.GRAY + "Drag and click on armor to apply this gem."}),
-                    new ItemLoreSection(lore)
+                    new ItemLoreSection(new String[] {ChatColor.GRAY + "Req Slots " + ChatColor.WHITE + StatUtil.getGemSlots(bonus.getTier())}),
+                    new ItemLoreSection(lore),
+                    new ItemLoreSection(new String[] {
+                            ChatColor.GRAY + "" + ChatColor.ITALIC + "Drag and click on armor",
+                            ChatColor.GRAY + "" + ChatColor.ITALIC + "to apply this gem!"
+                    }),
             };
 
         });

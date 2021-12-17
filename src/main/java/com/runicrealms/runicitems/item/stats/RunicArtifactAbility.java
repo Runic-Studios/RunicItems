@@ -9,6 +9,14 @@ public class RunicArtifactAbility {
     private final String description;
     private final RunicArtifactAbilityTrigger trigger;
 
+    /**
+     * Creates a RunicArtifactAbility which stores its identifier (used for NBT and listeners),
+     *
+     * @param identifier  the identifier of the ability, e.g., "adrenaline-rush"
+     * @param name        a display for the ability, e.g., "Adrenaline Rush"
+     * @param description a description of the passive effect
+     * @param trigger     the type of trigger for the ability
+     */
     public RunicArtifactAbility(String identifier, String name, String description, RunicArtifactAbilityTrigger trigger) {
         this.identifier = identifier;
         this.name = name;

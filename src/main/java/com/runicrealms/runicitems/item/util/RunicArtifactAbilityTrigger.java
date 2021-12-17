@@ -4,7 +4,8 @@ import org.bukkit.ChatColor;
 
 public enum RunicArtifactAbilityTrigger {
 
-    ON_CLICK("on-click", ChatColor.GOLD + "" + ChatColor.BOLD + "ON CLICK"),
+    ON_CAST("on-cast", ChatColor.GOLD + "" + ChatColor.BOLD + "ON CAST"),
+    ON_HIT("on-hit", ChatColor.GOLD + "" + ChatColor.BOLD + "ON HIT"),
     ON_KILL("on-kill", ChatColor.GOLD + "" + ChatColor.BOLD + "ON KILL");
 
     private final String identifier;

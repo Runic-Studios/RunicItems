@@ -38,10 +38,8 @@ public class RunicItemOffhand extends RunicItem {
                                 + entry.getKey().getIcon()
                 );
             }
-            return new ItemLoreSection[] {
-                    new ItemLoreSection(new String[] {
-                            ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
-                    }),
+            return new ItemLoreSection[]{
+                    (level > 0 ? new ItemLoreSection(new String[]{ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level}) : new ItemLoreSection(new String[]{""})),
                     new ItemLoreSection(lore),
                     new ItemLoreSection(Collections.singletonList(rarity.getDisplay())),
             };
@@ -99,7 +97,8 @@ public class RunicItemOffhand extends RunicItem {
     public static RunicItemOffhand getFromItemStack(ItemStack item) {
         NBTItem nbtItem = new NBTItem(item);
         RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
-        if (!(uncastedTemplate instanceof RunicItemOffhandTemplate)) throw new IllegalArgumentException("ItemStack is not an offhand item!");
+        if (!(uncastedTemplate instanceof RunicItemOffhandTemplate))
+            throw new IllegalArgumentException("ItemStack is not an offhand item!");
         RunicItemOffhandTemplate template = (RunicItemOffhandTemplate) uncastedTemplate;
         Set<String> keys = nbtItem.getKeys();
         int amountOfStats = 0;

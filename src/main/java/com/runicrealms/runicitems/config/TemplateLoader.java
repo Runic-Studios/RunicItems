@@ -1,10 +1,9 @@
 package com.runicrealms.runicitems.config;
 
-import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.AbilityManager;
+import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
-import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.RunicItemDynamic;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
@@ -32,7 +31,7 @@ public class TemplateLoader {
         for (File file : itemsFolder.listFiles()) templateFiles.put(file, itemsFolder);
         for (File file : scriptFolder.listFiles()) templateFiles.put(file, scriptFolder);
         for (File file : templateFiles.keySet()) {
-            //Bukkit.getLogger().log(Level.INFO, "[RunicItems] Loading template " + file.getName());
+            // Bukkit.getLogger().log(Level.INFO, "[RunicItems] Loading template " + file.getName()); // for debugging
             FileConfiguration itemConfig;
             itemConfig = ConfigUtil.getYamlConfigFile(file.getName(), templateFiles.get(file));
             RunicItemTemplate template;
@@ -80,7 +79,7 @@ public class TemplateLoader {
         } else if (itemConfig.getString("type").equalsIgnoreCase(RunicItemDynamic.getDynamicFieldString())) {
             return new RunicItemDynamicTemplate(
                     id, displayableItem, tags, data, loadTriggers(itemConfig),
-                    itemConfig.getStringList("lore"),  itemConfig.getInt(RunicItemDynamic.getDynamicFieldString())
+                    itemConfig.getStringList("lore"), itemConfig.getInt(RunicItemDynamic.getDynamicFieldString())
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("generic")) {
             return new RunicItemGenericTemplate(
@@ -129,7 +128,8 @@ public class TemplateLoader {
                         itemConfig.getInt("stats." + key + ".min"),
                         itemConfig.getInt("stats." + key + ".max")
                 ));
-            };
+            }
+            ;
             return StatUtil.sortStatMap(stats);
         }
         return new LinkedHashMap<>();

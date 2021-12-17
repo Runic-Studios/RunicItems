@@ -3,11 +3,10 @@ package com.runicrealms.runicitems;
 import co.aikar.commands.ConditionFailedException;
 import co.aikar.commands.PaperCommandManager;
 import com.runicrealms.runicitems.command.RunicItemCommand;
-import com.runicrealms.runicitems.config.ConfigUtil;
 import com.runicrealms.runicitems.config.AbilityLoader;
+import com.runicrealms.runicitems.config.ConfigUtil;
 import com.runicrealms.runicitems.config.TemplateLoader;
-import com.runicrealms.runicitems.listeners.GoldPouchListener;
-import com.runicrealms.runicitems.listeners.SoulboundListener;
+import com.runicrealms.runicitems.listeners.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -47,14 +46,19 @@ public class RunicItems extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new GemManager(), this);
         Bukkit.getPluginManager().registerEvents(new SoulboundListener(), this);
         Bukkit.getPluginManager().registerEvents(new GoldPouchListener(), this);
+        Bukkit.getPluginManager().registerEvents(new ArtifactOnCastListener(), this);
+        Bukkit.getPluginManager().registerEvents(new ArtifactOnHitListener(), this);
+        Bukkit.getPluginManager().registerEvents(new ArtifactOnKillListener(), this);
 
         // Register Commands
         commandManager = new PaperCommandManager(this);
         commandManager.getCommandConditions().addCondition("is-player", context -> {
-            if (!(context.getIssuer().getIssuer() instanceof Player)) throw new ConditionFailedException("This command cannot be run from console!");
+            if (!(context.getIssuer().getIssuer() instanceof Player))
+                throw new ConditionFailedException("This command cannot be run from console!");
         });
         commandManager.getCommandConditions().addCondition("is-op", context -> {
-            if (!context.getIssuer().getIssuer().isOp()) throw new ConditionFailedException("You must be an operator to run this command!");
+            if (!context.getIssuer().getIssuer().isOp())
+                throw new ConditionFailedException("You must be an operator to run this command!");
         });
         commandManager.registerCommand(new RunicItemCommand());
 

@@ -1,6 +1,6 @@
 package com.runicrealms.runicitems;
 
-import com.runicrealms.plugin.enums.ArmorType;
+import com.runicrealms.plugin.ArmorType;
 import com.runicrealms.plugin.events.ArmorEquipEvent;
 import com.runicrealms.runicitems.item.RunicItemArmor;
 import com.runicrealms.runicitems.item.RunicItemGem;
@@ -29,7 +29,8 @@ public class GemManager implements Listener {
 
         if (event.isCancelled()) return;
         // Nothing inventory action is when you click on armor in armor slots
-        if (!(event.getAction() == InventoryAction.SWAP_WITH_CURSOR || event.getAction() == InventoryAction.NOTHING)) return;
+        if (!(event.getAction() == InventoryAction.SWAP_WITH_CURSOR || event.getAction() == InventoryAction.NOTHING))
+            return;
         if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
         if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) return;
         if (!(RunicItemsAPI.getItemStackTemplate(event.getCurrentItem()) instanceof RunicItemArmorTemplate)) return;
@@ -77,10 +78,11 @@ public class GemManager implements Listener {
         event.setCurrentItem(generatedItem);
         event.setCursor(null);
 
-        if (event.getSlotType() == InventoryType.SlotType.ARMOR) Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
-            PlayerStatHolder holder = PlayerManager.getCachedPlayerStats().get(event.getWhoClicked().getUniqueId());
-            holder.updateItems(ArmorType.HELMET, ArmorType.CHESTPLATE, ArmorType.LEGGINGS, ArmorType.BOOTS);
-        });
+        if (event.getSlotType() == InventoryType.SlotType.ARMOR)
+            Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
+                PlayerStatHolder holder = PlayerManager.getCachedPlayerStats().get(event.getWhoClicked().getUniqueId());
+                holder.updateItems(ArmorType.HELMET, ArmorType.CHESTPLATE, ArmorType.LEGGINGS, ArmorType.BOOTS);
+            });
 
         event.setCancelled(true);
     }

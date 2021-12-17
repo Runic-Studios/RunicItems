@@ -1,12 +1,9 @@
 package com.runicrealms.runicitems.item;
 
+import com.runicrealms.plugin.utilities.ChatUtils;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
-import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
-import com.runicrealms.runicitems.item.stats.RunicItemStat;
-import com.runicrealms.runicitems.item.stats.RunicItemRarity;
-import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
-import com.runicrealms.runicitems.item.stats.RunicItemTag;
+import com.runicrealms.runicitems.item.stats.*;
 import com.runicrealms.runicitems.item.template.RunicItemArtifactTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
@@ -28,19 +25,18 @@ public class RunicItemArtifact extends RunicItemWeapon {
                              RunicArtifactAbility ability, RunicItemStatRange damageRange, LinkedHashMap<Stat, RunicItemStat> stats,
                              int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(templateId, displayableItem, tags, data, count, id, damageRange, stats, level, rarity, runicClass, () -> {
-            ItemLoreSection[] sections = new ItemLoreSection[3 + (stats.size() > 0 ? 1 : 0)];
-            sections[0] = new ItemLoreSection(new String[] {
-                    ChatColor.GRAY + "Req Class " + ChatColor.WHITE + runicClass.getDisplay(),
-                    ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
-                    rarity.getDisplay()
-            });
-            sections[1] = new ItemLoreSection(new String[] {
-                    ChatColor.RED + "+ " + damageRange.getMin() + "-" + damageRange.getMax() + Stat.STRENGTH.getIcon()
-            });
-            sections[2] = new ItemLoreSection(new String[] {
-                    ability.getTrigger().getDisplay() + " " + ChatColor.RESET + "" + ChatColor.GREEN + ability.getAbilityName(),
-                    ChatColor.translateAlternateColorCodes('&', ability.getDescription())
-            });
+            ItemLoreSection[] sections = new ItemLoreSection[4 + (stats.size() > 0 ? 1 : 0)];
+            sections[0] = new ItemLoreSection(new String[]{ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level});
+            sections[1] = new ItemLoreSection(new String[]{ChatColor.RED + "" + damageRange.getMin() + "-" + damageRange.getMax() + " DMG"});
+            List<String> formattedDescription = new ArrayList<>(Collections.singleton
+                    (
+                            ability.getTrigger().getDisplay() + " " + ChatColor.RESET +
+                                    ChatColor.GREEN + ability.getAbilityName()
+                    ));
+            formattedDescription.addAll(ChatUtils.formattedText(ability.getDescription()));
+            String[] artifactLore = new String[formattedDescription.size()];
+            formattedDescription.toArray(artifactLore);
+            sections[2] = new ItemLoreSection(artifactLore);
             List<String> lore = new LinkedList<>();
             for (Map.Entry<Stat, RunicItemStat> entry : stats.entrySet()) {
                 lore.add(
@@ -50,8 +46,9 @@ public class RunicItemArtifact extends RunicItemWeapon {
                                 + entry.getKey().getIcon()
                 );
             }
+            sections[3] = new ItemLoreSection(new String[]{rarity.getDisplay(), ChatColor.GRAY + runicClass.getDisplay()});
             if (stats.size() > 0) {
-                sections[3] = new ItemLoreSection(lore);
+                sections[4] = new ItemLoreSection(lore);
             }
             return sections;
         });
@@ -87,7 +84,8 @@ public class RunicItemArtifact extends RunicItemWeapon {
     public static RunicItemArtifact getFromItemStack(ItemStack item) {
         NBTItem nbtItem = new NBTItem(item);
         RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
-        if (!(uncastedTemplate instanceof RunicItemArtifactTemplate)) throw new IllegalArgumentException("ItemStack is not an artifact item!");
+        if (!(uncastedTemplate instanceof RunicItemArtifactTemplate))
+            throw new IllegalArgumentException("ItemStack is not an artifact item!");
         RunicItemArtifactTemplate template = (RunicItemArtifactTemplate) uncastedTemplate;
         Set<String> keys = nbtItem.getKeys();
         int amountOfStats = 0;

@@ -4,8 +4,8 @@ import com.runicrealms.plugin.database.Data;
 import com.runicrealms.plugin.utilities.ColorUtil;
 import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
-import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
+import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.util.DataUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
@@ -67,7 +67,9 @@ public abstract class RunicItem {
             for (String s : section.getLore()) {
                 lore.add(ColorUtil.format(s));
             }
-            if (!section.isEmpty() && !section.equals(this.loreSections.get(this.loreSections.size() - 1))) { // no space for last section
+            if (!section.isEmpty()
+                    && !section.getLore().get(0).equals("") // no extra space if it's a space section
+                    && !section.equals(this.loreSections.get(this.loreSections.size() - 1))) { // no space for last section
                 lore.add("");
             }
         }
