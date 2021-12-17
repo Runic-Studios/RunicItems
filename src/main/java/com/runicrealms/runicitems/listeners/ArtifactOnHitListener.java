@@ -13,7 +13,7 @@ public class ArtifactOnHitListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onWeaponDamage(WeaponDamageEvent e) {
         if (e.isCancelled()) return;
-        if (!e.isAutoAttack()) return;
+        if (!e.isBasicAttack()) return;
         ItemStack itemStack = e.getPlayer().getInventory().getItemInMainHand();
         ArtifactUtil.checkForArtifactTrigger(e.getPlayer(), itemStack, RunicArtifactAbilityTrigger.ON_HIT, e.getVictim());
     }
