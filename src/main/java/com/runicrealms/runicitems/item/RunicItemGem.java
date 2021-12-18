@@ -76,7 +76,7 @@ public class RunicItemGem extends RunicItem {
     public void addToData(Data section, String root) {
         super.addToData(section, root);
         for (Stat statType : this.bonus.getStats().keySet()) {
-            section.set(ItemManager.getInventoryPath() + "." + root + ".gem-stats." + statType.getIdentifier(), this.bonus.getStats().get(statType));
+            section.set(root + ".gem-stats." + statType.getIdentifier(), this.bonus.getStats().get(statType));
         }
     }
 

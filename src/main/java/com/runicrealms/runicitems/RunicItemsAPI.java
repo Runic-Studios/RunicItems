@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems;
 
 import com.runicrealms.plugin.database.Data;
+import com.runicrealms.runicitems.config.ItemLoader;
 import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
@@ -95,16 +96,16 @@ public class RunicItemsAPI {
         data.save();
     }
 
-//    /**
-//     * Deserializes an inventory stored in a Data section and applies it to an existing inventory
-//     * @param inventory - Inventory to modify
-//     * @param data - Data to read from
-//     */
-//    public static void applyDataToInventory(Inventory inventory, Data data) {
-//        for (String key : data.getKeys()) {
-//            inventory.setItem(Integer.parseInt(key), ItemLoader.loadItem(data.getSection(key), DupeManager.getNextItemId()).generateItem());
-//        }
-//    }
+    /**
+     * Deserializes an inventory stored in a Data section and applies it to an existing inventory
+     * @param inventory - Inventory to modify
+     * @param data - Data to read from
+     */
+    public static void applyDataToInventory(Inventory inventory, Data data) {
+        for (String key : data.getKeys()) {
+            inventory.setItem(Integer.parseInt(key), ItemLoader.loadItem(data.getSection(key), DupeManager.getNextItemId()).generateItem());
+        }
+    }
 
     /**
      * Creates a RunicItem from an ItemStack
