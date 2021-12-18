@@ -26,7 +26,7 @@ public class RunicItemArtifactTriggerEvent extends Event implements Cancellable 
      * @param runicItemArtifact   the artifact associated with the trigger
      * @param itemStack           the itemStack of the artifact in the event
      * @param abilityTrigger      the type of trigger (cast, hit, kill, etc.)
-     * @param artifactSpellToCast nullable parameter to specify which spell artifact spell to cast (for managing cooldowns)
+     * @param artifactSpellToCast nullable parameter to specify which active artifact spell to cast (for managing cooldowns, not necessary for passive artifact spells)
      */
     public RunicItemArtifactTriggerEvent(Player player, RunicItemArtifact runicItemArtifact, ItemStack itemStack,
                                          RunicArtifactAbilityTrigger abilityTrigger, @Nullable Spell artifactSpellToCast) {
