@@ -1,8 +1,10 @@
 package com.runicrealms.runicitems.listeners;
 
 import com.runicrealms.plugin.events.SpellCastEvent;
+import com.runicrealms.runicitems.item.event.RunicArtifactOnCastEvent;
 import com.runicrealms.runicitems.item.util.RunicArtifactAbilityTrigger;
 import com.runicrealms.runicitems.util.ArtifactUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -14,6 +16,17 @@ public class ArtifactOnCastListener implements Listener {
     public void onSpellCast(SpellCastEvent e) {
         if (e.isCancelled()) return;
         ItemStack itemStack = e.getCaster().getInventory().getItemInMainHand();
-        ArtifactUtil.checkForArtifactTrigger(e.getCaster(), itemStack, RunicArtifactAbilityTrigger.ON_CAST);
+        ArtifactUtil.ArtifactAndBooleanWrapper artifactAndBooleanWrapper = ArtifactUtil.checkForArtifactTrigger(itemStack, RunicArtifactAbilityTrigger.ON_CAST);
+        if (!artifactAndBooleanWrapper.isTrigger()) return;
+        Bukkit.getPluginManager().callEvent(new RunicArtifactOnCastEvent
+                (
+                        e.getCaster(),
+                        artifactAndBooleanWrapper.getRunicItemArtifact(),
+                        itemStack,
+                        RunicArtifactAbilityTrigger.ON_CAST,
+                        null,
+                        e.getSpell()
+                )
+        );
     }
 }
