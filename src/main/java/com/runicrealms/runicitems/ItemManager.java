@@ -403,6 +403,7 @@ public class ItemManager implements Listener {
     }
 
     public static RunicItem getRunicItemFromItemStack(ItemStack itemStack) {
+        if (itemStack == null || itemStack.getType() == Material.AIR) return null;
         NBTItem nbtItem = new NBTItem(itemStack);
         if ((!nbtItem.hasNBTData()) || (!nbtItem.hasKey("template-id"))) return null;
         RunicItemTemplate template = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
