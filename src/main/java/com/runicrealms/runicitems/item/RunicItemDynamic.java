@@ -11,6 +11,7 @@ import com.runicrealms.runicitems.item.util.ClickTrigger;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -131,6 +132,7 @@ public class RunicItemDynamic extends RunicItemGeneric {
      * @return a RunicItemDynamic object with the current stored custom field value
      */
     public static RunicItemDynamic getFromItemStack(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) return null;
         NBTItem nbtItem = new NBTItem(item);
         RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
         if (!(uncastedTemplate instanceof RunicItemDynamicTemplate))

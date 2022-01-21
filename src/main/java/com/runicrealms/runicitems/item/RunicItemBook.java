@@ -66,6 +66,7 @@ public class RunicItemBook extends RunicItem {
     }
 
     public static RunicItemBook getFromItemStack(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) return null;
         NBTItem nbtItem = new NBTItem(item);
         RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
         if (!(uncastedTemplate instanceof RunicItemBookTemplate)) throw new IllegalArgumentException("ItemStack is not a book item!");

@@ -13,6 +13,7 @@ import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.util.StatUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -81,6 +82,7 @@ public class RunicItemGem extends RunicItem {
     }
 
     public static RunicItemGem getFromItemStack(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) return null;
         NBTItem nbtItem = new NBTItem(item);
         RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
         if (!(uncastedTemplate instanceof RunicItemGemTemplate)) throw new IllegalArgumentException("ItemStack is not a gem item!");

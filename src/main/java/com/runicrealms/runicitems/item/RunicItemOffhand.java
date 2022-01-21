@@ -14,6 +14,7 @@ import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import de.tr7zw.nbtapi.NBTItem;
 import javafx.util.Pair;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -95,6 +96,7 @@ public class RunicItemOffhand extends RunicItem {
     }
 
     public static RunicItemOffhand getFromItemStack(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) return null;
         NBTItem nbtItem = new NBTItem(item);
         RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
         if (!(uncastedTemplate instanceof RunicItemOffhandTemplate))

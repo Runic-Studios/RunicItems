@@ -8,6 +8,7 @@ import com.runicrealms.runicitems.item.util.ClickTrigger;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import de.tr7zw.nbtapi.NBTItem;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ public class RunicItemGeneric extends RunicItem {
     }
 
     public static RunicItemGeneric getFromItemStack(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) return null;
         NBTItem nbtItem = new NBTItem(item);
         RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
         if (!(uncastedTemplate instanceof RunicItemGenericTemplate)) throw new IllegalArgumentException("ItemStack is not a generic item!");

@@ -12,6 +12,7 @@ import com.runicrealms.runicitems.item.util.RunicItemClass;
 import de.tr7zw.nbtapi.NBTItem;
 import javafx.util.Pair;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -82,6 +83,7 @@ public class RunicItemArtifact extends RunicItemWeapon {
     }
 
     public static RunicItemArtifact getFromItemStack(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) return null;
         NBTItem nbtItem = new NBTItem(item);
         RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
         if (!(uncastedTemplate instanceof RunicItemArtifactTemplate))
