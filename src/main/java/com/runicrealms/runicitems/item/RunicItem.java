@@ -152,4 +152,12 @@ public abstract class RunicItem {
         return this.id != null;
     }
 
+    public void setIsMenuDisplay(boolean isMenuDisplay) {
+        this.isMenuDisplay = isMenuDisplay;
+    }
+
+    public boolean isMenuDisplay() {
+        return this.isMenuDisplay;
+    }
+
 }
