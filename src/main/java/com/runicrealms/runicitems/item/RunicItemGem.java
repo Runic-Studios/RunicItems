@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 public class RunicItemGem extends RunicItem {
 
@@ -28,28 +30,7 @@ public class RunicItemGem extends RunicItem {
 
     public RunicItemGem(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data,
                         int count, long id, GemBonus bonus) {
-        super(templateId, displayableItem, tags, data, count, id, () -> {
-            List<String> lore = new ArrayList<>();
-
-            for (Stat stat : bonus.getStats().keySet()) {
-                int value = bonus.getStats().get(stat);
-                if (value == 0) continue;;
-                lore.add(stat.getChatColor()
-                        + (value < 0 ? "-" : "+")
-                        + value
-                        + stat.getIcon());
-            }
-
-            return new ItemLoreSection[] {
-                    new ItemLoreSection(new String[] {ChatColor.GRAY + "Req Slots " + ChatColor.WHITE + StatUtil.getGemSlots(bonus.getTier())}),
-                    new ItemLoreSection(lore),
-                    new ItemLoreSection(new String[] {
-                            ChatColor.GRAY + "" + ChatColor.ITALIC + "Drag and click on armor",
-                            ChatColor.GRAY + "" + ChatColor.ITALIC + "to apply this gem!"
-                    }),
-            };
-
-        });
+        super(templateId, displayableItem, tags, data, count, id);
         this.bonus = bonus;
     }
 
@@ -109,6 +90,34 @@ public class RunicItemGem extends RunicItem {
             }
         }
         return new RunicItemGem(template, item.getAmount(), nbtItem.getInteger("id"), new GemBonus(StatUtil.sortStatMap(stats), health, mainStat, tier));
+    }
+
+    private static final Function<RunicItemGem, ItemLoreSection[]> loreSectionGenerator = (itemGem) -> {
+        List<String> lore = new ArrayList<>();
+
+        for (Stat stat : itemGem.bonus.getStats().keySet()) {
+            int value = itemGem.bonus.getStats().get(stat);
+            if (value == 0) continue;;
+            lore.add(stat.getChatColor()
+                    + (value < 0 ? "-" : "+")
+                    + value
+                    + stat.getIcon());
+        }
+
+        return new ItemLoreSection[] {
+                new ItemLoreSection(new String[] {ChatColor.GRAY + "Req Slots " + ChatColor.WHITE + StatUtil.getGemSlots(itemGem.bonus.getTier())}),
+                new ItemLoreSection(lore),
+                new ItemLoreSection(new String[] {
+                        ChatColor.GRAY + "" + ChatColor.ITALIC + "Drag and click on armor",
+                        ChatColor.GRAY + "" + ChatColor.ITALIC + "to apply this gem!"
+                }),
+        };
+
+    };
+
+    @Override
+    protected Callable<ItemLoreSection[]> getLoreSectionGenerator() {
+        return () -> loreSectionGenerator.apply(this);
     }
 
 }

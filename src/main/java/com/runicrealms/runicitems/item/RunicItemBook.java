@@ -16,6 +16,8 @@ import org.bukkit.inventory.meta.BookMeta;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 public class RunicItemBook extends RunicItem {
 
@@ -25,7 +27,7 @@ public class RunicItemBook extends RunicItem {
 
     public RunicItemBook(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
                          List<String> lore, String author, List<String> pages) {
-        super(templateId, displayableItem, tags, data, count, id, () -> new ItemLoreSection[] {ItemLoreSection.generateTranslateColorCodes(lore)});
+        super(templateId, displayableItem, tags, data, count, id);
         this.lore = lore;
         this.author = author;
         this.pages = pages;
@@ -72,6 +74,14 @@ public class RunicItemBook extends RunicItem {
         if (!(uncastedTemplate instanceof RunicItemBookTemplate)) throw new IllegalArgumentException("ItemStack is not a book item!");
         RunicItemBookTemplate template = (RunicItemBookTemplate) uncastedTemplate;
         return new RunicItemBook(template, item.getAmount(), nbtItem.getInteger("id"));
+    }
+
+    private static final Function<RunicItemBook, ItemLoreSection[]> loreSectionGenerator =
+            (itemBook) -> new ItemLoreSection[] {ItemLoreSection.generateTranslateColorCodes(itemBook.lore)};
+
+    @Override
+    protected Callable<ItemLoreSection[]> getLoreSectionGenerator() {
+        return () -> loreSectionGenerator.apply(this);
     }
 
 }

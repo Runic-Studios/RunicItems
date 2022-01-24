@@ -22,6 +22,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 public class RunicItemWeapon extends RunicItem {
 
@@ -34,34 +35,7 @@ public class RunicItemWeapon extends RunicItem {
     public RunicItemWeapon(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
                            RunicItemStatRange damageRange, LinkedHashMap<Stat, RunicItemStat> stats,
                            int level, RunicItemRarity rarity, RunicItemClass runicClass) {
-        super(templateId, displayableItem, tags, data, count, id, () -> {
-            List<String> lore = new LinkedList<>();
-            for (Map.Entry<Stat, RunicItemStat> entry : stats.entrySet()) {
-                lore.add(
-                        entry.getKey().getChatColor()
-                                + (entry.getValue().getValue() < 0 ? "-" : "+")
-                                + entry.getValue().getValue()
-                                + entry.getKey().getIcon()
-                );
-            }
-            return new ItemLoreSection[]{
-                    (level > 0 ? new ItemLoreSection(new String[]{ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level}) : new ItemLoreSection(new String[]{""})),
-                    new ItemLoreSection(new String[]{ChatColor.RED + "" + damageRange.getMin() + "-" + damageRange.getMax() + " DMG"}),
-                    new ItemLoreSection(lore),
-                    new ItemLoreSection(new String[]{rarity.getDisplay(), ChatColor.GRAY + runicClass.getDisplay()}),
-            };
-        });
-        this.damageRange = damageRange;
-        this.stats = stats;
-        this.level = level;
-        this.rarity = rarity;
-        this.runicClass = runicClass;
-    }
-
-    public RunicItemWeapon(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
-                           RunicItemStatRange damageRange, LinkedHashMap<Stat, RunicItemStat> stats,
-                           int level, RunicItemRarity rarity, RunicItemClass runicClass, Callable<ItemLoreSection[]> loreSectionGenerator) {
-        super(templateId, displayableItem, tags, data, count, id, loreSectionGenerator);
+        super(templateId, displayableItem, tags, data, count, id);
         this.damageRange = damageRange;
         this.stats = stats;
         this.level = level;
@@ -151,6 +125,29 @@ public class RunicItemWeapon extends RunicItem {
             stats.put(stat.getKey(), stat.getValue());
         }
         return new RunicItemWeapon(template, item.getAmount(), nbtItem.getInteger("id"), stats);
+    }
+
+    private static final Function<RunicItemWeapon, ItemLoreSection[]> loreSectionGenerator = (itemWeapon) -> {
+        List<String> lore = new LinkedList<>();
+        for (Map.Entry<Stat, RunicItemStat> entry : itemWeapon.stats.entrySet()) {
+            lore.add(
+                    entry.getKey().getChatColor()
+                            + (entry.getValue().getValue() < 0 ? "-" : "+")
+                            + entry.getValue().getValue()
+                            + entry.getKey().getIcon()
+            );
+        }
+        return new ItemLoreSection[]{
+                (itemWeapon.level > 0 ? new ItemLoreSection(new String[]{ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + itemWeapon.level}) : new ItemLoreSection(new String[]{""})),
+                new ItemLoreSection(new String[]{ChatColor.RED + "" + itemWeapon.damageRange.getMin() + "-" + itemWeapon.damageRange.getMax() + " DMG"}),
+                new ItemLoreSection(lore),
+                new ItemLoreSection(new String[]{itemWeapon.rarity.getDisplay(), ChatColor.GRAY + itemWeapon.runicClass.getDisplay()}),
+        };
+    };
+
+    @Override
+    protected Callable<ItemLoreSection[]> getLoreSectionGenerator() {
+        return () -> loreSectionGenerator.apply(this);
     }
 
 }
