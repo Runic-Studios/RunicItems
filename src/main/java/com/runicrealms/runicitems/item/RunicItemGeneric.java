@@ -53,12 +53,9 @@ public class RunicItemGeneric extends RunicItem {
         return new RunicItemGeneric(template, item.getAmount(), nbtItem.getInteger("id"));
     }
 
-    private static final Function<RunicItemGeneric, ItemLoreSection[]> loreSectionGenerator =
-            (itemGeneric) -> new ItemLoreSection[] {ItemLoreSection.generateTranslateColorCodes(itemGeneric.lore)};
-
     @Override
-    protected Callable<ItemLoreSection[]> getLoreSectionGenerator() {
-        return () -> loreSectionGenerator.apply(this);
+    protected ItemLoreSection[] generateLore() {
+        return new ItemLoreSection[] {ItemLoreSection.generateTranslateColorCodes(lore)};
     }
 
 }

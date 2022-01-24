@@ -92,11 +92,12 @@ public class RunicItemGem extends RunicItem {
         return new RunicItemGem(template, item.getAmount(), nbtItem.getInteger("id"), new GemBonus(StatUtil.sortStatMap(stats), health, mainStat, tier));
     }
 
-    private static final Function<RunicItemGem, ItemLoreSection[]> loreSectionGenerator = (itemGem) -> {
+    @Override
+    protected ItemLoreSection[] generateLore() {
         List<String> lore = new ArrayList<>();
 
-        for (Stat stat : itemGem.bonus.getStats().keySet()) {
-            int value = itemGem.bonus.getStats().get(stat);
+        for (Stat stat : bonus.getStats().keySet()) {
+            int value = bonus.getStats().get(stat);
             if (value == 0) continue;;
             lore.add(stat.getChatColor()
                     + (value < 0 ? "-" : "+")
@@ -105,7 +106,7 @@ public class RunicItemGem extends RunicItem {
         }
 
         return new ItemLoreSection[] {
-                new ItemLoreSection(new String[] {ChatColor.GRAY + "Req Slots " + ChatColor.WHITE + StatUtil.getGemSlots(itemGem.bonus.getTier())}),
+                new ItemLoreSection(new String[] {ChatColor.GRAY + "Req Slots " + ChatColor.WHITE + StatUtil.getGemSlots(bonus.getTier())}),
                 new ItemLoreSection(lore),
                 new ItemLoreSection(new String[] {
                         ChatColor.GRAY + "" + ChatColor.ITALIC + "Drag and click on armor",
@@ -113,11 +114,6 @@ public class RunicItemGem extends RunicItem {
                 }),
         };
 
-    };
-
-    @Override
-    protected Callable<ItemLoreSection[]> getLoreSectionGenerator() {
-        return () -> loreSectionGenerator.apply(this);
     }
 
 }

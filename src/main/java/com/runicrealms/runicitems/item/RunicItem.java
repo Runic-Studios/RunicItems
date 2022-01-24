@@ -2,7 +2,6 @@ package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
 import com.runicrealms.plugin.utilities.ColorUtil;
-import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
@@ -47,12 +46,12 @@ public abstract class RunicItem {
         this.id = id;
     }
 
-    protected abstract Callable<ItemLoreSection[]> getLoreSectionGenerator();
+    protected abstract ItemLoreSection[] generateLore();
 
     public ItemStack generateItem() {
         ItemStack item = this.displayableItem.generateItem(this.count);
         try {
-            ItemLoreSection[] loreSections = getLoreSectionGenerator().call();
+            ItemLoreSection[] loreSections = generateLore();
             if (loreSections != null && loreSections.length > 0) {
                 for (ItemLoreSection section : loreSections) {
                     if (section != null) {

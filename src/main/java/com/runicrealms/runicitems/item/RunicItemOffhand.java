@@ -115,9 +115,10 @@ public class RunicItemOffhand extends RunicItem {
         return new RunicItemOffhand(template, item.getAmount(), nbtItem.getInteger("id"), stats);
     }
 
-    private static final Function<RunicItemOffhand, ItemLoreSection[]> loreSectionGenerator = (itemOffhand) -> {
+    @Override
+    protected ItemLoreSection[] generateLore() {
         List<String> lore = new LinkedList<>();
-        for (Map.Entry<Stat, RunicItemStat> entry : itemOffhand.stats.entrySet()) {
+        for (Map.Entry<Stat, RunicItemStat> entry : stats.entrySet()) {
             lore.add(
                     entry.getKey().getChatColor()
                             + (entry.getValue().getValue() < 0 ? "-" : "+")
@@ -126,15 +127,10 @@ public class RunicItemOffhand extends RunicItem {
             );
         }
         return new ItemLoreSection[]{
-                (itemOffhand.level > 0 ? new ItemLoreSection(new String[]{ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + itemOffhand.level}) : new ItemLoreSection(new String[]{""})),
+                (level > 0 ? new ItemLoreSection(new String[]{ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level}) : new ItemLoreSection(new String[]{""})),
                 new ItemLoreSection(lore),
-                new ItemLoreSection(Collections.singletonList(itemOffhand.rarity.getDisplay())),
+                new ItemLoreSection(Collections.singletonList(rarity.getDisplay())),
         };
-    };
-
-    @Override
-    protected Callable<ItemLoreSection[]> getLoreSectionGenerator() {
-        return () -> loreSectionGenerator.apply(this);
     }
 
 }
