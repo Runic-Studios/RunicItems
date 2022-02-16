@@ -25,6 +25,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 public class RunicItemArmor extends RunicItem {
 
@@ -41,7 +43,7 @@ public class RunicItemArmor extends RunicItem {
     public RunicItemArmor(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
                           int health, LinkedHashMap<Stat, RunicItemStat> stats, List<GemBonus> gemBonuses, int maxGemSlots,
                           int level, RunicItemRarity rarity, RunicItemClass runicClass) {
-        super(templateId, displayableItem, tags, data, count, id, () -> new ItemLoreSection[0]);
+        super(templateId, displayableItem, tags, data, count, id);
         this.rarity = rarity;
         this.level = level;
         this.health = health;
@@ -49,8 +51,8 @@ public class RunicItemArmor extends RunicItem {
         this.stats = stats;
         this.maxGemSlots = maxGemSlots;
         this.runicClass = runicClass;
-        this.setLoreSectionGenerator(false);
     }
+
 
     public RunicItemArmor(RunicItemArmorTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats, List<GemBonus> gemBonuses) {
         this(
@@ -219,12 +221,8 @@ public class RunicItemArmor extends RunicItem {
         return new RunicItemArmor(template, item.getAmount(), nbtItem.getInteger("id"), stats, gemBonuses);
     }
 
-    /**
-     * @param isMenuItemDisplay
-     * @return
-     */
-    public void setLoreSectionGenerator(boolean isMenuItemDisplay) {
-
+    @Override
+    protected ItemLoreSection[] generateLore() {
         List<String> lore = new LinkedList<>();
 
         Map<Stat, Integer> gemOnlyStats = new HashMap<>();
@@ -238,7 +236,7 @@ public class RunicItemArmor extends RunicItem {
 
         for (Stat stat : Stat.values()) {
             if (stats.get(stat) != null && stats.get(stat).getValue() == 0) continue;
-            if (isMenuItemDisplay && stats.containsKey(stat)) {
+            if (isMenuDisplay && stats.containsKey(stat)) {
                 lore.add(stat.getChatColor() + "+" + stats.get(stat).getRange().getMin() +
                         "-" + stats.get(stat).getRange().getMax() + stat.getIcon());
             } else if (stats.containsKey(stat)) {
@@ -302,7 +300,7 @@ public class RunicItemArmor extends RunicItem {
                 gemTextBuilder.append(Stat.EMPTY_GEM_ICON).append(" ");
             }
             gemTextBuilder.append(ChatColor.WHITE).append("]");
-            this.loreSectionGenerator = () -> new ItemLoreSection[]{
+            return new ItemLoreSection[] {
                     (maxGemSlots > 0
                             ? new ItemLoreSection(new String[]{
                             ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
@@ -318,11 +316,12 @@ public class RunicItemArmor extends RunicItem {
                     }),
             };
         } else {
-            this.loreSectionGenerator = () -> new ItemLoreSection[]{
+            return new ItemLoreSection[] {
                     new ItemLoreSection(new String[]{healthString}),
                     new ItemLoreSection(lore),
                     new ItemLoreSection(new String[]{rarity.getDisplay(), ChatColor.GRAY + runicClass.getDisplay()}),
             };
         }
     }
+
 }

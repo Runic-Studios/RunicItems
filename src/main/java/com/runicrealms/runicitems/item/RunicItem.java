@@ -2,7 +2,6 @@ package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
 import com.runicrealms.plugin.utilities.ColorUtil;
-import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
@@ -27,7 +26,6 @@ public abstract class RunicItem {
 
     protected final DisplayableItem displayableItem; // Base ItemStack information that we get from the template
     protected final String templateId; // Template ID
-    protected Callable<ItemLoreSection[]> loreSectionGenerator;
 
     protected final List<RunicItemTag> tags; // List of tags (soulbound, untradeable, etc.)
     protected final Map<String, String> data;
@@ -36,20 +34,24 @@ public abstract class RunicItem {
 
     protected List<ItemLoreSection> loreSections = new ArrayList<>();
 
-    public RunicItem(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id, Callable<ItemLoreSection[]> loreSectionGenerator) {
+    // If this is an icon to be used in a menu
+    protected boolean isMenuDisplay = false;
+
+    public RunicItem(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id) {
         this.templateId = templateId;
         this.displayableItem = displayableItem;
         this.tags = tags;
         this.data = data;
         this.count = count;
         this.id = id;
-        this.loreSectionGenerator = loreSectionGenerator;
     }
+
+    protected abstract ItemLoreSection[] generateLore();
 
     public ItemStack generateItem() {
         ItemStack item = this.displayableItem.generateItem(this.count);
         try {
-            ItemLoreSection[] loreSections = this.loreSectionGenerator.call();
+            ItemLoreSection[] loreSections = generateLore();
             if (loreSections != null && loreSections.length > 0) {
                 for (ItemLoreSection section : loreSections) {
                     if (section != null) {
@@ -147,6 +149,14 @@ public abstract class RunicItem {
 
     public boolean hasId() {
         return this.id != null;
+    }
+
+    public void setIsMenuDisplay(boolean isMenuDisplay) {
+        this.isMenuDisplay = isMenuDisplay;
+    }
+
+    public boolean isMenuDisplay() {
+        return this.isMenuDisplay;
     }
 
 }

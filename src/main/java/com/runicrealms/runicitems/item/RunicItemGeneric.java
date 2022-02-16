@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 public class RunicItemGeneric extends RunicItem {
 
@@ -23,7 +24,7 @@ public class RunicItemGeneric extends RunicItem {
 
     public RunicItemGeneric(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
                             Map<ClickTrigger, String> triggers, List<String> lore) {
-        super(templateId, displayableItem, tags, data, count, id, () -> new ItemLoreSection[] {ItemLoreSection.generateTranslateColorCodes(lore)});
+        super(templateId, displayableItem, tags, data, count, id);
         this.lore = lore;
         this.triggers = triggers;
     }
@@ -50,6 +51,11 @@ public class RunicItemGeneric extends RunicItem {
         if (!(uncastedTemplate instanceof RunicItemGenericTemplate)) throw new IllegalArgumentException("ItemStack is not a generic item!");
         RunicItemGenericTemplate template = (RunicItemGenericTemplate) uncastedTemplate;
         return new RunicItemGeneric(template, item.getAmount(), nbtItem.getInteger("id"));
+    }
+
+    @Override
+    protected ItemLoreSection[] generateLore() {
+        return new ItemLoreSection[] {ItemLoreSection.generateTranslateColorCodes(lore)};
     }
 
 }
