@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -54,10 +55,10 @@ public class DupeManager implements Listener {
 
             if (event.getAction() == InventoryAction.DROP_ALL_CURSOR
                     || event.getAction() == InventoryAction.DROP_ONE_CURSOR) {
-                if (checkInventoryForDupes(event.getWhoClicked().getInventory(), event.getCursor(), CurrentItemType.CURSOR, event, player)) return;
+                if (player.getGameMode() != GameMode.CREATIVE && checkInventoryForDupes(event.getWhoClicked().getInventory(), event.getCursor(), CurrentItemType.CURSOR, event, player)) return;
             } else if (event.getAction() == InventoryAction.DROP_ALL_SLOT
                     || event.getAction() == InventoryAction.DROP_ONE_SLOT) {
-                if (checkInventoryForDupes(event.getClickedInventory(), event.getCurrentItem(), CurrentItemType.CURRENT, event, player)) return;
+                if (player.getGameMode() != GameMode.CREATIVE && checkInventoryForDupes(event.getClickedInventory(), event.getCurrentItem(), CurrentItemType.CURRENT, event, player)) return;
             }
 
             if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
@@ -68,12 +69,12 @@ public class DupeManager implements Listener {
                 type = CurrentItemType.CURSOR;
             } else return;
             if (GuildBankUtil.isViewingBank(player.getUniqueId())) {
-                if (checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player)) return;
+                if (player.getGameMode() != GameMode.CREATIVE && checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player)) return;
             }
             if (RunicBankAPI.isViewingBank(player)) {
-                if (checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player)) return;
+                if (player.getGameMode() != GameMode.CREATIVE && checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player)) return;
             }
-            checkInventoryForDupes(player.getInventory(), currentItem, type, event, player);
+            if (player.getGameMode() != GameMode.CREATIVE) checkInventoryForDupes(player.getInventory(), currentItem, type, event, player);
         }
     }
 

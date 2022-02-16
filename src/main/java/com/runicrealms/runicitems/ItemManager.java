@@ -20,6 +20,7 @@ import de.tr7zw.nbtapi.NBTItem;
 import net.minecraft.server.v1_16_R3.PacketPlayOutCollect;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
@@ -78,6 +79,7 @@ public class ItemManager implements Listener {
                 PacketContainer container = event.getPacket();
                 if (container.getPlayerDigTypes().getValues().get(0).equals(EnumWrappers.PlayerDigType.DROP_ITEM) // Just Q
                         || container.getPlayerDigTypes().getValues().get(0).equals(EnumWrappers.PlayerDigType.DROP_ALL_ITEMS)) { // CTRL+Q
+                    if (event.getPlayer().getGameMode() == GameMode.CREATIVE) return;
                     DupeManager.checkInventoryForDupes(event.getPlayer().getInventory(), event.getPlayer());
                 }
             }
@@ -142,7 +144,7 @@ public class ItemManager implements Listener {
             RunicItemGeneric generic = (RunicItemGeneric) item;
             ClickTrigger clickTrigger = ClickTrigger.getFromInteractAction(event.getAction(), event.getPlayer());
             if (generic.getTriggers().containsKey(clickTrigger)) {
-                boolean isDuped = DupeManager.checkInventoryForDupes(inventory, event.getItem(), event, event.getPlayer(), event.getPlayer().getInventory().getHeldItemSlot());
+                boolean isDuped = event.getPlayer().getGameMode() != GameMode.CREATIVE && DupeManager.checkInventoryForDupes(inventory, event.getItem(), event, event.getPlayer(), event.getPlayer().getInventory().getHeldItemSlot());
                 if (!isDuped) Bukkit.getPluginManager().callEvent(new RunicItemGenericTriggerEvent(event.getPlayer(), generic, itemStack, clickTrigger, generic.getTriggers().get(clickTrigger)));
             }
         }
