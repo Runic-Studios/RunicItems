@@ -1,16 +1,11 @@
 package com.runicrealms.runicitems.command;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CatchUnknown;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandCompletion;
-import co.aikar.commands.annotation.Conditions;
-import co.aikar.commands.annotation.Default;
-import co.aikar.commands.annotation.Subcommand;
-import co.aikar.commands.annotation.Syntax;
+import co.aikar.commands.annotation.*;
 import com.runicrealms.plugin.api.RunicCoreAPI;
 import com.runicrealms.runicitems.*;
 import com.runicrealms.runicitems.item.RunicItem;
+import com.runicrealms.runicitems.item.RunicItemDynamic;
 import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemArtifactTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
@@ -54,14 +49,23 @@ public class RunicItemCommand extends BaseCommand {
     @Syntax("<item> [amount]")
     @CommandCompletion("@item-ids @nothing")
     public void onCommandGet(Player player, String[] args) {
-        if (args.length == 0) { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+        if (args.length == 0) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help"));
+            return;
+        }
         RunicItemTemplate template = TemplateManager.getTemplateFromId(args[0]);
         int count = 1;
-        if (template == null) { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!")); return; }
+        if (template == null) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!"));
+            return;
+        }
         if (args.length >= 2) {
             if (isInt(args[1])) {
                 count = Integer.parseInt(args[1]);
-            } else { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+            } else {
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!"));
+                return;
+            }
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
         RunicItemsAPI.addItem(player.getInventory(), item.generateItem());
@@ -72,15 +76,27 @@ public class RunicItemCommand extends BaseCommand {
     @Syntax("<level-min> <level-max> [amount]")
     @CommandCompletion("@range:0-60 @range:0-60 @nothing")
     public void onCommandGetRange(Player player, String[] args) {
-        if (args.length == 1) { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
-        if (!isInt(args[0]) || !isInt(args[1])) { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Level min and level max must be integers!")); return; }
+        if (args.length == 1) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help"));
+            return;
+        }
+        if (!isInt(args[0]) || !isInt(args[1])) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Level min and level max must be integers!"));
+            return;
+        }
         RunicItemTemplate template = LootManager.getRandomItemInRange(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
         int count = 1;
-        if (template == null) { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!")); return; }
+        if (template == null) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!"));
+            return;
+        }
         if (args.length >= 3) {
             if (isInt(args[2])) {
                 count = Integer.parseInt(args[2]);
-            } else { player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+            } else {
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!"));
+                return;
+            }
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
         RunicItemsAPI.addItem(player.getInventory(), item.generateItem());
@@ -92,10 +108,16 @@ public class RunicItemCommand extends BaseCommand {
     @Syntax("<item> <location> [amount]")
     @CommandCompletion("@item-ids @nothing @nothing")
     public void onCommandDrop(CommandSender sender, String[] args) {
-        if (args.length < 2) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+        if (args.length < 2) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help"));
+            return;
+        }
         RunicItemTemplate template = TemplateManager.getTemplateFromId(args[0]);
         int count = 1;
-        if (template == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!")); return; }
+        if (template == null) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!"));
+            return;
+        }
         String[] splitLocation = args[1].split(",");
         Location location = new Location(
                 Bukkit.getWorld(splitLocation[0]),
@@ -106,7 +128,10 @@ public class RunicItemCommand extends BaseCommand {
         if (args.length >= 3) {
             if (isInt(args[2])) {
                 count = Integer.parseInt(args[2]);
-            } else { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+            } else {
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!"));
+                return;
+            }
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
         location.getWorld().dropItem(location, item.generateItem());
@@ -117,11 +142,20 @@ public class RunicItemCommand extends BaseCommand {
     @Syntax("<min-level> <max-level> <location> [amount]")
     @CommandCompletion("@range:0-60 @range:0-60 @nothing @nothing")
     public void onCommandDropRange(CommandSender sender, String[] args) {
-        if (args.length < 3) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
-        if (!isInt(args[0]) || !isInt(args[1])) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Level min and level max must be integers!")); return; }
+        if (args.length < 3) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help"));
+            return;
+        }
+        if (!isInt(args[0]) || !isInt(args[1])) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Level min and level max must be integers!"));
+            return;
+        }
         RunicItemTemplate template = LootManager.getRandomItemInRange(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
         int count = 1;
-        if (template == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!")); return; }
+        if (template == null) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!"));
+            return;
+        }
         String[] splitLocation = args[2].split(",");
         Location location = new Location(
                 Bukkit.getWorld(splitLocation[0]),
@@ -132,7 +166,10 @@ public class RunicItemCommand extends BaseCommand {
         if (args.length >= 4) {
             if (isInt(args[3])) {
                 count = Integer.parseInt(args[3]);
-            } else { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+            } else {
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!"));
+                return;
+            }
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
         location.getWorld().dropItem(location, item.generateItem());
@@ -144,18 +181,44 @@ public class RunicItemCommand extends BaseCommand {
     @Syntax("<player> <item> [amount]")
     @CommandCompletion("@players @item-ids @nothing")
     public void onCommandGive(CommandSender sender, String[] args) {
-        if (args.length < 2) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+        if (args.length < 2) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help"));
+            return;
+        }
         Player target = Bukkit.getPlayerExact(args[0]);
-        if (target == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid player!")); return; }
+        if (target == null) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid player!"));
+            return;
+        }
         RunicItemTemplate template = TemplateManager.getTemplateFromId(args[1]);
         int count = 1;
-        if (template == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!")); return; }
-        if (args.length >= 3) {
-            if (!isInt(args[2])) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
-            count = Integer.parseInt(args[2]);
-            if (count < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+        if (template == null) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!"));
+            return;
         }
+        if (args.length >= 3) {
+            if (!isInt(args[2])) {
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!"));
+                return;
+            }
+            count = Integer.parseInt(args[2]);
+            if (count < 1) {
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!"));
+                return;
+            }
+        }
+
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
+        int dynamicField;
+        if (item instanceof RunicItemDynamic && args.length == 4) {
+            if (isInt(args[3])) {
+                dynamicField = Integer.parseInt(args[3]);
+            } else {
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid dyanmic field!"));
+                return;
+            }
+            ((RunicItemDynamic) item).setDynamicField(dynamicField);
+        }
         RunicItemsAPI.addItem(target.getInventory(), item.generateItem());
     }
 
@@ -164,17 +227,35 @@ public class RunicItemCommand extends BaseCommand {
     @Syntax("<player> <level-min> <level-max> [amount]")
     @CommandCompletion("@players @range:0-60 @range:0-60 @nothing")
     public void onCommandGiveRange(CommandSender sender, String[] args) {
-        if (args.length < 3) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+        if (args.length < 3) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help"));
+            return;
+        }
         Player target = Bukkit.getPlayerExact(args[0]);
-        if (target == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid player!")); return; }
-        if (!isInt(args[1]) || !isInt(args[2])) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Level min and level max must be integers!")); return; }
+        if (target == null) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid player!"));
+            return;
+        }
+        if (!isInt(args[1]) || !isInt(args[2])) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Level min and level max must be integers!"));
+            return;
+        }
         RunicItemTemplate template = LootManager.getRandomItemInRange(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
         int count = 1;
-        if (template == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!")); return; }
+        if (template == null) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!"));
+            return;
+        }
         if (args.length >= 4) {
-            if (!isInt(args[3])) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+            if (!isInt(args[3])) {
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!"));
+                return;
+            }
             count = Integer.parseInt(args[3]);
-            if (count < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+            if (count < 1) {
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!"));
+                return;
+            }
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
         RunicItemsAPI.addItem(target.getInventory(), item.generateItem());
@@ -186,19 +267,34 @@ public class RunicItemCommand extends BaseCommand {
     @Syntax("<player> [item] [amount]")
     @CommandCompletion("@players @item-ids @nothing")
     public void onCommandClear(CommandSender sender, String[] args) {
-        if (args.length < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+        if (args.length < 1) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help"));
+            return;
+        }
         Player target = Bukkit.getPlayerExact(args[0]);
-        if (target == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid player!")); return; }
+        if (target == null) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid player!"));
+            return;
+        }
         RunicItemTemplate template = null;
         if (args.length >= 2) {
             template = TemplateManager.getTemplateFromId(args[1]);
-            if (template == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!")); return; }
+            if (template == null) {
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!"));
+                return;
+            }
         }
         int amount = -1;
         if (args.length >= 3) {
-            if (!isInt(args[2])) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+            if (!isInt(args[2])) {
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!"));
+                return;
+            }
             amount = Integer.parseInt(args[2]);
-            if (amount < 1) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!")); return; }
+            if (amount < 1) {
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat is not a valid amount!"));
+                return;
+            }
         }
         int amountRemoved = 0;
         ItemStack[] contents = target.getInventory().getContents();
@@ -256,44 +352,44 @@ public class RunicItemCommand extends BaseCommand {
         player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dItem NBT Data: "));
         for (String key : nbtItem.getKeys()) {
             if (!key.equals("display"))
-            switch (nbtItem.getType(key)) {
-                case NBTTagByte:
-                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getByte(key));
-                    break;
-                case NBTTagByteArray:
-                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + Arrays.toString(nbtItem.getByteArray(key)));
-                    break;
-                case NBTTagCompound:
-                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getCompound(key).toString());
-                    break;
-                case NBTTagDouble:
-                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getDouble(key));
-                    break;
-                case NBTTagFloat:
-                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getFloat(key));
-                    break;
-                case NBTTagInt:
-                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getInteger(key));
-                    break;
-                case NBTTagIntArray:
-                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + Arrays.toString(nbtItem.getIntArray(key)));
-                    break;
-                case NBTTagList:
-                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getStringList(key));
-                    break;
-                case NBTTagLong:
-                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getLong(key));
-                    break;
-                case NBTTagShort:
-                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getShort(key));
-                    break;
-                case NBTTagString:
-                    player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getString(key));
-                    break;
-                default: {
-                    player.sendMessage(ChatColor.GREEN + "- " + key + " : unknown type");
+                switch (nbtItem.getType(key)) {
+                    case NBTTagByte:
+                        player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getByte(key));
+                        break;
+                    case NBTTagByteArray:
+                        player.sendMessage(ChatColor.GREEN + "- " + key + " : " + Arrays.toString(nbtItem.getByteArray(key)));
+                        break;
+                    case NBTTagCompound:
+                        player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getCompound(key).toString());
+                        break;
+                    case NBTTagDouble:
+                        player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getDouble(key));
+                        break;
+                    case NBTTagFloat:
+                        player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getFloat(key));
+                        break;
+                    case NBTTagInt:
+                        player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getInteger(key));
+                        break;
+                    case NBTTagIntArray:
+                        player.sendMessage(ChatColor.GREEN + "- " + key + " : " + Arrays.toString(nbtItem.getIntArray(key)));
+                        break;
+                    case NBTTagList:
+                        player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getStringList(key));
+                        break;
+                    case NBTTagLong:
+                        player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getLong(key));
+                        break;
+                    case NBTTagShort:
+                        player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getShort(key));
+                        break;
+                    case NBTTagString:
+                        player.sendMessage(ChatColor.GREEN + "- " + key + " : " + nbtItem.getString(key));
+                        break;
+                    default: {
+                        player.sendMessage(ChatColor.GREEN + "- " + key + " : unknown type");
+                    }
                 }
-            }
         }
     }
 
@@ -326,10 +422,16 @@ public class RunicItemCommand extends BaseCommand {
     @Syntax("<player> <item> <item> <item> <item> <item>")
     @CommandCompletion("@online @item-ids @item-ids item-ids item-ids item-ids")
     public void onCommandPicker(CommandSender sender, String[] args) {
-        if (args.length != 6) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+        if (args.length != 6) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help"));
+            return;
+        }
 
         Player target = Bukkit.getPlayerExact(args[0]);
-        if (target == null) { sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help")); return; }
+        if (target == null) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help"));
+            return;
+        }
         RunicItemClass playerClass = RunicItemClass.getFromIdentifier(RunicCoreAPI.getPlayerCache(target).getClassName());
 
         for (int i = 1; i < 6; i++) {
