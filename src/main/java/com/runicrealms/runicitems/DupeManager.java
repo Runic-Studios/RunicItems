@@ -1,5 +1,6 @@
 package com.runicrealms.runicitems;
 
+import com.runicrealms.plugin.RunicCore;
 import com.runicrealms.plugin.api.RunicBankAPI;
 import com.runicrealms.plugin.api.RunicCoreAPI;
 import com.runicrealms.runicguilds.gui.GuildBankUtil;
@@ -211,6 +212,7 @@ public class DupeManager implements Listener {
                                         + getItemName(currentItem)
                                         + "` at "
                                         + new SimpleDateFormat("MM/dd/yy HH:mm:ss").format(System.currentTimeMillis())
+                                        + "(db: " + RunicCore.getInstance().getConfig().getString("database") + ")"
                                 ).build()).queue();
                         Bukkit.getOnlinePlayers().stream().filter(ServerOperator::isOp).forEach(target -> {
                             target.sendMessage(ChatColor.translateAlternateColorCodes('&',
