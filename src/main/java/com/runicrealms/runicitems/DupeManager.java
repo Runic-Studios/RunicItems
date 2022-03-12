@@ -153,11 +153,13 @@ public class DupeManager implements Listener {
 
     // For inventory click events
     public static boolean checkInventoryForDupes(Inventory inventory, ItemStack currentItem, CurrentItemType type, InventoryClickEvent event, Player player) {
+        if (currentItem == null) return false;
         int ignoreSlot = -1;
         if (type != CurrentItemType.CURSOR) {
             for (int i = 0; i < inventory.getSize(); i++) {
                 ItemStack item = inventory.getItem(i);
-                if (item != null && item.getType() != Material.AIR && item.getAmount() == currentItem.getAmount()) {
+                if (item == null) continue;
+                if (item.getType() != Material.AIR && item.getAmount() == currentItem.getAmount()) {
                     if (NBTUtil.isNBTSimilar(item, currentItem, true, true)) {
                         ignoreSlot = i;
                         break; // We only want to remove once!!!
@@ -190,9 +192,11 @@ public class DupeManager implements Listener {
     }
 
     private static boolean checkInventoryForDupesNoDelete(Inventory inventory, ItemStack currentItem, Player player, int ignoreSlot) {
+        if (currentItem == null) return false;
         for (int i = 0; i < inventory.getSize(); i++) {
             ItemStack item = inventory.getItem(i);
-            if (item != null && item.getType() != Material.AIR && item != currentItem && i != ignoreSlot) {
+            if (item == null) continue;
+            if (item.getType() != Material.AIR && item != currentItem && i != ignoreSlot) {
                 if (checkItemsDuped(item, currentItem)) {
                     if (channel != null) {
                         channel.sendMessage(new EmbedBuilder()
