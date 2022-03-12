@@ -92,12 +92,21 @@ public abstract class RunicItem {
         nbtItem.setLong("id", this.id);
         nbtItem.setString("template-id", this.templateId);
         nbtItem.setInteger("last-count", this.count);
+        nbtItem.setBoolean("isRI", true);
         for (RunicItemTag tag : this.tags) {
             nbtItem.setByte(tag.getIdentifier(), (byte) 1);
         }
         for (String dataKey : this.data.keySet()) {
             nbtItem.setString("data-" + dataKey, this.data.get(dataKey));
         }
+        return item;
+    }
+
+    public ItemStack generateGUIItem() {
+        ItemStack item = generateItem();
+        NBTItem nbtItem = new NBTItem(item, true);
+        nbtItem.setBoolean("isRI", true);
+        nbtItem.removeKey("id");
         return item;
     }
 

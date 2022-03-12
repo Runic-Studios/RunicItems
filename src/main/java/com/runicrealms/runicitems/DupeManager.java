@@ -105,6 +105,7 @@ public class DupeManager implements Listener {
 
     public static void assignNewDupeId(ItemStack item) {
         NBTItem nbtItem = new NBTItem(item, true);
+        if (nbtItem.hasNBTData() && nbtItem.hasKey("isRI") && !nbtItem.getBoolean("isRI")) return;
         nbtItem.setLong("id", getNextItemId());
     }
 

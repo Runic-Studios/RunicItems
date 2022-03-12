@@ -60,6 +60,7 @@ public class NBTUtil {
         keys.remove("HideFlags");
         keys.remove("display");
         keys.remove("AttributeModifiers");
+        keys.remove("isRI");
         try {
             for (String key : keys) {
                 if (
