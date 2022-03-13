@@ -48,6 +48,9 @@ public class DupeManager implements Listener {
             if (RunicCoreAPI.getPlayerCache(player) == null) return;
             final ItemStack currentItem;
             final CurrentItemType type;
+            if (event.getClickedInventory() == event.getWhoClicked().getInventory()) {
+                if (event.getSlot() == 0 || event.getSlot() == 7 || event.getSlot() == 8) return;
+            }
             if (event.getAction() == InventoryAction.PICKUP_HALF
                     && (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)
                     && event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
