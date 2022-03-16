@@ -30,15 +30,15 @@ public class StatUtil {
 
         List<Pair<Integer, int[]>> tierFour = new ArrayList<>(3);
         tierFour.add(new Pair<>(7, new int[0]));
-        tierFour.add(new Pair<>(5, new int[] {2}));
-        tierFour.add(new Pair<>(4, new int[] {1, 1, 1}));
+        tierFour.add(new Pair<>(6, new int[] {2}));
+        tierFour.add(new Pair<>(6, new int[] {1, 1, 1}));
         GEM_STAT_OPTIONS.put(4, tierFour);
 
         List<Pair<Integer, int[]>> tierFive = new ArrayList<>(4);
         tierFive.add(new Pair<>(8, new int[0]));
-        tierFive.add(new Pair<>(6, new int[] {3}));
-        tierFive.add(new Pair<>(5, new int[] {2, 2}));
-        tierFive.add(new Pair<>(5, new int[] {1, 1, 1, 1}));
+        tierFive.add(new Pair<>(7, new int[] {2}));
+        tierFive.add(new Pair<>(6, new int[] {2, 2}));
+        tierFive.add(new Pair<>(6, new int[] {1, 1, 1, 1}));
         GEM_STAT_OPTIONS.put(5, tierFive);
 
         GEM_TIER_SLOTS = new HashMap<>();
