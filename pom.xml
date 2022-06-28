@@ -165,12 +165,6 @@
             <version>1.16.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <!-- MongoDB -->
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver-sync</artifactId>
-            <version>4.3.0</version>
-        </dependency>
         <!-- MythicMobs -->
         <dependency>
             <groupId>net.elseland.xikage</groupId>

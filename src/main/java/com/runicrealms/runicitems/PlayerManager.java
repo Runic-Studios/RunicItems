@@ -1,7 +1,7 @@
 package com.runicrealms.runicitems;
 
 import com.runicrealms.plugin.ArmorType;
-import com.runicrealms.plugin.character.api.CharacterLoadEvent;
+import com.runicrealms.plugin.character.api.CharacterSelectEvent;
 import com.runicrealms.plugin.events.ArmorEquipEvent;
 import com.runicrealms.runicitems.player.PlayerStatHolder;
 import org.bukkit.Bukkit;
@@ -22,7 +22,7 @@ public class PlayerManager implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL)
     // Fire before other character load events so checking stats functions properly
-    public void onCharacterLoad(CharacterLoadEvent e) {
+    public void onCharacterLoad(CharacterSelectEvent e) {
         cachedPlayerStats.put(e.getPlayer().getUniqueId(), new PlayerStatHolder(e.getPlayer()));
     }
 

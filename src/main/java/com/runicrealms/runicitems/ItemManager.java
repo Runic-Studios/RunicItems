@@ -6,7 +6,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.runicrealms.plugin.character.api.CharacterLoadEvent;
+import com.runicrealms.plugin.character.api.CharacterSelectEvent;
 import com.runicrealms.plugin.database.Data;
 import com.runicrealms.plugin.database.MongoDataSection;
 import com.runicrealms.plugin.database.event.CacheSaveEvent;
@@ -18,18 +18,13 @@ import com.runicrealms.runicitems.item.util.ClickTrigger;
 import com.runicrealms.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import net.minecraft.server.v1_16_R3.PacketPlayOutCollect;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
@@ -88,7 +83,7 @@ public class ItemManager implements Listener {
 
     // Fire before loading stats
     @EventHandler(priority = EventPriority.LOW)
-    public void onCharacterJoin(CharacterLoadEvent event) {
+    public void onCharacterJoin(CharacterSelectEvent event) {
         //if (RunicItems.isDatabaseLoadingEnabled()) {
         if (event.getPlayerCache().getMongoData().has("character." + event.getSlot() + ".inventory")) {
             Data data = event.getPlayerCache().getMongoData().getSection("character." + event.getSlot() + ".inventory");
@@ -145,7 +140,8 @@ public class ItemManager implements Listener {
             ClickTrigger clickTrigger = ClickTrigger.getFromInteractAction(event.getAction(), event.getPlayer());
             if (generic.getTriggers().containsKey(clickTrigger)) {
                 boolean isDuped = event.getPlayer().getGameMode() != GameMode.CREATIVE && DupeManager.checkInventoryForDupes(inventory, event.getItem(), event, event.getPlayer(), event.getPlayer().getInventory().getHeldItemSlot());
-                if (!isDuped) Bukkit.getPluginManager().callEvent(new RunicItemGenericTriggerEvent(event.getPlayer(), generic, itemStack, clickTrigger, generic.getTriggers().get(clickTrigger)));
+                if (!isDuped)
+                    Bukkit.getPluginManager().callEvent(new RunicItemGenericTriggerEvent(event.getPlayer(), generic, itemStack, clickTrigger, generic.getTriggers().get(clickTrigger)));
             }
         }
     }
