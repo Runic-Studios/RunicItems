@@ -1,7 +1,6 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
-import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.GemBonus;
@@ -16,13 +15,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.function.Function;
+import java.util.*;
 
 public class RunicItemGem extends RunicItem {
 
@@ -41,6 +34,7 @@ public class RunicItemGem extends RunicItem {
     public GemBonus getBonus() {
         return this.bonus;
     }
+
     @Override
     public ItemStack generateItem() {
         ItemStack item = super.generateItem();
@@ -55,8 +49,8 @@ public class RunicItemGem extends RunicItem {
     }
 
     @Override
-    public void addToData(Data section, String root) {
-        super.addToData(section, root);
+    public void addToDataSection(Data section, String root) {
+        super.addToDataSection(section, root);
         for (Stat statType : this.bonus.getStats().keySet()) {
             section.set(root + ".gem-stats." + statType.getIdentifier(), this.bonus.getStats().get(statType));
         }
@@ -66,7 +60,8 @@ public class RunicItemGem extends RunicItem {
         if (item == null || item.getType() == Material.AIR) return null;
         NBTItem nbtItem = new NBTItem(item);
         RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
-        if (!(uncastedTemplate instanceof RunicItemGemTemplate)) throw new IllegalArgumentException("ItemStack is not a gem item!");
+        if (!(uncastedTemplate instanceof RunicItemGemTemplate))
+            throw new IllegalArgumentException("ItemStack is not a gem item!");
         RunicItemGemTemplate template = (RunicItemGemTemplate) uncastedTemplate;
         Set<String> keys = nbtItem.getKeys();
         Map<Stat, Integer> stats = new HashMap<>();
@@ -98,17 +93,18 @@ public class RunicItemGem extends RunicItem {
 
         for (Stat stat : bonus.getStats().keySet()) {
             int value = bonus.getStats().get(stat);
-            if (value == 0) continue;;
+            if (value == 0) continue;
+            ;
             lore.add(stat.getChatColor()
                     + (value < 0 ? "-" : "+")
                     + value
                     + stat.getIcon());
         }
 
-        return new ItemLoreSection[] {
-                new ItemLoreSection(new String[] {ChatColor.GRAY + "Req Slots " + ChatColor.WHITE + StatUtil.getGemSlots(bonus.getTier())}),
+        return new ItemLoreSection[]{
+                new ItemLoreSection(new String[]{ChatColor.GRAY + "Req Slots " + ChatColor.WHITE + StatUtil.getGemSlots(bonus.getTier())}),
                 new ItemLoreSection(lore),
-                new ItemLoreSection(new String[] {
+                new ItemLoreSection(new String[]{
                         ChatColor.GRAY + "" + ChatColor.ITALIC + "Drag and click on armor",
                         ChatColor.GRAY + "" + ChatColor.ITALIC + "to apply this gem!"
                 }),

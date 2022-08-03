@@ -2,7 +2,6 @@ package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
 import com.runicrealms.plugin.utilities.ColorUtil;
-import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.template.RunicItemDynamicTemplate;
@@ -15,7 +14,8 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This is the class that actually gets the RunicItemDynamic from template
@@ -80,8 +80,8 @@ public class RunicItemDynamic extends RunicItemGeneric {
     Store dynamic data that changes during runtime
      */
     @Override
-    public void addToData(Data section, String root) {
-        super.addToData(section, root);
+    public void addToDataSection(Data section, String root) {
+        super.addToDataSection(section, root);
         section.set(root + "." + DYNAMIC_FIELD_STRING, this.getDynamicField());
     }
 

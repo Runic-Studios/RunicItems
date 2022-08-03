@@ -1,7 +1,6 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
-import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
@@ -21,8 +20,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.function.Function;
 
 public class RunicItemWeapon extends RunicItem {
 
@@ -72,8 +69,8 @@ public class RunicItemWeapon extends RunicItem {
     }
 
     @Override
-    public void addToData(Data section, String root) {
-        super.addToData(section, root);
+    public void addToDataSection(Data section, String root) {
+        super.addToDataSection(section, root);
         for (Stat statType : this.stats.keySet()) {
             section.set(root + ".stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
         }

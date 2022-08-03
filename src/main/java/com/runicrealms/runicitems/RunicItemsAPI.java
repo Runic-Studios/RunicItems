@@ -89,7 +89,7 @@ public class RunicItemsAPI {
             if (contents[i] != null) {
                 RunicItem runicItem = ItemManager.getRunicItemFromItemStack(contents[i]);
                 if (runicItem != null) {
-                    runicItem.addToData(data, i + "");
+                    runicItem.addToDataSection(data, i + "");
                 }
             }
         }
@@ -98,8 +98,9 @@ public class RunicItemsAPI {
 
     /**
      * Deserializes an inventory stored in a Data section and applies it to an existing inventory
+     *
      * @param inventory - Inventory to modify
-     * @param data - Data to read from
+     * @param data      - Data to read from
      */
     public static void applyDataToInventory(Inventory inventory, Data data) {
         for (String key : data.getKeys()) {

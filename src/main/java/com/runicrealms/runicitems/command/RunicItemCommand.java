@@ -432,7 +432,7 @@ public class RunicItemCommand extends BaseCommand {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help"));
             return;
         }
-        RunicItemClass playerClass = RunicItemClass.getFromIdentifier(RunicCoreAPI.getPlayerCache(target).getClassName());
+        RunicItemClass playerClass = RunicItemClass.getFromIdentifier(RunicCoreAPI.getPlayerClass(target.getUniqueId()));
 
         for (int i = 1; i < 6; i++) {
             RunicItemTemplate template = TemplateManager.getTemplateFromId(args[i]);

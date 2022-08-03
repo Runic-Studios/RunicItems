@@ -9,7 +9,8 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.runicrealms.plugin.character.api.CharacterSelectEvent;
 import com.runicrealms.plugin.database.Data;
 import com.runicrealms.plugin.database.MongoDataSection;
-import com.runicrealms.plugin.database.event.CacheSaveEvent;
+import com.runicrealms.plugin.database.PlayerMongoData;
+import com.runicrealms.plugin.database.event.MongoSaveEvent;
 import com.runicrealms.runicitems.config.ItemLoader;
 import com.runicrealms.runicitems.item.*;
 import com.runicrealms.runicitems.item.event.RunicItemGenericTriggerEvent;
@@ -64,7 +65,7 @@ public class ItemManager implements Listener {
         fires only when you have the inventory open, and this packet only fires when you don't have your
         inventory open and hit q.
 
-        We use this packet + InventoryClickEvent to handle all of the events without overlap.
+        We use this packet + InventoryClickEvent to handle all the events without overlap.
 
         In addition, this receiver should fire before the bukkit events, allowing us to handle it before bukkit.
          */
@@ -81,12 +82,18 @@ public class ItemManager implements Listener {
         });
     }
 
-    // Fire before loading stats
-    @EventHandler(priority = EventPriority.LOW)
-    public void onCharacterJoin(CharacterSelectEvent event) {
+    /**
+     * Important: fire BEFORE loading stats
+     *
+     * @param event when the character is first selected, before it is loaded
+     */
+    @EventHandler(priority = EventPriority.LOW) // fires early
+    public void onCharacterLoad(CharacterSelectEvent event) {
         //if (RunicItems.isDatabaseLoadingEnabled()) {
-        if (event.getPlayerCache().getMongoData().has("character." + event.getSlot() + ".inventory")) {
-            Data data = event.getPlayerCache().getMongoData().getSection("character." + event.getSlot() + ".inventory");
+        int slot = event.getCharacterData().getBaseCharacterInfo().getSlot();
+        PlayerMongoData playerMongoData = new PlayerMongoData(event.getPlayer().getUniqueId().toString());
+        if (playerMongoData.has("character." + slot + ".inventory")) {
+            Data data = playerMongoData.getSection("character." + slot + ".inventory");
             for (String key : data.getKeys()) {
                 if (!key.equalsIgnoreCase("type")) {
                     try {
@@ -104,7 +111,7 @@ public class ItemManager implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onCacheSave(CacheSaveEvent event) {
+    public void onDatabaseSave(MongoSaveEvent event) {
         //if (RunicItems.isDatabaseLoadingEnabled()) {
         ItemStack[] contents = event.getPlayer().getInventory().getContents();
         MongoDataSection character = event.getMongoDataSection();
@@ -115,7 +122,7 @@ public class ItemManager implements Listener {
             if (contents[i] != null) {
                 RunicItem runicItem = getRunicItemFromItemStack(contents[i]);
                 if (runicItem != null) {
-                    runicItem.addToData(character, "inventory." + i);
+                    runicItem.addToDataSection(character, "inventory." + i);
                 }
             }
         }

@@ -18,7 +18,6 @@ import org.bukkit.inventory.meta.PotionMeta;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 public abstract class RunicItem {
 
@@ -134,7 +133,11 @@ public abstract class RunicItem {
         return this.data;
     }
 
-    public void addToData(Data section, String root) {
+    /**
+     * @param section
+     * @param root
+     */
+    public void addToDataSection(Data section, String root) {
         section.set(root + ".template-id", this.templateId);
         section.set(root + ".count", this.count);
         int count = 0;

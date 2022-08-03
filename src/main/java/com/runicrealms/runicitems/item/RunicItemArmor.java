@@ -1,7 +1,6 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.database.Data;
-import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.GemBonus;
@@ -25,8 +24,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.function.Function;
 
 public class RunicItemArmor extends RunicItem {
 
@@ -107,8 +104,8 @@ public class RunicItemArmor extends RunicItem {
     }
 
     @Override
-    public void addToData(Data section, String root) {
-        super.addToData(section, root);
+    public void addToDataSection(Data section, String root) {
+        super.addToDataSection(section, root);
         for (Stat statType : this.stats.keySet()) {
             section.set(root + ".stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
         }
@@ -300,7 +297,7 @@ public class RunicItemArmor extends RunicItem {
                 gemTextBuilder.append(Stat.EMPTY_GEM_ICON).append(" ");
             }
             gemTextBuilder.append(ChatColor.WHITE).append("]");
-            return new ItemLoreSection[] {
+            return new ItemLoreSection[]{
                     (maxGemSlots > 0
                             ? new ItemLoreSection(new String[]{
                             ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
@@ -316,7 +313,7 @@ public class RunicItemArmor extends RunicItem {
                     }),
             };
         } else {
-            return new ItemLoreSection[] {
+            return new ItemLoreSection[]{
                     new ItemLoreSection(new String[]{healthString}),
                     new ItemLoreSection(lore),
                     new ItemLoreSection(new String[]{rarity.getDisplay(), ChatColor.GRAY + runicClass.getDisplay()}),

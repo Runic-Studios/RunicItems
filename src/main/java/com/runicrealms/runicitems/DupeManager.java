@@ -45,7 +45,7 @@ public class DupeManager implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getWhoClicked() instanceof Player) {
             final Player player = (Player) event.getWhoClicked();
-            if (RunicCoreAPI.getPlayerCache(player) == null) return;
+            if (!RunicCoreAPI.getLoadedCharacters().contains(player.getUniqueId())) return;
             final ItemStack currentItem;
             final CurrentItemType type;
             if (event.getClickedInventory() == event.getWhoClicked().getInventory()) {
