@@ -12,7 +12,6 @@ import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.config.ItemLoader;
 import com.runicrealms.runicitems.item.RunicItem;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -24,9 +23,23 @@ import java.util.logging.Level;
 
 public class InventoryData implements SessionData {
     private static final int PLAYER_INVENTORY_SIZE = 41;
+    public static final String PATH_LOCATION = "inventory";
     private final UUID uuid;
     private final Integer slot;
     private final ItemStack[] contents;
+
+    /**
+     * Build the character's inventory data from their current inventory contents (used for saving)
+     *
+     * @param uuid     of the player
+     * @param slot     of the character
+     * @param contents the character's current inventory contents
+     */
+    public InventoryData(UUID uuid, Integer slot, ItemStack[] contents) {
+        this.uuid = uuid;
+        this.slot = slot;
+        this.contents = contents;
+    }
 
     /**
      * Build the character's inventory data from mongo
@@ -36,14 +49,13 @@ public class InventoryData implements SessionData {
      * @param slot      of the character
      */
     public InventoryData(UUID uuid, PlayerMongoDataSection character, int slot) {
-        Player player;
         this.uuid = uuid;
         this.slot = slot;
         this.contents = new ItemStack[PLAYER_INVENTORY_SIZE];
         if (character.has("inventory")) {
             Data data = character.getSection("inventory");
             for (String key : data.getKeys()) {
-                if (!key.equalsIgnoreCase("type")) {
+                if (!key.equalsIgnoreCase("type")) { // todo: can probably remove
                     try {
                         RunicItem item = ItemLoader.loadItem(data.getSection(key), DupeManager.getNextItemId());
                         if (item != null)
@@ -52,14 +64,13 @@ public class InventoryData implements SessionData {
                         Bukkit.getLogger().log
                                 (
                                         Level.WARNING,
-                                        "[RunicItems] ERROR loading item " + key + " for player uuid" + this.uuid
+                                        "[RunicItems] ERROR loading item " + key + " from mongo for player uuid" + this.uuid
                                 );
                         exception.printStackTrace();
                     }
                 }
             }
         }
-
     }
 
     /**
@@ -69,18 +80,29 @@ public class InventoryData implements SessionData {
      * @param slot  of the character
      * @param jedis the jedis resource
      */
-    public InventoryData(UUID uuid, int slot, Jedis jedis) {
-        this.uuid = uuid;
-        this.slot = slot;
-        this.contents = new ItemStack[PLAYER_INVENTORY_SIZE];
-        for (int i = 0; i < contents.length; i++) {
-            if (jedis.exists(parentKey + ":" + questNoUserData.getQuestID())) {
-                Map<String, String> questDataMap = jedis.hgetAll(parentKey + ":" + questNoUserData.getQuestID()); // get the parent key of the section
-                RunicItem item; // todo: RunicItem item = loadItemFromJedis();
-                contents[i] = item.generateItem();
-            }
-        }
-    }
+//    public InventoryData(UUID uuid, int slot, Jedis jedis) {
+//        this.uuid = uuid;
+//        this.slot = slot;
+//        this.contents = new ItemStack[PLAYER_INVENTORY_SIZE];
+//        String parentKey = getJedisKey(uuid, slot);
+//        for (int i = 0; i < contents.length; i++) {
+//            if (jedis.exists(parentKey + ":" + i)) {
+//                Map<String, String> itemDataMap = jedis.hgetAll(parentKey + ":" + i); // get all the item data
+//                try {
+//                    RunicItem item = ItemLoader.loadItem(itemDataMap, DupeManager.getNextItemId());
+//                    if (item != null)
+//                        contents[i] = item.generateItem();
+//                } catch (Exception exception) {
+//                    Bukkit.getLogger().log
+//                            (
+//                                    Level.WARNING,
+//                                    "[RunicItems] ERROR loading item " + i + " from redis for player uuid" + this.uuid
+//                            );
+//                    exception.printStackTrace();
+//                }
+//            }
+//        }
+//    }
 
     /**
      * @param jedisPool
@@ -89,7 +111,8 @@ public class InventoryData implements SessionData {
         Bukkit.broadcastMessage("writing inventory data to jedis");
         try (Jedis jedis = jedisPool.getResource()) {
             jedis.auth(RedisManager.REDIS_PASSWORD);
-//            String key = getJedisKey(this.uuid, RunicCoreAPI.getCharacterSlot(this.uuid));
+            String key = getJedisKey(this.uuid, this.getSlot());
+            jedis.set(key, "true"); // quick check to see if inventory data is written
             Map<Integer, Map<String, String>> itemDataMap = this.toItemMap();
             if (!itemDataMap.isEmpty()) {
                 for (Integer itemSlot : itemDataMap.keySet()) {
@@ -99,6 +122,17 @@ public class InventoryData implements SessionData {
                 }
             }
         }
+    }
+
+    /**
+     * Quests data is nested in redis, so here's a handy method to get the key
+     *
+     * @param uuid of the player
+     * @param slot of the character
+     * @return a string representing the location in jedis
+     */
+    public static String getJedisKey(UUID uuid, int slot) {
+        return uuid + ":character:" + slot + ":" + PATH_LOCATION;
     }
 
     @Override
@@ -132,6 +166,14 @@ public class InventoryData implements SessionData {
             }
         }
         character.save();
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public Integer getSlot() {
+        return slot;
     }
 
     public ItemStack[] getContents() {

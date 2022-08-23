@@ -7,6 +7,7 @@ import com.runicrealms.runicitems.config.AbilityLoader;
 import com.runicrealms.runicitems.config.ConfigUtil;
 import com.runicrealms.runicitems.config.TemplateLoader;
 import com.runicrealms.runicitems.listeners.*;
+import com.runicrealms.runicitems.model.InventoryDataManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -20,6 +21,7 @@ public class RunicItems extends JavaPlugin {
     private static RunicItems instance;
 
     private static PaperCommandManager commandManager;
+    private static InventoryDataManager inventoryDataManager;
     private static JDA jda;
 
     private static boolean databaseLoadingEnabled = true;
@@ -43,6 +45,7 @@ public class RunicItems extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new ItemManager(), this);
         Bukkit.getPluginManager().registerEvents(new DupeManager(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerManager(), this);
+        Bukkit.getPluginManager().registerEvents(new InventoryDataManager(), this);
         Bukkit.getPluginManager().registerEvents(new GemManager(), this);
         Bukkit.getPluginManager().registerEvents(new SoulboundListener(), this);
         Bukkit.getPluginManager().registerEvents(new GoldPouchListener(), this);
