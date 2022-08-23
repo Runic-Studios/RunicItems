@@ -16,6 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -149,6 +150,21 @@ public abstract class RunicItem {
         /*for (String dataKey : this.data.keySet()) {
             section.set(ItemManager.getInventoryPath() + "." + root + ".data." + dataKey, this.data.get(dataKey));
         }*/
+    }
+
+    /**
+     * @return
+     */
+    public Map<String, String> addToJedis() {
+        Map<String, String> jedisDataMap = new HashMap<>();
+        jedisDataMap.put("template-id", this.templateId);
+        jedisDataMap.put("count", String.valueOf(this.count));
+        int count = 0;
+        for (RunicItemTag tag : this.tags) {
+            jedisDataMap.put("tags:" + count, tag.getIdentifier());
+            count++;
+        }
+        return jedisDataMap;
     }
 
     public Long getId() {

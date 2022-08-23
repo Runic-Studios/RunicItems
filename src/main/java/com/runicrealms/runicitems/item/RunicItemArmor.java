@@ -15,7 +15,7 @@ import com.runicrealms.runicitems.item.util.RunicItemClass;
 import com.runicrealms.runicitems.player.AddedArmorStats;
 import com.runicrealms.runicitems.util.StatUtil;
 import de.tr7zw.nbtapi.NBTItem;
-import javafx.util.Pair;
+import jdk.internal.net.http.common.Pair;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -176,7 +176,7 @@ public class RunicItemArmor extends RunicItem {
         }
         LinkedHashMap<Stat, RunicItemStat> stats = new LinkedHashMap<>();
         for (Pair<Stat, RunicItemStat> stat : statsList) {
-            stats.put(stat.getKey(), stat.getValue());
+            stats.put(stat.first, stat.second);
         }
 
         Map<Integer, LinkedHashMap<Stat, Integer>> gemStats = new HashMap<>();
