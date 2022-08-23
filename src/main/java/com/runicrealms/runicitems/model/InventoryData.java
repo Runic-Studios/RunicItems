@@ -24,6 +24,7 @@ import java.util.logging.Level;
 public class InventoryData implements SessionData {
     private static final int PLAYER_INVENTORY_SIZE = 41;
     public static final String PATH_LOCATION = "inventory";
+    public static final String DATA_LOCATION = "data";
     private final UUID uuid;
     private final Integer slot;
     private final ItemStack[] contents;
@@ -132,7 +133,7 @@ public class InventoryData implements SessionData {
      * @return a string representing the location in jedis
      */
     public static String getJedisKey(UUID uuid, int slot) {
-        return uuid + ":character:" + slot + ":" + PATH_LOCATION;
+        return uuid + ":character:" + slot + ":" + PATH_LOCATION + ":" + DATA_LOCATION;
     }
 
     @Override

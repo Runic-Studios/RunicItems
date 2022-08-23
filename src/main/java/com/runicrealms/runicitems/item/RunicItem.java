@@ -75,6 +75,9 @@ public abstract class RunicItem {
                 lore.add("");
             }
         }
+        if (this.tags.size() >= 1) {
+            lore.add("");
+        }
         for (RunicItemTag tag : this.tags) {
             lore.add(tag.getDisplay());
         }

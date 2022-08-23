@@ -79,7 +79,7 @@ public class RunicItemWeapon extends RunicItem {
     public Map<String, String> addToJedis() {
         Map<String, String> jedisDataMap = super.addToJedis();
         for (Stat statType : this.stats.keySet()) {
-            jedisDataMap.put("stats." + statType.getIdentifier(), String.valueOf(this.stats.get(statType).getRollPercentage()));
+            jedisDataMap.put("stats:" + statType.getIdentifier(), String.valueOf(this.stats.get(statType).getRollPercentage()));
         }
         return jedisDataMap;
     }
