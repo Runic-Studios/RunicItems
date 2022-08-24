@@ -56,6 +56,15 @@ public class RunicItemGem extends RunicItem {
         }
     }
 
+    @Override
+    public Map<String, String> addToJedis() {
+        Map<String, String> jedisDataMap = super.addToJedis();
+        for (Stat statType : this.bonus.getStats().keySet()) {
+            jedisDataMap.put("gem-stats." + statType.getIdentifier(), String.valueOf(this.bonus.getStats().get(statType)));
+        }
+        return jedisDataMap;
+    }
+
     public static RunicItemGem getFromItemStack(ItemStack item) {
         if (item == null || item.getType() == Material.AIR) return null;
         NBTItem nbtItem = new NBTItem(item);

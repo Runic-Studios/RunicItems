@@ -86,6 +86,13 @@ public class RunicItemDynamic extends RunicItemGeneric {
     }
 
     @Override
+    public Map<String, String> addToJedis() {
+        Map<String, String> jedisDataMap = super.addToJedis();
+        jedisDataMap.put(DYNAMIC_FIELD_STRING, String.valueOf(this.getDynamicField()));
+        return jedisDataMap;
+    }
+
+    @Override
     public ItemStack generateItem() {
         ItemStack item = super.generateItem();
         ItemMeta meta = item.getItemMeta();

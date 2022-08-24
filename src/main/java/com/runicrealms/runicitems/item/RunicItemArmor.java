@@ -122,6 +122,26 @@ public class RunicItemArmor extends RunicItem {
     }
 
     @Override
+    public Map<String, String> addToJedis() {
+        Map<String, String> jedisDataMap = super.addToJedis();
+        for (Stat statType : this.stats.keySet()) {
+            jedisDataMap.put("stats:" + statType.getIdentifier(), String.valueOf(this.stats.get(statType).getRollPercentage()));
+        }
+        int count = 0;
+        for (GemBonus gemBonus : this.gemBonuses) {
+            for (Stat statType : gemBonus.getStats().keySet()) {
+                jedisDataMap.put("gems." + count + "." + statType.getIdentifier(), String.valueOf(gemBonus.getStats().get(statType)));
+            }
+            if (gemBonus.getHealth() != 0)
+                jedisDataMap.put("gems." + count + ".health", String.valueOf(gemBonus.getHealth()));
+            jedisDataMap.put("gems." + count + ".tier", String.valueOf(gemBonus.getTier()));
+            jedisDataMap.put("gems." + count + ".main", gemBonus.getMainStat().getIdentifier());
+            count++;
+        }
+        return jedisDataMap;
+    }
+
+    @Override
     public ItemStack generateItem() {
         ItemStack item = super.generateItem();
         ItemMeta meta = item.getItemMeta();
