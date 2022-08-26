@@ -89,14 +89,14 @@ public class ItemLoader {
      * @param id
      * @return
      */
-//    public static RunicItem loadItem(Map<String, String> itemDataMap, long id) {
-//        try {
-//            String templateId = itemDataMap.get("template-id");
-//            int count = Integer.parseInt(itemDataMap.get("count"));
-//            RunicItemTemplate template = TemplateManager.getTemplateFromId(templateId);
-//            if (template instanceof RunicItemArmorTemplate) {
-//                List<GemBonus> gemBonuses = new ArrayList<>();
-//                if (section.has("gems")) {
+    public static RunicItem loadItem(Map<String, String> itemDataMap, long id) {
+        try {
+            String templateId = itemDataMap.get("template-id");
+            int count = Integer.parseInt(itemDataMap.get("count"));
+            RunicItemTemplate template = TemplateManager.getTemplateFromId(templateId);
+            if (template instanceof RunicItemArmorTemplate) {
+                List<GemBonus> gemBonuses = new ArrayList<>();
+//                if (section.has("gems")) { todo: gems
 //                    for (String gemKey : section.getSection("gems").getKeys()) {
 //                        LinkedHashMap<Stat, Integer> gemStats = new LinkedHashMap<>();
 //                        for (String statKey : section.getSection("gems." + gemKey).getKeys()) {
@@ -113,26 +113,27 @@ public class ItemLoader {
 //                                section.get("gems." + gemKey + ".tier", Integer.class)));
 //                    }
 //                }
-//                RunicItemArmorTemplate armorTemplate = (RunicItemArmorTemplate) template;
-//                return new RunicItemArmor(armorTemplate, count, id, loadStats(section, armorTemplate.getStats()), gemBonuses);
-//            } else if (template instanceof RunicItemArtifactTemplate) {
-//                RunicItemArtifactTemplate artifactTemplate = (RunicItemArtifactTemplate) template;
-//                return new RunicItemArtifact(artifactTemplate, count, id, loadStats(section, artifactTemplate.getStats()));
-//            } else if (template instanceof RunicItemBookTemplate) {
-//                RunicItemBookTemplate bookTemplate = (RunicItemBookTemplate) template;
-//                return new RunicItemBook(bookTemplate, count, id);
-//            } else if (template instanceof RunicItemDynamicTemplate) {
-//                int dynamicField = Integer.parseInt(itemDataMap.get(RunicItemDynamic.getDynamicFieldString()));
-//                return new RunicItemDynamic((RunicItemDynamicTemplate) template, count, id, dynamicField);
-//            } else if (template instanceof RunicItemGenericTemplate) {
-//                return new RunicItemGeneric((RunicItemGenericTemplate) template, count, id);
-//            } else if (template instanceof RunicItemOffhandTemplate) {
-//                RunicItemOffhandTemplate offhandTemplate = (RunicItemOffhandTemplate) template;
-//                return new RunicItemOffhand(offhandTemplate, count, id, loadStats(section, offhandTemplate.getStats()));
-//            } else if (template instanceof RunicItemWeaponTemplate) {
-//                RunicItemWeaponTemplate weaponTemplate = (RunicItemWeaponTemplate) template;
-//                return new RunicItemWeapon(weaponTemplate, count, id, loadStats(section, weaponTemplate.getStats()));
-//            } else if (template instanceof RunicItemGemTemplate) {
+                RunicItemArmorTemplate armorTemplate = (RunicItemArmorTemplate) template;
+                return new RunicItemArmor(armorTemplate, count, id, loadStats(itemDataMap, armorTemplate.getStats()), gemBonuses);
+            } else if (template instanceof RunicItemArtifactTemplate) {
+                RunicItemArtifactTemplate artifactTemplate = (RunicItemArtifactTemplate) template;
+                return new RunicItemArtifact(artifactTemplate, count, id, loadStats(itemDataMap, artifactTemplate.getStats()));
+            } else if (template instanceof RunicItemBookTemplate) {
+                RunicItemBookTemplate bookTemplate = (RunicItemBookTemplate) template;
+                return new RunicItemBook(bookTemplate, count, id);
+            } else if (template instanceof RunicItemDynamicTemplate) {
+                int dynamicField = Integer.parseInt(itemDataMap.get(RunicItemDynamic.getDynamicFieldString()));
+                return new RunicItemDynamic((RunicItemDynamicTemplate) template, count, id, dynamicField);
+            } else if (template instanceof RunicItemGenericTemplate) {
+                return new RunicItemGeneric((RunicItemGenericTemplate) template, count, id);
+            } else if (template instanceof RunicItemOffhandTemplate) {
+                RunicItemOffhandTemplate offhandTemplate = (RunicItemOffhandTemplate) template;
+                return new RunicItemOffhand(offhandTemplate, count, id, loadStats(itemDataMap, offhandTemplate.getStats()));
+            } else if (template instanceof RunicItemWeaponTemplate) {
+                RunicItemWeaponTemplate weaponTemplate = (RunicItemWeaponTemplate) template;
+                return new RunicItemWeapon(weaponTemplate, count, id, loadStats(itemDataMap, weaponTemplate.getStats()));
+            }
+//            } else if (template instanceof RunicItemGemTemplate) { todo: gems
 //                RunicItemGemTemplate gemTemplate = (RunicItemGemTemplate) template;
 //                return new RunicItemGem(gemTemplate, count, id, new GemBonus(
 //                        loadGemStats(section),
@@ -140,13 +141,13 @@ public class ItemLoader {
 //                        gemTemplate.getMainStat(),
 //                        gemTemplate.getTier()));
 //            }
-//        } catch (Exception exception) {
-//            Bukkit.getLogger().log(Level.INFO, "[RunicItems] Error loading item from redis!");
-//            exception.printStackTrace();
-//            return null;
-//        }
-//        return null;
-//    }
+        } catch (Exception exception) {
+            Bukkit.getLogger().log(Level.INFO, "[RunicItems] Error loading item from redis!");
+            exception.printStackTrace();
+            return null;
+        }
+        return null;
+    }
 
     /**
      * @param section
@@ -168,20 +169,23 @@ public class ItemLoader {
         return StatUtil.sortStatMap(stats);
     }
 
-//    private static LinkedHashMap<Stat, RunicItemStat> loadStats(Map<String, String> itemDataMap, Map<Stat, RunicItemStatRange> templateStats) {
-//        Map<Stat, RunicItemStat> stats = new HashMap<>();
-//        if (section.has("stats")) {
-//            Set<String> sectionKeys = section.getSection("stats").getKeys();
-//            for (Stat templateStatType : templateStats.keySet()) {
-//                if (sectionKeys.contains(templateStatType.getIdentifier())) { // Item has stat and has already been rolled (stored in database)
-//                    stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType), section.get("stats." + templateStatType.getIdentifier(), Double.class)));
-//                } else { // Item has recently been added this stat and the roll does not exist in database, so make a new roll
-//                    stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType)));
-//                }
-//            }
-//        }
-//        return StatUtil.sortStatMap(stats);
-//    }
+    /**
+     * @param itemDataMap
+     * @param templateStats
+     * @return
+     */
+    private static LinkedHashMap<Stat, RunicItemStat> loadStats(Map<String, String> itemDataMap, Map<Stat, RunicItemStatRange> templateStats) {
+        Map<Stat, RunicItemStat> stats = new HashMap<>();
+        for (Stat templateStatType : templateStats.keySet()) {
+            if (itemDataMap.containsKey("stats:" + templateStatType.getIdentifier())) { // Item has stat and has already been rolled (stored in database)
+                double stat = Double.parseDouble(itemDataMap.get("stats:" + templateStatType.getIdentifier()));
+                stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType), stat));
+            } else { // Item has recently been added this stat and the roll does not exist in database, so make a new roll
+                stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType)));
+            }
+        }
+        return StatUtil.sortStatMap(stats);
+    }
 
     /**
      * @param section

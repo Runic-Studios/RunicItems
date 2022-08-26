@@ -1,7 +1,7 @@
 package com.runicrealms.runicitems.util;
 
+import com.runicrealms.plugin.utilities.Pair;
 import com.runicrealms.runicitems.Stat;
-import com.runicrealms.runicitems.item.Pair;
 
 import java.util.*;
 

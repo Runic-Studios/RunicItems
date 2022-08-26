@@ -81,29 +81,29 @@ public class InventoryData implements SessionData {
      * @param slot  of the character
      * @param jedis the jedis resource
      */
-//    public InventoryData(UUID uuid, int slot, Jedis jedis) {
-//        this.uuid = uuid;
-//        this.slot = slot;
-//        this.contents = new ItemStack[PLAYER_INVENTORY_SIZE];
-//        String parentKey = getJedisKey(uuid, slot);
-//        for (int i = 0; i < contents.length; i++) {
-//            if (jedis.exists(parentKey + ":" + i)) {
-//                Map<String, String> itemDataMap = jedis.hgetAll(parentKey + ":" + i); // get all the item data
-//                try {
-//                    RunicItem item = ItemLoader.loadItem(itemDataMap, DupeManager.getNextItemId());
-//                    if (item != null)
-//                        contents[i] = item.generateItem();
-//                } catch (Exception exception) {
-//                    Bukkit.getLogger().log
-//                            (
-//                                    Level.WARNING,
-//                                    "[RunicItems] ERROR loading item " + i + " from redis for player uuid" + this.uuid
-//                            );
-//                    exception.printStackTrace();
-//                }
-//            }
-//        }
-//    }
+    public InventoryData(UUID uuid, int slot, Jedis jedis) {
+        this.uuid = uuid;
+        this.slot = slot;
+        this.contents = new ItemStack[PLAYER_INVENTORY_SIZE];
+        String parentKey = getJedisKey(uuid, slot);
+        for (int i = 0; i < contents.length; i++) {
+            if (jedis.exists(parentKey + ":" + i)) {
+                Map<String, String> itemDataMap = jedis.hgetAll(parentKey + ":" + i); // get all the item data
+                try {
+                    RunicItem item = ItemLoader.loadItem(itemDataMap, DupeManager.getNextItemId());
+                    if (item != null)
+                        contents[i] = item.generateItem();
+                } catch (Exception exception) {
+                    Bukkit.getLogger().log
+                            (
+                                    Level.WARNING,
+                                    "[RunicItems] ERROR loading item " + i + " from redis for player uuid" + this.uuid
+                            );
+                    exception.printStackTrace();
+                }
+            }
+        }
+    }
 
     /**
      * @param jedisPool
