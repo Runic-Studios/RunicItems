@@ -110,12 +110,13 @@ public class InventoryData implements SessionData {
      */
     public void writeToJedis(JedisPool jedisPool) {
         Bukkit.broadcastMessage("writing inventory data to jedis");
+        String key = getJedisKey(this.uuid, this.getSlot());
+        RedisUtil.removeAllFromRedis(jedisPool, key); // removes all sub-keys
         try (Jedis jedis = jedisPool.getResource()) {
             jedis.auth(RedisManager.REDIS_PASSWORD);
-            String key = getJedisKey(this.uuid, this.getSlot());
             jedis.set(key, "true"); // quick check to see if inventory data is written
             jedis.expire(key, RedisUtil.EXPIRE_TIME);
-            Map<Integer, Map<String, String>> itemDataMap = this.toItemMap();
+            Map<Integer, Map<String, String>> itemDataMap = this.toItemMap(); // from inventory
             if (!itemDataMap.isEmpty()) {
                 for (Integer itemSlot : itemDataMap.keySet()) {
                     if (itemDataMap.get(itemSlot) == null) continue;
