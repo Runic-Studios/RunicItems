@@ -5,7 +5,6 @@ import com.runicrealms.plugin.database.MongoDataSection;
 import com.runicrealms.plugin.database.PlayerMongoData;
 import com.runicrealms.plugin.database.PlayerMongoDataSection;
 import com.runicrealms.plugin.model.SessionData;
-import com.runicrealms.plugin.redis.RedisManager;
 import com.runicrealms.plugin.redis.RedisUtil;
 import com.runicrealms.runicitems.DupeManager;
 import com.runicrealms.runicitems.ItemManager;
@@ -14,7 +13,6 @@ import com.runicrealms.runicitems.item.RunicItem;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -106,23 +104,20 @@ public class InventoryData implements SessionData {
     }
 
     /**
-     * @param jedisPool
+     * @param jedis the jedis resource
      */
-    public void writeToJedis(JedisPool jedisPool) {
+    public void writeToJedis(Jedis jedis) {
         Bukkit.broadcastMessage("writing inventory data to jedis");
         String key = getJedisKey(this.uuid, this.getSlot());
-        RedisUtil.removeAllFromRedis(jedisPool, key); // removes all sub-keys
-        try (Jedis jedis = jedisPool.getResource()) {
-            jedis.auth(RedisManager.REDIS_PASSWORD);
-            jedis.set(key, "true"); // quick check to see if inventory data is written
-            jedis.expire(key, RedisUtil.EXPIRE_TIME);
-            Map<Integer, Map<String, String>> itemDataMap = this.toItemMap(); // from inventory
-            if (!itemDataMap.isEmpty()) {
-                for (Integer itemSlot : itemDataMap.keySet()) {
-                    if (itemDataMap.get(itemSlot) == null) continue;
-                    jedis.hmset(key + ":" + itemSlot, itemDataMap.get(itemSlot));
-                    jedis.expire(key + ":" + itemSlot, RedisUtil.EXPIRE_TIME);
-                }
+        RedisUtil.removeAllFromRedis(jedis, key); // removes all sub-keys
+        jedis.set(key, "true"); // quick check to see if inventory data is written
+        jedis.expire(key, RedisUtil.EXPIRE_TIME);
+        Map<Integer, Map<String, String>> itemDataMap = this.toItemMap(); // from inventory
+        if (!itemDataMap.isEmpty()) {
+            for (Integer itemSlot : itemDataMap.keySet()) {
+                if (itemDataMap.get(itemSlot) == null) continue;
+                jedis.hmset(key + ":" + itemSlot, itemDataMap.get(itemSlot));
+                jedis.expire(key + ":" + itemSlot, RedisUtil.EXPIRE_TIME);
             }
         }
     }
