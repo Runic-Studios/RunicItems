@@ -153,6 +153,7 @@ public class InventoryData implements SessionData {
 
     @Override
     public void writeToMongo(PlayerMongoData playerMongoData, int... slot) {
+        Bukkit.broadcastMessage("writing inventory data to mongo");
         MongoDataSection character = playerMongoData.getCharacter(slot[0]);
         character.remove("inventory"); // reset the stored inventory section
         character.save();

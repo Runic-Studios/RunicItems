@@ -36,7 +36,6 @@ public class InventoryDataManager implements Listener {
      * @param event when the character is first selected, before it is loaded
      */
     @EventHandler(priority = EventPriority.LOW) // fires early
-    // todo: this is bugged during an rstop. rstops needs to kick everyone BEFORE the mongo save event
     public void onCharacterQuit(CharacterQuitEvent event) {
         InventoryData inventoryData = new InventoryData
                 (
@@ -47,16 +46,42 @@ public class InventoryDataManager implements Listener {
         inventoryData.writeToJedis(event.getJedis());
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    /**
+     * Saves player skill tree info when the server is shut down
+     * for EACH alt the player has used during the runtime of this server.
+     * Works even if the player is now entirely offline
+     */
+    @EventHandler
     public void onDatabaseSave(MongoSaveEvent event) {
-        Player onlinePlayer = Bukkit.getPlayer(event.getUuid());
+        for (UUID uuid : event.getPlayersToSave().keySet()) {
+            for (int characterSlot : event.getPlayersToSave().get(uuid)) {
+                PlayerMongoData playerMongoData = new PlayerMongoData(uuid.toString());
+                saveInventoryToMongo(uuid, characterSlot, event.getJedis(), playerMongoData);
+                playerMongoData.save();
+            }
+        }
+        event.markPluginSaved("items");
+    }
+
+    /**
+     * Removes the inventory section from the player's mongo data, then writes to it with their updated inventory
+     * from either jedis (if they're offline) or their inventory (if they're online)
+     * Also saves the character mongo section
+     *
+     * @param uuid            of the player to save
+     * @param slot            of the character
+     * @param jedis           the jedis resource (of the MongoSaveEvent)
+     * @param playerMongoData the player's mongo data
+     */
+    private void saveInventoryToMongo(UUID uuid, int slot, Jedis jedis, PlayerMongoData playerMongoData) {
+        Player onlinePlayer = Bukkit.getPlayer(uuid);
         InventoryData inventoryData;
         if (onlinePlayer != null) {
-            inventoryData = new InventoryData(event.getUuid(), event.getSlot(), onlinePlayer.getInventory().getContents());
+            inventoryData = new InventoryData(uuid, slot, onlinePlayer.getInventory().getContents());
         } else {
-            inventoryData = loadInventoryData(event.getUuid(), event.getSlot(), event.getJedis()); // from redis
+            inventoryData = loadInventoryData(uuid, slot, jedis); // from redis
         }
-        inventoryData.writeToMongo(event.getMongoData(), event.getSlot());
+        inventoryData.writeToMongo(playerMongoData, slot);
     }
 
     /**
