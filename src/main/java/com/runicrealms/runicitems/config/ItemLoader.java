@@ -132,15 +132,14 @@ public class ItemLoader {
             } else if (template instanceof RunicItemWeaponTemplate) {
                 RunicItemWeaponTemplate weaponTemplate = (RunicItemWeaponTemplate) template;
                 return new RunicItemWeapon(weaponTemplate, count, id, loadStats(itemDataMap, weaponTemplate.getStats()));
+            } else if (template instanceof RunicItemGemTemplate) {
+                RunicItemGemTemplate gemTemplate = (RunicItemGemTemplate) template;
+                return new RunicItemGem(gemTemplate, count, id, new GemBonus(
+                        loadGemStats(itemDataMap),
+                        itemDataMap.get("health") != null ? Integer.parseInt(itemDataMap.get("health")) : 0,
+                        gemTemplate.getMainStat(),
+                        gemTemplate.getTier()));
             }
-//            } else if (template instanceof RunicItemGemTemplate) { todo: gems
-//                RunicItemGemTemplate gemTemplate = (RunicItemGemTemplate) template;
-//                return new RunicItemGem(gemTemplate, count, id, new GemBonus(
-//                        loadGemStats(section),
-//                        section.has("health") ? section.get("health", Integer.class) : 0,
-//                        gemTemplate.getMainStat(),
-//                        gemTemplate.getTier()));
-//            }
         } catch (Exception exception) {
             Bukkit.getLogger().log(Level.INFO, "[RunicItems] Error loading item from redis!");
             exception.printStackTrace();
@@ -184,6 +183,32 @@ public class ItemLoader {
                 stats.put(templateStatType, new RunicItemStat(templateStats.get(templateStatType)));
             }
         }
+        return StatUtil.sortStatMap(stats);
+    }
+
+    /**
+     * @param itemDataMap
+     * @return
+     */
+    private static LinkedHashMap<Stat, Integer> loadGemStats(Map<String, String> itemDataMap) { // , Map<Stat, RunicItemStatRange> templateStats
+        Map<Stat, Integer> stats = new HashMap<>();
+
+        for (Stat stat : Stat.values()) { // for all POSSIBLE values of stat
+            if (itemDataMap.containsKey("gem-stats:" + stat.getIdentifier())) { // Item has stat and has already been rolled (stored in database)
+                int statValue = Integer.parseInt(itemDataMap.get("gem-stats:" + stat.getIdentifier()));
+                stats.put(stat, statValue);
+            }
+        }
+
+
+//        if (section.has("gem-stats")) {
+//            Data gemStatsSection = section.getSection("gem-stats");
+//            for (String key : gemStatsSection.getKeys()) {
+//                Stat stat = Stat.getFromIdentifier(key);
+//                if (stat == null) continue;
+//                stats.put(stat, gemStatsSection.get(key, Integer.class));
+//            }
+//        }
         return StatUtil.sortStatMap(stats);
     }
 

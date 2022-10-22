@@ -60,7 +60,7 @@ public class RunicItemGem extends RunicItem {
     public Map<String, String> addToJedis() {
         Map<String, String> jedisDataMap = super.addToJedis();
         for (Stat statType : this.bonus.getStats().keySet()) {
-            jedisDataMap.put("gem-stats." + statType.getIdentifier(), String.valueOf(this.bonus.getStats().get(statType)));
+            jedisDataMap.put("gem-stats:" + statType.getIdentifier(), String.valueOf(this.bonus.getStats().get(statType)));
         }
         return jedisDataMap;
     }

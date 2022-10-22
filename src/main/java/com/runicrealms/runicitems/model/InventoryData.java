@@ -104,10 +104,12 @@ public class InventoryData implements SessionData {
     }
 
     /**
+     * This...
+     *
      * @param jedis the jedis resource
      */
     public void writeToJedis(Jedis jedis) {
-        Bukkit.broadcastMessage("writing inventory data to jedis");
+        // Bukkit.broadcastMessage("writing inventory data to jedis");
         String key = getJedisKey(this.uuid, this.getSlot());
         RedisUtil.removeAllFromRedis(jedis, key); // removes all sub-keys
         jedis.set(key, "true"); // quick check to see if inventory data is written
@@ -137,7 +139,7 @@ public class InventoryData implements SessionData {
     public Map<String, String> toMap() {
         return null;
     }
-    
+
     public Map<Integer, Map<String, String>> toItemMap() {
         Map<Integer, Map<String, String>> itemDataMap = new HashMap<>();
         for (int i = 0; i < contents.length; i++) {
@@ -152,7 +154,7 @@ public class InventoryData implements SessionData {
 
     @Override
     public void writeToMongo(PlayerMongoData playerMongoData, int... slot) {
-        Bukkit.broadcastMessage("writing inventory data to mongo");
+        // Bukkit.broadcastMessage("writing inventory data to mongo");
         MongoDataSection character = playerMongoData.getCharacter(slot[0]);
         character.remove("inventory"); // reset the stored inventory section
         character.save();
