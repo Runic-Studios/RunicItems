@@ -6,7 +6,7 @@
 
     <groupId>com.runicrealms.runicitems</groupId>
     <artifactId>RunicItems</artifactId>
-    <version>1.16.4</version>
+    <version>1.16.5</version>
 
     <name>RunicItems</name>
 
@@ -166,7 +166,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.16.4-R0.1-SNAPSHOT</version>
+            <version>1.16.5-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <!-- MythicMobs -->
@@ -181,7 +181,7 @@
         <dependency>
             <groupId>com.destroystokyo.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.16.4-R0.1-SNAPSHOT</version>
+            <version>1.16.5-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <!-- ProtocolLib API -->
@@ -220,9 +220,9 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
-            <version>1.16.4</version>
+            <version>1.16.5</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../lib/craftbukkit-1.16.4.jar</systemPath>
+            <systemPath>${project.basedir}/../lib/craftbukkit-1.16.5.jar</systemPath>
         </dependency>
         <!-- RunicGuilds -->
         <dependency>

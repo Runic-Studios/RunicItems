@@ -4,9 +4,9 @@ import org.bukkit.ChatColor;
 
 public enum Stat {
 
-    DEXTERITY("dexterity", "Dexterity", "DEX", ChatColor.YELLOW, "✦", "Deal more ranged damage and gain movement speed!"),
-    INTELLIGENCE("intelligence", "Intelligence", "INT", ChatColor.DARK_AQUA, "ʔ", "Deal more spell damage and gain more max mana!"),
-    STRENGTH("strength", "Strength", "STR", ChatColor.RED, "⚔", "Deal more melee weapon damage!"),
+    DEXTERITY("dexterity", "Dexterity", "DEX", ChatColor.YELLOW, "✦", "Gain increased crit change and movement speed!"),
+    INTELLIGENCE("intelligence", "Intelligence", "INT", ChatColor.DARK_AQUA, "ʔ", "Deal more magic damage and gain more max mana!"),
+    STRENGTH("strength", "Strength", "STR", ChatColor.RED, "⚔", "Deal more physical damage!"),
     VITALITY("vitality", "Vitality", "VIT", ChatColor.WHITE, "■", "Gain damage reduction and health regen!"),
     WISDOM("wisdom", "Wisdom", "WIS", ChatColor.GREEN, "✸", "Gain more spell healing and mana regen!");
 
@@ -20,15 +20,13 @@ public enum Stat {
     Combat multipliers
      */
     // dexterity
-    private static final double DODGE_CHANCE = 0.0025; // .25%
+    private static final double CRITICAL_CHANCE = 0.004; // .4%
     private static final double MOVEMENT_SPEED_MULT = 0.0035; // .35%
-    private static final double RANGED_DMG_MULT = 0.01; // 1%
     // intelligence
     private static final double MANA_REGEN_MULT = 0.04; // 4%
     private static final double MAGIC_DMG_MULT = 0.012; // 1.2%
     // strength
-    private static final double CRITICAL_CHANCE = 0.004; // .4%
-    private static final double MELEE_DMG_MULT = 0.008; // .8%
+    private static final double PHYSICAL_DMG_MULT = 0.01; // 1.0%
     // wisdom
     private static final double MAX_MANA_MULT = 0.01; // 1%
     private static final double SPELL_HEALING_MULT = 0.006; // .6%
@@ -89,14 +87,6 @@ public enum Stat {
         return CRITICAL_DAMAGE_MULTIPLIER;
     }
 
-    public static double getDodgeChance() {
-        return DODGE_CHANCE;
-    }
-
-    public static double getRangedDmgMult() {
-        return RANGED_DMG_MULT;
-    }
-
     public static double getMovementSpeedMult() {
         return MOVEMENT_SPEED_MULT;
     }
@@ -109,8 +99,8 @@ public enum Stat {
         return MAX_MANA_MULT;
     }
 
-    public static double getMeleeDmgMult() {
-        return MELEE_DMG_MULT;
+    public static double getPhysicalDmgMult() {
+        return PHYSICAL_DMG_MULT;
     }
 
     public static double getCriticalChance() {
@@ -144,7 +134,7 @@ public enum Stat {
     /**
      * Returns the enum value of a stat from its string
      *
-     * @param identifier of stat (not case sensitive)
+     * @param identifier of stat (not case-sensitive)
      * @return enum of stat
      */
     public static Stat getFromIdentifier(String identifier) {

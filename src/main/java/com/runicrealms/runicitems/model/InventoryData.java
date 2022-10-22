@@ -137,8 +137,7 @@ public class InventoryData implements SessionData {
     public Map<String, String> toMap() {
         return null;
     }
-
-    // todo: the parent interface method should be updated and split into 'SimpleSessionData' and 'NestedSessionData'. add a generic object parameter
+    
     public Map<Integer, Map<String, String>> toItemMap() {
         Map<Integer, Map<String, String>> itemDataMap = new HashMap<>();
         for (int i = 0; i < contents.length; i++) {
