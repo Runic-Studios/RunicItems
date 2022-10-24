@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 
 import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class ItemLoader {
 
@@ -95,24 +96,7 @@ public class ItemLoader {
             int count = Integer.parseInt(itemDataMap.get("count"));
             RunicItemTemplate template = TemplateManager.getTemplateFromId(templateId);
             if (template instanceof RunicItemArmorTemplate) {
-                List<GemBonus> gemBonuses = new ArrayList<>();
-//                if (section.has("gems")) { todo: gems
-//                    for (String gemKey : section.getSection("gems").getKeys()) {
-//                        LinkedHashMap<Stat, Integer> gemStats = new LinkedHashMap<>();
-//                        for (String statKey : section.getSection("gems." + gemKey).getKeys()) {
-//                            if (!statKey.equalsIgnoreCase("health")
-//                                    && !statKey.equalsIgnoreCase("main")
-//                                    && !statKey.equalsIgnoreCase("tier")) {
-//                                gemStats.put(Stat.getFromIdentifier(statKey), section.get("gems." + gemKey + "." + statKey, Integer.class));
-//                            }
-//                        }
-//                        gemBonuses.add(new GemBonus(
-//                                gemStats,
-//                                section.has("gems." + gemKey + ".health") ? section.get("gems." + gemKey + ".health", Integer.class) : 0,
-//                                Stat.getFromIdentifier(section.get("gems." + gemKey + ".main", String.class)),
-//                                section.get("gems." + gemKey + ".tier", Integer.class)));
-//                    }
-//                }
+                List<GemBonus> gemBonuses = getGemBonuses(itemDataMap);
                 RunicItemArmorTemplate armorTemplate = (RunicItemArmorTemplate) template;
                 return new RunicItemArmor(armorTemplate, count, id, loadStats(itemDataMap, armorTemplate.getStats()), gemBonuses);
             } else if (template instanceof RunicItemArtifactTemplate) {
@@ -190,7 +174,7 @@ public class ItemLoader {
      * @param itemDataMap
      * @return
      */
-    private static LinkedHashMap<Stat, Integer> loadGemStats(Map<String, String> itemDataMap) { // , Map<Stat, RunicItemStatRange> templateStats
+    private static LinkedHashMap<Stat, Integer> loadGemStats(Map<String, String> itemDataMap) {
         Map<Stat, Integer> stats = new HashMap<>();
 
         for (Stat stat : Stat.values()) { // for all POSSIBLE values of stat
@@ -199,17 +183,56 @@ public class ItemLoader {
                 stats.put(stat, statValue);
             }
         }
-
-
-//        if (section.has("gem-stats")) {
-//            Data gemStatsSection = section.getSection("gem-stats");
-//            for (String key : gemStatsSection.getKeys()) {
-//                Stat stat = Stat.getFromIdentifier(key);
-//                if (stat == null) continue;
-//                stats.put(stat, gemStatsSection.get(key, Integer.class));
-//            }
-//        }
         return StatUtil.sortStatMap(stats);
+    }
+
+    private static final int MAX_GEM_SLOTS = 10;
+
+    /*
+    if (section.has("gems")) {
+    for (String gemKey : section.getSection("gems").getKeys()) {
+        LinkedHashMap<Stat, Integer> gemStats = new LinkedHashMap<>();
+        for (String statKey : section.getSection("gems." + gemKey).getKeys()) {
+            if (!statKey.equalsIgnoreCase("health")
+                    && !statKey.equalsIgnoreCase("main")
+                    && !statKey.equalsIgnoreCase("tier")) {
+                gemStats.put(Stat.getFromIdentifier(statKey), section.get("gems." + gemKey + "." + statKey, Integer.class));
+            }
+        }
+        gemBonuses.add(new GemBonus(
+                gemStats,
+                section.has("gems." + gemKey + ".health") ? section.get("gems." + gemKey + ".health", Integer.class) : 0,
+                Stat.getFromIdentifier(section.get("gems." + gemKey + ".main", String.class)),
+                section.get("gems." + gemKey + ".tier", Integer.class)));
+    }
+     */
+
+    /**
+     * Runs through the keys obtained from redis and assigns gem bonuses based on the slot (gem key)
+     *
+     * @param itemDataMap from redis with key-value pairs
+     * @return a list of gem bonuses to apply to the armor item
+     */
+    private static List<GemBonus> getGemBonuses(Map<String, String> itemDataMap) {
+        List<GemBonus> gemBonuses = new ArrayList<>();
+        for (int i = 0; i < MAX_GEM_SLOTS; i++) { // gems.0.main
+            if (!itemDataMap.containsKey("gems." + i + ".main")) continue;
+            final int gemSlot = i;
+            LinkedHashMap<Stat, Integer> gemStats = new LinkedHashMap<>();
+            for (String statKey : itemDataMap.keySet().stream().filter(s -> s.startsWith("gems." + gemSlot)).collect(Collectors.toList())) { // gem.0.main
+                if (!statKey.equalsIgnoreCase("gems." + gemSlot + ".health")
+                        && !statKey.equalsIgnoreCase("gems." + gemSlot + ".main")
+                        && !statKey.equalsIgnoreCase("gems." + gemSlot + ".tier")) {
+                    gemStats.put(Stat.getFromIdentifier(statKey.split("\\.")[2]), Integer.valueOf(itemDataMap.get(statKey)));
+                }
+            }
+            gemBonuses.add(new GemBonus(
+                    gemStats,
+                    itemDataMap.containsKey("gems." + gemSlot + ".health") ? Integer.parseInt(itemDataMap.get("gems." + gemSlot + ".health")) : 0,
+                    Stat.getFromIdentifier(itemDataMap.get("gems." + gemSlot + ".main")),
+                    Integer.parseInt(itemDataMap.get("gems." + gemSlot + ".tier"))));
+        }
+        return gemBonuses;
     }
 
     /**
