@@ -4,7 +4,7 @@ import com.runicrealms.plugin.database.Data;
 import com.runicrealms.plugin.database.MongoDataSection;
 import com.runicrealms.plugin.database.PlayerMongoData;
 import com.runicrealms.plugin.database.PlayerMongoDataSection;
-import com.runicrealms.plugin.model.SessionData;
+import com.runicrealms.plugin.model.SessionDataNested;
 import com.runicrealms.plugin.redis.RedisUtil;
 import com.runicrealms.runicitems.DupeManager;
 import com.runicrealms.runicitems.ItemManager;
@@ -14,12 +14,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import redis.clients.jedis.Jedis;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class InventoryData implements SessionData {
+public class InventoryData implements SessionDataNested {
     private static final int PLAYER_INVENTORY_SIZE = 41;
     public static final String PATH_LOCATION = "inventory";
     public static final String DATA_LOCATION = "data";
@@ -104,27 +103,6 @@ public class InventoryData implements SessionData {
     }
 
     /**
-     * This...
-     *
-     * @param jedis the jedis resource
-     */
-    public void writeToJedis(Jedis jedis) {
-        // Bukkit.broadcastMessage("writing inventory data to jedis");
-        String key = getJedisKey(this.uuid, this.getSlot());
-        RedisUtil.removeAllFromRedis(jedis, key); // removes all sub-keys
-        jedis.set(key, "true"); // quick check to see if inventory data is written
-        jedis.expire(key, RedisUtil.EXPIRE_TIME);
-        Map<Integer, Map<String, String>> itemDataMap = this.toItemMap(); // from inventory
-        if (!itemDataMap.isEmpty()) {
-            for (Integer itemSlot : itemDataMap.keySet()) {
-                if (itemDataMap.get(itemSlot) == null) continue;
-                jedis.hmset(key + ":" + itemSlot, itemDataMap.get(itemSlot));
-                jedis.expire(key + ":" + itemSlot, RedisUtil.EXPIRE_TIME);
-            }
-        }
-    }
-
-    /**
      * Quests data is nested in redis, so here's a handy method to get the key
      *
      * @param uuid of the player
@@ -136,20 +114,35 @@ public class InventoryData implements SessionData {
     }
 
     @Override
-    public Map<String, String> toMap() {
-        return null;
+    public Map<String, String> toMap(Object nestedObject) {
+        RunicItem runicItem = (RunicItem) nestedObject;
+        return runicItem.addToJedis();
     }
 
-    public Map<Integer, Map<String, String>> toItemMap() {
-        Map<Integer, Map<String, String>> itemDataMap = new HashMap<>();
+    /**
+     * Write the character's inventory data to jedis
+     *
+     * @param jedis the jedis resource
+     * @param slot  of the character
+     */
+    @Override
+    public void writeToJedis(Jedis jedis, int... slot) {
+        // Bukkit.broadcastMessage("writing inventory data to jedis");
+        String key = getJedisKey(this.uuid, this.getSlot());
+        RedisUtil.removeAllFromRedis(jedis, key); // removes all sub-keys
+        jedis.set(key, "true"); // quick check to see if inventory data is written
+        jedis.expire(key, RedisUtil.EXPIRE_TIME);
+
+
         for (int i = 0; i < contents.length; i++) {
             if (contents[i] != null) {
                 RunicItem runicItem = ItemManager.getRunicItemFromItemStack(contents[i]);
-                if (runicItem != null)
-                    itemDataMap.put(i, runicItem.addToJedis());
+                if (runicItem != null) {
+                    jedis.hmset(key + ":" + i, this.toMap(runicItem));
+                    jedis.expire(key + ":" + i, RedisUtil.EXPIRE_TIME);
+                }
             }
         }
-        return itemDataMap;
     }
 
     @Override
