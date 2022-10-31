@@ -146,11 +146,11 @@ public class InventoryData implements SessionDataNested {
     }
 
     @Override
-    public void writeToMongo(PlayerMongoData playerMongoData, int... slot) {
+    public PlayerMongoData writeToMongo(PlayerMongoData playerMongoData, int... slot) {
         // Bukkit.broadcastMessage("writing inventory data to mongo");
         MongoDataSection character = playerMongoData.getCharacter(slot[0]);
         character.remove("inventory"); // reset the stored inventory section
-        character.save();
+        // character.save();
         for (int i = 0; i < contents.length; i++) {
             if (contents[i] != null) {
                 RunicItem runicItem = ItemManager.getRunicItemFromItemStack(contents[i]);
@@ -158,7 +158,8 @@ public class InventoryData implements SessionDataNested {
                     runicItem.addToDataSection(character, "inventory." + i);
             }
         }
-        character.save();
+        // character.save();
+        return playerMongoData;
     }
 
     public UUID getUuid() {
