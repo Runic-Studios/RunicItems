@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import redis.clients.jedis.Jedis;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -21,7 +22,6 @@ import java.util.logging.Level;
 public class InventoryData implements SessionDataNested {
     private static final int PLAYER_INVENTORY_SIZE = 41;
     public static final String PATH_LOCATION = "inventory";
-    public static final String DATA_LOCATION = "data";
     private final UUID uuid;
     private final Integer slot;
     private final ItemStack[] contents;
@@ -53,19 +53,17 @@ public class InventoryData implements SessionDataNested {
         if (character.has("inventory")) {
             Data data = character.getSection("inventory");
             for (String key : data.getKeys()) {
-                if (!key.equalsIgnoreCase("type")) { // todo: can probably remove
-                    try {
-                        RunicItem item = ItemLoader.loadItem(data.getSection(key), DupeManager.getNextItemId());
-                        if (item != null)
-                            contents[Integer.parseInt(key)] = item.generateItem();
-                    } catch (Exception exception) {
-                        Bukkit.getLogger().log
-                                (
-                                        Level.WARNING,
-                                        "[RunicItems] ERROR loading item " + key + " from mongo for player uuid" + this.uuid
-                                );
-                        exception.printStackTrace();
-                    }
+                try {
+                    RunicItem item = ItemLoader.loadItem(data.getSection(key), DupeManager.getNextItemId());
+                    if (item != null)
+                        contents[Integer.parseInt(key)] = item.generateItem();
+                } catch (Exception exception) {
+                    Bukkit.getLogger().log
+                            (
+                                    Level.WARNING,
+                                    "[RunicItems] ERROR loading item " + key + " from mongo for player uuid" + this.uuid
+                            );
+                    exception.printStackTrace();
                 }
             }
         }
@@ -110,13 +108,23 @@ public class InventoryData implements SessionDataNested {
      * @return a string representing the location in jedis
      */
     public static String getJedisKey(UUID uuid, int slot) {
-        return uuid + ":character:" + slot + ":" + PATH_LOCATION + ":" + DATA_LOCATION;
+        return uuid + ":character:" + slot + ":" + PATH_LOCATION;
+    }
+
+    @Override
+    public List<String> getFields() {
+        return null;
     }
 
     @Override
     public Map<String, String> toMap(Object nestedObject) {
         RunicItem runicItem = (RunicItem) nestedObject;
         return runicItem.addToJedis();
+    }
+
+    @Override
+    public Map<String, String> getDataMapFromJedis(Jedis jedis, Object o, int... ints) {
+        return null;
     }
 
     /**
@@ -127,13 +135,8 @@ public class InventoryData implements SessionDataNested {
      */
     @Override
     public void writeToJedis(Jedis jedis, int... slot) {
-        // Bukkit.broadcastMessage("writing inventory data to jedis");
         String key = getJedisKey(this.uuid, this.getSlot());
         RedisUtil.removeAllFromRedis(jedis, key); // removes all sub-keys
-        jedis.set(key, "true"); // quick check to see if inventory data is written
-        jedis.expire(key, RedisUtil.EXPIRE_TIME);
-
-
         for (int i = 0; i < contents.length; i++) {
             if (contents[i] != null) {
                 RunicItem runicItem = ItemManager.getRunicItemFromItemStack(contents[i]);
@@ -147,10 +150,8 @@ public class InventoryData implements SessionDataNested {
 
     @Override
     public PlayerMongoData writeToMongo(PlayerMongoData playerMongoData, int... slot) {
-        // Bukkit.broadcastMessage("writing inventory data to mongo");
         MongoDataSection character = playerMongoData.getCharacter(slot[0]);
         character.remove("inventory"); // reset the stored inventory section
-        // character.save();
         for (int i = 0; i < contents.length; i++) {
             if (contents[i] != null) {
                 RunicItem runicItem = ItemManager.getRunicItemFromItemStack(contents[i]);
@@ -158,7 +159,6 @@ public class InventoryData implements SessionDataNested {
                     runicItem.addToDataSection(character, "inventory." + i);
             }
         }
-        // character.save();
         return playerMongoData;
     }
 

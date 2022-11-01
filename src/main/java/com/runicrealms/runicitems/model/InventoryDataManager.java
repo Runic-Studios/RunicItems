@@ -1,11 +1,11 @@
 package com.runicrealms.runicitems.model;
 
+import com.runicrealms.plugin.api.RunicCoreAPI;
 import com.runicrealms.plugin.character.api.CharacterQuitEvent;
 import com.runicrealms.plugin.character.api.CharacterSelectEvent;
 import com.runicrealms.plugin.database.PlayerMongoData;
 import com.runicrealms.plugin.database.PlayerMongoDataSection;
 import com.runicrealms.plugin.database.event.MongoSaveEvent;
-import com.runicrealms.plugin.redis.RedisUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -92,13 +92,10 @@ public class InventoryDataManager implements Listener {
      * @return a InventoryData object if it is found in redis
      */
     public InventoryData checkRedisForInventoryData(UUID uuid, Integer slot, Jedis jedis) {
-        String key = InventoryData.getJedisKey(uuid, slot); // if it has this key, it has loaded the quest data
-        if (jedis.exists(key)) {
-            // Bukkit.broadcastMessage(ChatColor.GREEN + "redis inventory data found, building data from redis");
-            jedis.expire(key, RedisUtil.EXPIRE_TIME);
+        String key = InventoryData.getJedisKey(uuid, slot);
+        if (!RunicCoreAPI.getNestedJedisKeys(key, jedis).isEmpty()) {
             return new InventoryData(uuid, slot, jedis);
         }
-        // Bukkit.broadcastMessage(ChatColor.RED + "redis quest data not found");
         return null;
     }
 
