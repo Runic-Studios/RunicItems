@@ -1,7 +1,7 @@
 package com.runicrealms.runicitems.item;
 
+import com.runicrealms.plugin.api.Pair;
 import com.runicrealms.plugin.database.Data;
-import com.runicrealms.plugin.utilities.Pair;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.GemBonus;
