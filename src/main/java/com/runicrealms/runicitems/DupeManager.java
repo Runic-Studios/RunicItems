@@ -3,7 +3,7 @@ package com.runicrealms.runicitems;
 import com.runicrealms.plugin.RunicCore;
 import com.runicrealms.plugin.api.RunicBankAPI;
 import com.runicrealms.plugin.api.RunicCoreAPI;
-import com.runicrealms.runicguilds.gui.GuildBankUtil;
+import com.runicrealms.runicguilds.ui.GuildBankUtil;
 import com.runicrealms.runicitems.command.RunicItemCommand;
 import com.runicrealms.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
@@ -59,10 +59,12 @@ public class DupeManager implements Listener {
 
             if (event.getAction() == InventoryAction.DROP_ALL_CURSOR
                     || event.getAction() == InventoryAction.DROP_ONE_CURSOR) {
-                if (player.getGameMode() != GameMode.CREATIVE && checkInventoryForDupes(event.getWhoClicked().getInventory(), event.getCursor(), CurrentItemType.CURSOR, event, player)) return;
+                if (player.getGameMode() != GameMode.CREATIVE && checkInventoryForDupes(event.getWhoClicked().getInventory(), event.getCursor(), CurrentItemType.CURSOR, event, player))
+                    return;
             } else if (event.getAction() == InventoryAction.DROP_ALL_SLOT
                     || event.getAction() == InventoryAction.DROP_ONE_SLOT) {
-                if (player.getGameMode() != GameMode.CREATIVE && checkInventoryForDupes(event.getClickedInventory(), event.getCurrentItem(), CurrentItemType.CURRENT, event, player)) return;
+                if (player.getGameMode() != GameMode.CREATIVE && checkInventoryForDupes(event.getClickedInventory(), event.getCurrentItem(), CurrentItemType.CURRENT, event, player))
+                    return;
             }
 
             if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
@@ -73,12 +75,15 @@ public class DupeManager implements Listener {
                 type = CurrentItemType.CURSOR;
             } else return;
             if (GuildBankUtil.isViewingBank(player.getUniqueId())) {
-                if (player.getGameMode() != GameMode.CREATIVE && checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player)) return;
+                if (player.getGameMode() != GameMode.CREATIVE && checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player))
+                    return;
             }
             if (RunicBankAPI.isViewingBank(player)) {
-                if (player.getGameMode() != GameMode.CREATIVE && checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player)) return;
+                if (player.getGameMode() != GameMode.CREATIVE && checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player))
+                    return;
             }
-            if (player.getGameMode() != GameMode.CREATIVE) checkInventoryForDupes(player.getInventory(), currentItem, type, event, player);
+            if (player.getGameMode() != GameMode.CREATIVE)
+                checkInventoryForDupes(player.getInventory(), currentItem, type, event, player);
         }
     }
 
@@ -220,7 +225,7 @@ public class DupeManager implements Listener {
                         Bukkit.getOnlinePlayers().stream().filter(ServerOperator::isOp).forEach(target -> {
                             target.sendMessage(ChatColor.translateAlternateColorCodes('&',
                                     RunicItemCommand.PREFIX + "Player " + player.getName() + " has attempted dupe. Check discord for more info."
-                                    ));
+                            ));
                         });
                     }
                     return true;
@@ -231,14 +236,15 @@ public class DupeManager implements Listener {
     }
 
 
-
     private enum CurrentItemType {
         CURRENT, CURSOR;
 
         void deleteItem(InventoryClickEvent event) {
             switch (this) {
-                case CURSOR: event.setCursor(null);
-                case CURRENT: event.setCurrentItem(null);
+                case CURSOR:
+                    event.setCursor(null);
+                case CURRENT:
+                    event.setCurrentItem(null);
             }
         }
     }
