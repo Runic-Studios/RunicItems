@@ -1,9 +1,6 @@
 package com.runicrealms.runicitems.model;
 
-import com.runicrealms.plugin.database.Data;
-import com.runicrealms.plugin.database.MongoDataSection;
-import com.runicrealms.plugin.database.PlayerMongoData;
-import com.runicrealms.plugin.database.PlayerMongoDataSection;
+import com.runicrealms.plugin.database.*;
 import com.runicrealms.plugin.model.SessionDataNested;
 import com.runicrealms.plugin.redis.RedisUtil;
 import com.runicrealms.runicitems.DupeManager;
@@ -149,7 +146,8 @@ public class InventoryData implements SessionDataNested {
     }
 
     @Override
-    public PlayerMongoData writeToMongo(PlayerMongoData playerMongoData, int... slot) {
+    public PlayerMongoData writeToMongo(MongoData mongoData, int... slot) {
+        PlayerMongoData playerMongoData = (PlayerMongoData) mongoData;
         MongoDataSection character = playerMongoData.getCharacter(slot[0]);
         character.remove("inventory"); // reset the stored inventory section
         for (int i = 0; i < contents.length; i++) {

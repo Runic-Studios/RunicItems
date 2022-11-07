@@ -3,7 +3,7 @@ package com.runicrealms.runicitems;
 import com.runicrealms.plugin.RunicCore;
 import com.runicrealms.plugin.api.RunicBankAPI;
 import com.runicrealms.plugin.api.RunicCoreAPI;
-import com.runicrealms.runicguilds.ui.GuildBankUtil;
+import com.runicrealms.runicguilds.util.GuildBankUtil;
 import com.runicrealms.runicitems.command.RunicItemCommand;
 import com.runicrealms.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
