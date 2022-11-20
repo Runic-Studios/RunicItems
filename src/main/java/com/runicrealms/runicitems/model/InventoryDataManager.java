@@ -56,7 +56,6 @@ public class InventoryDataManager implements Listener {
             for (int characterSlot : event.getPlayersToSave().get(uuid).getCharactersToSave()) {
                 PlayerMongoData playerMongoData = event.getPlayersToSave().get(uuid).getPlayerMongoData();
                 saveInventoryToMongo(uuid, characterSlot, event.getJedis(), playerMongoData);
-                // playerMongoData.save();
             }
         }
         event.markPluginSaved("items");
