@@ -1,8 +1,8 @@
 package com.runicrealms.runicitems.model;
 
+import com.runicrealms.plugin.RunicCore;
 import com.runicrealms.plugin.database.*;
 import com.runicrealms.plugin.model.SessionDataNested;
-import com.runicrealms.plugin.redis.RedisUtil;
 import com.runicrealms.runicitems.DupeManager;
 import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.config.ItemLoader;
@@ -17,8 +17,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 public class InventoryData implements SessionDataNested {
-    private static final int PLAYER_INVENTORY_SIZE = 41;
     public static final String PATH_LOCATION = "inventory";
+    private static final int PLAYER_INVENTORY_SIZE = 41;
     private final UUID uuid;
     private final Integer slot;
     private final ItemStack[] contents;
@@ -108,6 +108,15 @@ public class InventoryData implements SessionDataNested {
         return uuid + ":character:" + slot + ":" + PATH_LOCATION;
     }
 
+    public ItemStack[] getContents() {
+        return contents;
+    }
+
+    @Override
+    public Map<String, String> getDataMapFromJedis(Jedis jedis, Object o, int... ints) {
+        return null;
+    }
+
     @Override
     public List<String> getFields() {
         return null;
@@ -119,11 +128,6 @@ public class InventoryData implements SessionDataNested {
         return runicItem.addToJedis();
     }
 
-    @Override
-    public Map<String, String> getDataMapFromJedis(Jedis jedis, Object o, int... ints) {
-        return null;
-    }
-
     /**
      * Write the character's inventory data to jedis
      *
@@ -133,13 +137,13 @@ public class InventoryData implements SessionDataNested {
     @Override
     public void writeToJedis(Jedis jedis, int... slot) {
         String key = getJedisKey(this.uuid, this.getSlot());
-        RedisUtil.removeAllFromRedis(jedis, key); // removes all sub-keys
+        RunicCore.getRedisAPI().removeAllFromRedis(jedis, key); // removes all sub-keys
         for (int i = 0; i < contents.length; i++) {
             if (contents[i] != null) {
                 RunicItem runicItem = ItemManager.getRunicItemFromItemStack(contents[i]);
                 if (runicItem != null) {
                     jedis.hmset(key + ":" + i, this.toMap(runicItem));
-                    jedis.expire(key + ":" + i, RedisUtil.EXPIRE_TIME);
+                    jedis.expire(key + ":" + i, RunicCore.getRedisAPI().getExpireTime());
                 }
             }
         }
@@ -160,15 +164,11 @@ public class InventoryData implements SessionDataNested {
         return playerMongoData;
     }
 
-    public UUID getUuid() {
-        return uuid;
-    }
-
     public Integer getSlot() {
         return slot;
     }
 
-    public ItemStack[] getContents() {
-        return contents;
+    public UUID getUuid() {
+        return uuid;
     }
 }

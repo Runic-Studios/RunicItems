@@ -1,6 +1,6 @@
 package com.runicrealms.runicitems.model;
 
-import com.runicrealms.plugin.api.RunicCoreAPI;
+import com.runicrealms.plugin.RunicCore;
 import com.runicrealms.plugin.character.api.CharacterQuitEvent;
 import com.runicrealms.plugin.character.api.CharacterSelectEvent;
 import com.runicrealms.plugin.database.PlayerMongoData;
@@ -16,6 +16,41 @@ import redis.clients.jedis.Jedis;
 import java.util.UUID;
 
 public class InventoryDataManager implements Listener {
+
+    /**
+     * Checks redis to see if the currently selected character's inventory is in session storage.
+     * And if it is, returns the InventoryData object
+     *
+     * @param uuid of player to check
+     * @param slot of the character
+     * @return a InventoryData object if it is found in redis
+     */
+    public InventoryData checkRedisForInventoryData(UUID uuid, Integer slot, Jedis jedis) {
+        String key = InventoryData.getJedisKey(uuid, slot);
+        if (!RunicCore.getRedisAPI().getNestedJedisKeys(key, jedis).isEmpty()) {
+            return new InventoryData(uuid, slot, jedis);
+        }
+        return null;
+    }
+
+    /**
+     * Creates an InventoryData object. Tries to build it from session storage (Redis) first,
+     * then falls back to Mongo
+     *
+     * @param uuid  of player who is attempting to load their data
+     * @param slot  the slot of the character
+     * @param jedis the jedis resource
+     * @return an InventoryData object
+     */
+    public InventoryData loadInventoryData(UUID uuid, Integer slot, Jedis jedis) {
+        // Step 1: check if quest data is cached in redis
+        InventoryData inventoryData = checkRedisForInventoryData(uuid, slot, jedis);
+        if (inventoryData != null) return inventoryData;
+        // Step 2: check mongo documents
+        PlayerMongoData playerMongoData = new PlayerMongoData(uuid.toString());
+        PlayerMongoDataSection character = playerMongoData.getCharacter(slot);
+        return new InventoryData(uuid, character, slot);
+    }
 
     /**
      * Important: fire BEFORE loading stats
@@ -80,40 +115,5 @@ public class InventoryDataManager implements Listener {
             inventoryData = loadInventoryData(uuid, slot, jedis); // from redis
         }
         inventoryData.writeToMongo(playerMongoData, slot);
-    }
-
-    /**
-     * Checks redis to see if the currently selected character's inventory is in session storage.
-     * And if it is, returns the InventoryData object
-     *
-     * @param uuid of player to check
-     * @param slot of the character
-     * @return a InventoryData object if it is found in redis
-     */
-    public InventoryData checkRedisForInventoryData(UUID uuid, Integer slot, Jedis jedis) {
-        String key = InventoryData.getJedisKey(uuid, slot);
-        if (!RunicCoreAPI.getNestedJedisKeys(key, jedis).isEmpty()) {
-            return new InventoryData(uuid, slot, jedis);
-        }
-        return null;
-    }
-
-    /**
-     * Creates an InventoryData object. Tries to build it from session storage (Redis) first,
-     * then falls back to Mongo
-     *
-     * @param uuid  of player who is attempting to load their data
-     * @param slot  the slot of the character
-     * @param jedis the jedis resource
-     * @return an InventoryData object
-     */
-    public InventoryData loadInventoryData(UUID uuid, Integer slot, Jedis jedis) {
-        // Step 1: check if quest data is cached in redis
-        InventoryData inventoryData = checkRedisForInventoryData(uuid, slot, jedis);
-        if (inventoryData != null) return inventoryData;
-        // Step 2: check mongo documents
-        PlayerMongoData playerMongoData = new PlayerMongoData(uuid.toString());
-        PlayerMongoDataSection character = playerMongoData.getCharacter(slot);
-        return new InventoryData(uuid, character, slot);
     }
 }

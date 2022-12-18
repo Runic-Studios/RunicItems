@@ -1,6 +1,6 @@
 package com.runicrealms.runicitems.listeners;
 
-import com.runicrealms.plugin.api.RunicCoreAPI;
+import com.runicrealms.plugin.RunicCore;
 import com.runicrealms.plugin.item.util.ItemRemover;
 import com.runicrealms.plugin.utilities.CurrencyUtil;
 import com.runicrealms.runicitems.RunicItems;
@@ -24,6 +24,43 @@ public class GoldPouchListener implements Listener {
     private static final int GOLD_POUCH_INTERACT_DELAY = 10; // ticks
     private static final String POUCH_ID = "gold-pouch";
     private final HashSet<UUID> playersUpdatingPouches = new HashSet<>(); // prevents exploits
+
+    /**
+     * Empties our RunicItemDynamic object of its stored coins with a reference to the previous amount
+     * Should be used before generateItem
+     *
+     * @return the previously held coins amount
+     */
+    public int emptyPouch(RunicItemDynamic runicItemDynamic) {
+        int coins = runicItemDynamic.getDynamicField();
+        runicItemDynamic.setDynamicField(0);
+        return coins;
+    }
+
+    /**
+     * Fills our gold pouch item using gold from the player's inventory
+     */
+    public void fillPouch(Player player, RunicItemDynamic runicItemDynamic) {
+        int currentAmount = runicItemDynamic.getDynamicField();
+        int maxAmount = Integer.parseInt(runicItemDynamic.getData().get("maxCoins"));
+        int amountToFill = maxAmount - currentAmount;
+        // if player has enough coins to fill the pouch, fill it
+        if (RunicCore.getShopAPI().hasItems(player, CurrencyUtil.goldCoin(), amountToFill)) {
+            ItemRemover.takeItem(player, CurrencyUtil.goldCoin(), amountToFill);
+            runicItemDynamic.setDynamicField(maxAmount);
+            return;
+        }
+        // if player does not have enough coins to fill it, start filling it using the largest stack size possible
+        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 64);
+        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 48);
+        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 32);
+        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 16);
+        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 8);
+        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 4);
+        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 2);
+        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 1);
+        runicItemDynamic.setDynamicField(currentAmount);
+    }
 
     @EventHandler
     public void onGoldPouchTrigger(RunicItemGenericTriggerEvent e) {
@@ -62,32 +99,6 @@ public class GoldPouchListener implements Listener {
         Bukkit.getScheduler().runTaskLater(RunicItems.getInstance(), () -> playersUpdatingPouches.remove(player.getUniqueId()), GOLD_POUCH_INTERACT_DELAY);
     }
 
-
-    /**
-     * Fills our gold pouch item using gold from the player's inventory
-     */
-    public void fillPouch(Player player, RunicItemDynamic runicItemDynamic) {
-        int currentAmount = runicItemDynamic.getDynamicField();
-        int maxAmount = Integer.parseInt(runicItemDynamic.getData().get("maxCoins"));
-        int amountToFill = maxAmount - currentAmount;
-        // if player has enough coins to fill the pouch, fill it
-        if (RunicCoreAPI.hasItems(player, CurrencyUtil.goldCoin(), amountToFill)) {
-            ItemRemover.takeItem(player, CurrencyUtil.goldCoin(), amountToFill);
-            runicItemDynamic.setDynamicField(maxAmount);
-            return;
-        }
-        // if player does not have enough coins to fill it, start filling it using the largest stack size possible
-        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 64);
-        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 48);
-        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 32);
-        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 16);
-        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 8);
-        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 4);
-        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 2);
-        currentAmount = removeGoldStackSize(currentAmount, maxAmount, player, 1);
-        runicItemDynamic.setDynamicField(currentAmount);
-    }
-
     /**
      * If a player doesn't have enough coins to fill a pouch, we manually start filling it by the largest stack possible
      *
@@ -98,23 +109,11 @@ public class GoldPouchListener implements Listener {
      * @return the new current amount of coins in the pouch
      */
     private int removeGoldStackSize(int currentAmount, int maxAmount, Player player, int stackSize) {
-        while (RunicCoreAPI.hasItems(player, CurrencyUtil.goldCoin(), stackSize) && currentAmount < maxAmount) {
+        while (RunicCore.getShopAPI().hasItems(player, CurrencyUtil.goldCoin(), stackSize) && currentAmount < maxAmount) {
             // remove it, add to pouch
             ItemRemover.takeItem(player, CurrencyUtil.goldCoin(), stackSize);
             currentAmount += stackSize;
         }
         return currentAmount;
-    }
-
-    /**
-     * Empties our RunicItemDynamic object of its stored coins with a reference to the previous amount
-     * Should be used before generateItem
-     *
-     * @return the previously held coins amount
-     */
-    public int emptyPouch(RunicItemDynamic runicItemDynamic) {
-        int coins = runicItemDynamic.getDynamicField();
-        runicItemDynamic.setDynamicField(0);
-        return coins;
     }
 }
