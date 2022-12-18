@@ -27,7 +27,7 @@ public class InventoryDataManager implements Listener {
      */
     public InventoryData checkRedisForInventoryData(UUID uuid, Integer slot, Jedis jedis) {
         String key = InventoryData.getJedisKey(uuid, slot);
-        if (!RunicCore.getRedisAPI().getNestedJedisKeys(key, jedis).isEmpty()) {
+        if (!RunicCore.getRedisAPI().getNestedKeys(key, jedis).isEmpty()) {
             return new InventoryData(uuid, slot, jedis);
         }
         return null;
