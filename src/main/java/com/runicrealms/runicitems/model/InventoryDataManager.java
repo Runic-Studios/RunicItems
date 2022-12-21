@@ -60,8 +60,10 @@ public class InventoryDataManager implements Listener {
     @EventHandler(priority = EventPriority.LOW) // fires early
     public void onCharacterLoad(CharacterSelectEvent event) {
         int slot = event.getCharacterData().getBaseCharacterInfo().getSlot();
-        InventoryData inventoryData = loadInventoryData(event.getPlayer().getUniqueId(), slot, event.getJedis());
-        event.getPlayer().getInventory().setContents(inventoryData.getContents());
+        try (Jedis jedis = RunicCore.getRedisAPI().getNewJedisResource()) {
+            InventoryData inventoryData = loadInventoryData(event.getPlayer().getUniqueId(), slot, jedis);
+            event.getPlayer().getInventory().setContents(inventoryData.getContents());
+        }
     }
 
     /**
@@ -77,7 +79,9 @@ public class InventoryDataManager implements Listener {
                         event.getSlot(),
                         event.getPlayer().getInventory().getContents()
                 );
-        inventoryData.writeToJedis(event.getJedis());
+        try (Jedis jedis = RunicCore.getRedisAPI().getNewJedisResource()) {
+            inventoryData.writeToJedis(jedis);
+        }
     }
 
     /**
