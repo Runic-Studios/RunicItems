@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
 public class RunicItemDropListener implements Listener {
 
     /**
-     *  Custom implementation of the setAge method in newer API
+     * Custom implementation of the setAge method in newer API
      *
      * @param duration in seconds
      * @param item
@@ -32,22 +32,21 @@ public class RunicItemDropListener implements Listener {
         }
     }
 
-    private static boolean isRunicItem (Item item) {
-
+    private static boolean isRunicItem(Item item) {
+        // Logic to decide whether item is runicItem or not
+        return true;
     }
 
     /* TODO
         - Check if item is instance of Runic item
         - Set the age of the item to 0
      */
-
     @EventHandler
-    public void itemDrop (PlayerDropItemEvent e) {
+    public void itemDrop(PlayerDropItemEvent e) {
         Item item = e.getItemDrop();
-        if (isRunicItem(item))
-        // Set age of dropped item to 0
-        setAge(0, item);
-
+        if (isRunicItem(item)) {
+            // Set age of dropped item to 0
+            setAge(0, item);
+        }
     }
-
 }
