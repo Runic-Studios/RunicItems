@@ -1,9 +1,11 @@
 package com.runicrealms.runicitems.listeners;
 
+import com.runicrealms.runicitems.RunicItemsAPI;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
 
@@ -31,20 +33,13 @@ public class RunicItemDropListener implements Listener {
             e.printStackTrace();
         }
     }
-
-    private static boolean isRunicItem(Item item) {
-        // Logic to decide whether item is runicItem or not
-        return true;
-    }
-
-    /* TODO
-        - Check if item is instance of Runic item
-        - Set the age of the item to 0
-     */
+    
     @EventHandler
     public void itemDrop(PlayerDropItemEvent e) {
         Item item = e.getItemDrop();
-        if (isRunicItem(item)) {
+        ItemStack itemstack = item.getItemStack();
+        // Check whether itemDrop belongs to a stack of runic items
+        if (RunicItemsAPI.getItemStackTemplate(itemstack) != null) {
             // Set age of dropped item to 0
             setAge(0, item);
         }
