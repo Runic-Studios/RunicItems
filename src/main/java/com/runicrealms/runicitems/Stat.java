@@ -2,13 +2,34 @@ package com.runicrealms.runicitems;
 
 import org.bukkit.ChatColor;
 
+@SuppressWarnings("unused")
 public enum Stat {
 
-    DEXTERITY("dexterity", "Dexterity", "DEX", ChatColor.YELLOW, "✦", "Gain increased crit chance!"),
-    INTELLIGENCE("intelligence", "Intelligence", "INT", ChatColor.DARK_AQUA, "ʔ", "Deal more magic damage and gain more max mana!"),
-    STRENGTH("strength", "Strength", "STR", ChatColor.RED, "⚔", "Deal more physical damage!"),
-    VITALITY("vitality", "Vitality", "VIT", ChatColor.WHITE, "■", "Gain damage reduction and health regen!"),
-    WISDOM("wisdom", "Wisdom", "WIS", ChatColor.GREEN, "✸", "Gain more spell healing, shielding and mana regen!");
+    DEXTERITY
+            (
+                    "dexterity", "Dexterity", "DEX", ChatColor.YELLOW, "✦",
+                    "Gain increased attack speed and ability haste!"
+            ),
+    INTELLIGENCE
+            (
+                    "intelligence", "Intelligence", "INT", ChatColor.DARK_AQUA, "ʔ",
+                    "Deal more magic damage and gain more max mana!"
+            ),
+    STRENGTH
+            (
+                    "strength", "Strength", "STR", ChatColor.RED, "⚔",
+                    "Deal more physical damage!"
+            ),
+    VITALITY
+            (
+                    "vitality", "Vitality", "VIT", ChatColor.WHITE, "■",
+                    "Gain damage reduction and health regen!"
+            ),
+    WISDOM
+            (
+                    "wisdom", "Wisdom", "WIS", ChatColor.GREEN, "✸",
+                    "Gain more spell healing, shielding, mana regen and experience!"
+            );
 
     public static final Stat[] PLAYER_STATS = new Stat[]{DEXTERITY, INTELLIGENCE, STRENGTH, VITALITY, WISDOM};
 
@@ -19,27 +40,28 @@ public enum Stat {
     /*
     Combat multipliers
      */
-    // dexterity
-    private static final double CRITICAL_CHANCE = 0.004; // .4%
-    private static final double MOVEMENT_SPEED_MULT = 0.0035; // .35%
-    // intelligence
+    // Dexterity
+    private static final double ATTACK_SPEED = 0.005; // .5%
+    private static final double ABILITY_HASTE = 0.005; // .5%
+    // Intelligence
     private static final double MANA_REGEN_MULT = 0.04; // 4%
-    private static final double MAGIC_DMG_MULT = 0.012; // 1.2%
-    // strength
-    private static final double PHYSICAL_DMG_MULT = 0.01; // 1.0%
-    // wisdom
+    private static final double MAGIC_DMG_MULT = 0.01; // 1%
+    // Strength
+    private static final double PHYSICAL_DMG_MULT = 0.0075; // 0.75%
+    // Wisdom
     private static final double MAX_MANA_MULT = 0.01; // 1%
     private static final double SPELL_HEALING_MULT = 0.006; // .6%
     private static final double SPELL_SHIELDING_MULT = 0.006; // .6%
-    // vitality
+    private static final double EXP_MULT = .0025; // 0.25%
+
+    // Vitality
     private static final double DAMAGE_REDUCTION_MULT = 0.004; // 0.4%
     private static final double HEALTH_REGEN_MULT = 0.02; // 2%
 
     /*
-    Damage caps
+    Capped values
      */
     private static final double DAMAGE_REDUCTION_CAP = 40; // %
-    private static final double MOVEMENT_SPEED_CAP = 25; // %
 
     /*
     Enum fields
@@ -64,8 +86,16 @@ public enum Stat {
         return CRITICAL_DAMAGE_MULTIPLIER;
     }
 
-    public static double getMovementSpeedMult() {
-        return MOVEMENT_SPEED_MULT;
+    public static double getAbilityHaste() {
+        return ABILITY_HASTE;
+    }
+
+    public static double getAttackSpeed() {
+        return ATTACK_SPEED;
+    }
+
+    public static double getExpMult() {
+        return EXP_MULT;
     }
 
     public static double getMagicDmgMult() {
@@ -78,10 +108,6 @@ public enum Stat {
 
     public static double getPhysicalDmgMult() {
         return PHYSICAL_DMG_MULT;
-    }
-
-    public static double getCriticalChance() {
-        return CRITICAL_CHANCE;
     }
 
     public static double getDamageReductionMult() {
@@ -106,10 +132,6 @@ public enum Stat {
 
     public static double getDamageReductionCap() {
         return DAMAGE_REDUCTION_CAP;
-    }
-
-    public static double getMovementSpeedCap() {
-        return MOVEMENT_SPEED_CAP;
     }
 
     /**
