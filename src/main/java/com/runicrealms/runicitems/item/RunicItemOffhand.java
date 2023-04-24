@@ -1,6 +1,6 @@
 package com.runicrealms.runicitems.item;
 
-import com.runicrealms.plugin.database.Data;
+import com.runicrealms.plugin.api.Pair;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
@@ -11,7 +11,6 @@ import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import de.tr7zw.nbtapi.NBTItem;
-import javafx.util.Pair;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -42,43 +41,6 @@ public class RunicItemOffhand extends RunicItem {
         );
     }
 
-    public LinkedHashMap<Stat, RunicItemStat> getStats() {
-        return this.stats;
-    }
-
-    public int getLevel() {
-        return this.level;
-    }
-
-    public RunicItemRarity getRarity() {
-        return this.rarity;
-    }
-
-    @Override
-    public void addToDataSection(Data section, String root) {
-        super.addToDataSection(section, root);
-        for (Stat statType : this.stats.keySet()) {
-            section.set(root + ".stats." + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
-        }
-    }
-
-    @Override
-    public ItemStack generateItem() {
-        ItemStack item = super.generateItem();
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(this.getRarity().getChatColor() + this.getDisplayableItem().getDisplayName()); // apply rarity color
-            item.setItemMeta(meta);
-        }
-        NBTItem nbtItem = new NBTItem(item, true);
-        int count = 0;
-        for (Stat statType : this.stats.keySet()) {
-            nbtItem.setDouble("stat-" + count + "-" + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
-            count++;
-        }
-        return item;
-    }
-
     public static RunicItemOffhand getFromItemStack(ItemStack item) {
         if (item == null || item.getType() == Material.AIR) return null;
         NBTItem nbtItem = new NBTItem(item);
@@ -107,9 +69,35 @@ public class RunicItemOffhand extends RunicItem {
         }
         LinkedHashMap<Stat, RunicItemStat> stats = new LinkedHashMap<>();
         for (Pair<Stat, RunicItemStat> stat : statsList) {
-            stats.put(stat.getKey(), stat.getValue());
+            stats.put(stat.first, stat.second);
         }
         return new RunicItemOffhand(template, item.getAmount(), nbtItem.getInteger("id"), stats);
+    }
+
+    @Override
+    public Map<String, String> addToJedis() {
+        Map<String, String> jedisDataMap = super.addToJedis();
+        for (Stat statType : this.stats.keySet()) {
+            jedisDataMap.put("stats:" + statType.getIdentifier(), String.valueOf(this.stats.get(statType).getRollPercentage()));
+        }
+        return jedisDataMap;
+    }
+
+    @Override
+    public ItemStack generateItem() {
+        ItemStack item = super.generateItem();
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(this.getRarity().getChatColor() + this.getDisplayableItem().getDisplayName()); // apply rarity color
+            item.setItemMeta(meta);
+        }
+        NBTItem nbtItem = new NBTItem(item, true);
+        int count = 0;
+        for (Stat statType : this.stats.keySet()) {
+            nbtItem.setDouble("stat-" + count + "-" + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
+            count++;
+        }
+        return item;
     }
 
     @Override
@@ -128,6 +116,29 @@ public class RunicItemOffhand extends RunicItem {
                 new ItemLoreSection(lore),
                 new ItemLoreSection(Collections.singletonList(rarity.getDisplay())),
         };
+    }
+
+    @Override
+    public org.bson.Document writeToDocument(RunicItem source, org.bson.Document document) {
+        document = super.writeToDocument(source, document);
+        Map<String, Double> statsMap = new HashMap<>();
+        for (Stat statType : this.stats.keySet()) {
+            statsMap.put(statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
+        }
+        document.put("stats", statsMap);
+        return document;
+    }
+
+    public int getLevel() {
+        return this.level;
+    }
+
+    public RunicItemRarity getRarity() {
+        return this.rarity;
+    }
+
+    public LinkedHashMap<Stat, RunicItemStat> getStats() {
+        return this.stats;
     }
 
 }

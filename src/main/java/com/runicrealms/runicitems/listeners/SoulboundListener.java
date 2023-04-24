@@ -20,7 +20,7 @@ public class SoulboundListener implements Listener {
         if (RunicItemsAPI.getRunicItemFromItemStack(e.getItemDrop().getItemStack()) == null) return;
         RunicItem runicItem = RunicItemsAPI.getRunicItemFromItemStack(e.getItemDrop().getItemStack());
         boolean isSoulbound = runicItem.getTags().contains(RunicItemTag.SOULBOUND);
-        if (isSoulbound && e.getPlayer().getGameMode() == GameMode.SURVIVAL) {
+        if (isSoulbound && e.getPlayer().getGameMode() != GameMode.CREATIVE) {
             e.setCancelled(true);
             e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 0.5f, 1);
             e.getPlayer().sendMessage(ChatColor.GRAY + "This item is soulbound.");

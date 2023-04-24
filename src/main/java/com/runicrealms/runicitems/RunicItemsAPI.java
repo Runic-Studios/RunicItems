@@ -1,7 +1,5 @@
 package com.runicrealms.runicitems;
 
-import com.runicrealms.plugin.database.Data;
-import com.runicrealms.runicitems.config.ItemLoader;
 import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
@@ -74,38 +72,6 @@ public class RunicItemsAPI {
     public static RunicItem generateItemInRange(int minimumLevel, int maximumLevel, int count) {
         RunicItemTemplate template = LootManager.getRandomItemInRange(minimumLevel, maximumLevel);
         return template.generateItem(count, DupeManager.getNextItemId(), null, null);
-    }
-
-    /**
-     * Serializes inventory and adds it to a Data section
-     * WARNING: This MUST NOT be called on the main thread!
-     *
-     * @param inventory - Inventory to save
-     * @param data      - Data to save to
-     */
-    public static void saveInventoryToData(Inventory inventory, Data data) {
-        ItemStack[] contents = inventory.getContents();
-        for (int i = 0; i < contents.length; i++) {
-            if (contents[i] != null) {
-                RunicItem runicItem = ItemManager.getRunicItemFromItemStack(contents[i]);
-                if (runicItem != null) {
-                    runicItem.addToDataSection(data, i + "");
-                }
-            }
-        }
-        data.save();
-    }
-
-    /**
-     * Deserializes an inventory stored in a Data section and applies it to an existing inventory
-     *
-     * @param inventory - Inventory to modify
-     * @param data      - Data to read from
-     */
-    public static void applyDataToInventory(Inventory inventory, Data data) {
-        for (String key : data.getKeys()) {
-            inventory.setItem(Integer.parseInt(key), ItemLoader.loadItem(data.getSection(key), DupeManager.getNextItemId()).generateItem());
-        }
     }
 
     /**

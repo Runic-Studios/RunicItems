@@ -6,12 +6,6 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.runicrealms.plugin.character.api.CharacterSelectEvent;
-import com.runicrealms.plugin.database.Data;
-import com.runicrealms.plugin.database.MongoDataSection;
-import com.runicrealms.plugin.database.PlayerMongoData;
-import com.runicrealms.plugin.database.event.MongoSaveEvent;
-import com.runicrealms.runicitems.config.ItemLoader;
 import com.runicrealms.runicitems.item.*;
 import com.runicrealms.runicitems.item.event.RunicItemGenericTriggerEvent;
 import com.runicrealms.runicitems.item.template.*;
@@ -40,7 +34,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
 
 
 public class ItemManager implements Listener {
@@ -80,54 +73,6 @@ public class ItemManager implements Listener {
                 }
             }
         });
-    }
-
-    /**
-     * Important: fire BEFORE loading stats
-     *
-     * @param event when the character is first selected, before it is loaded
-     */
-    @EventHandler(priority = EventPriority.LOW) // fires early
-    public void onCharacterLoad(CharacterSelectEvent event) {
-        //if (RunicItems.isDatabaseLoadingEnabled()) {
-        int slot = event.getCharacterData().getBaseCharacterInfo().getSlot();
-        PlayerMongoData playerMongoData = new PlayerMongoData(event.getPlayer().getUniqueId().toString());
-        if (playerMongoData.has("character." + slot + ".inventory")) {
-            Data data = playerMongoData.getSection("character." + slot + ".inventory");
-            for (String key : data.getKeys()) {
-                if (!key.equalsIgnoreCase("type")) {
-                    try {
-                        RunicItem item = ItemLoader.loadItem(data.getSection(key), DupeManager.getNextItemId());
-                        if (item != null)
-                            event.getPlayer().getInventory().setItem(Integer.parseInt(key), item.generateItem());
-                    } catch (Exception exception) {
-                        Bukkit.getLogger().log(Level.WARNING, "[RunicItems] ERROR loading item " + key + " for player " + event.getPlayer().getUniqueId());
-                        exception.printStackTrace();
-                    }
-                }
-            }
-        }
-        //}
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onDatabaseSave(MongoSaveEvent event) {
-        //if (RunicItems.isDatabaseLoadingEnabled()) {
-        ItemStack[] contents = event.getPlayer().getInventory().getContents();
-        MongoDataSection character = event.getMongoDataSection();
-        character.remove("inventory"); // removes all stored inventory stuffs
-        character.set("inventory.type", "runicitems");
-        character.save();
-        for (int i = 0; i < contents.length; i++) {
-            if (contents[i] != null) {
-                RunicItem runicItem = getRunicItemFromItemStack(contents[i]);
-                if (runicItem != null) {
-                    runicItem.addToDataSection(character, "inventory." + i);
-                }
-            }
-        }
-        character.save();
-        //}
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

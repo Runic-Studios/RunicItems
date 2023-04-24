@@ -1,5 +1,6 @@
 package com.runicrealms.runicitems.item;
 
+import com.runicrealms.plugin.api.Pair;
 import com.runicrealms.plugin.utilities.ChatUtils;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
@@ -10,14 +11,11 @@ import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
 import de.tr7zw.nbtapi.NBTItem;
-import javafx.util.Pair;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.function.Function;
 
 public class RunicItemArtifact extends RunicItemWeapon {
 
@@ -85,7 +83,7 @@ public class RunicItemArtifact extends RunicItemWeapon {
         }
         LinkedHashMap<Stat, RunicItemStat> stats = new LinkedHashMap<>();
         for (Pair<Stat, RunicItemStat> stat : statsList) {
-            stats.put(stat.getKey(), stat.getValue());
+            stats.put(stat.first, stat.second);
         }
         return new RunicItemArtifact(template, item.getAmount(), nbtItem.getInteger("id"), stats);
     }

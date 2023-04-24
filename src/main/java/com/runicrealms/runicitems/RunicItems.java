@@ -1,33 +1,87 @@
 package com.runicrealms.runicitems;
 
-import co.aikar.commands.ConditionFailedException;
-import co.aikar.commands.PaperCommandManager;
+import com.runicrealms.libs.acf.ConditionFailedException;
+import com.runicrealms.libs.acf.PaperCommandManager;
+import com.runicrealms.libs.taskchain.BukkitTaskChainFactory;
+import com.runicrealms.libs.taskchain.TaskChain;
+import com.runicrealms.libs.taskchain.TaskChainFactory;
+import com.runicrealms.plugin.database.event.MongoSaveEvent;
+import com.runicrealms.runicitems.api.DataAPI;
 import com.runicrealms.runicitems.command.RunicItemCommand;
 import com.runicrealms.runicitems.config.AbilityLoader;
 import com.runicrealms.runicitems.config.ConfigUtil;
 import com.runicrealms.runicitems.config.TemplateLoader;
+import com.runicrealms.runicitems.converter.RunicItemReadConverter;
+import com.runicrealms.runicitems.converter.RunicItemWriteConverter;
 import com.runicrealms.runicitems.listeners.*;
+import com.runicrealms.runicitems.model.InventoryDataManager;
+import com.runicrealms.runicitems.model.MongoTask;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class RunicItems extends JavaPlugin {
-
+public class RunicItems extends JavaPlugin implements Listener {
     private static RunicItems instance;
-
     private static PaperCommandManager commandManager;
+    private static DataAPI dataAPI;
+    private static MongoTask mongoTask;
     private static JDA jda;
 
     private static boolean databaseLoadingEnabled = true;
+    private static TaskChainFactory taskChainFactory;
+
+    public static RunicItems getInstance() {
+        return instance;
+    }
+
+    public static PaperCommandManager getCommandManager() {
+        return commandManager;
+    }
+
+    public static DataAPI getDataAPI() {
+        return dataAPI;
+    }
+
+    public static MongoTask getMongoTask() {
+        return mongoTask;
+    }
+    
+    public static <T> TaskChain<T> newChain() {
+        return taskChainFactory.newChain();
+    }
+
+    public static <T> TaskChain<T> newSharedChain(String name) {
+        return taskChainFactory.newSharedChain(name);
+    }
+
+    public static JDA getJda() {
+        return jda;
+    }
+
+    public static boolean isDatabaseLoadingEnabled() {
+        return databaseLoadingEnabled;
+    }
+
+    public static void setDatabaseLoadingEnabled(boolean enabled) {
+        databaseLoadingEnabled = enabled;
+    }
 
     @Override
     public void onEnable() {
         // Setup base
         instance = this;
+        taskChainFactory = BukkitTaskChainFactory.create(this);
+        dataAPI = new InventoryDataManager();
+        mongoTask = new MongoTask();
+        new RunicItemReadConverter();
+        new RunicItemWriteConverter();
         ConfigUtil.initDirs();
 
         // Load YML files
@@ -74,24 +128,17 @@ public class RunicItems extends JavaPlugin {
         }
     }
 
-    public static RunicItems getInstance() {
-        return instance;
-    }
+//    @EventHandler
+//    public void onPreShutdown(PreshutdownEvent)
 
-    public static PaperCommandManager getCommandManager() {
-        return commandManager;
-    }
-
-    public static JDA getJda() {
-        return jda;
-    }
-
-    public static void setDatabaseLoadingEnabled(boolean enabled) {
-        databaseLoadingEnabled = enabled;
-    }
-
-    public static boolean isDatabaseLoadingEnabled() {
-        return databaseLoadingEnabled;
+    /**
+     * Properly shut down JDA during a save
+     */
+    @EventHandler(priority = EventPriority.LOW)
+    public void onMongoSave(MongoSaveEvent event) {
+        jda.shutdownNow();
+//        jda.shutdown();
+        jda = null;
     }
 
 }

@@ -1,12 +1,12 @@
 package com.runicrealms.runicitems.item;
 
-import com.runicrealms.plugin.database.Data;
 import com.runicrealms.plugin.utilities.ColorUtil;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.util.DataUtil;
 import de.tr7zw.nbtapi.NBTItem;
+import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -16,25 +16,24 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public abstract class RunicItem {
-
+    protected DisplayableItem displayableItem; // Base ItemStack information that we get from the template
+    protected String templateId; // Template ID
+    protected List<RunicItemTag> tags; // List of tags (soulbound, untradeable, etc.)
+    protected Map<String, String> data;
     protected Long id;
-
-    protected final DisplayableItem displayableItem; // Base ItemStack information that we get from the template
-    protected final String templateId; // Template ID
-
-    protected final List<RunicItemTag> tags; // List of tags (soulbound, untradeable, etc.)
-    protected final Map<String, String> data;
-
     protected int count;
-
     protected List<ItemLoreSection> loreSections = new ArrayList<>();
-
     // If this is an icon to be used in a menu
     protected boolean isMenuDisplay = false;
+
+    public RunicItem() {
+
+    }
 
     public RunicItem(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id) {
         this.templateId = templateId;
@@ -45,7 +44,32 @@ public abstract class RunicItem {
         this.id = id;
     }
 
-    protected abstract ItemLoreSection[] generateLore();
+    /**
+     * @return
+     */
+    public Map<String, String> addToJedis() {
+        Map<String, String> jedisDataMap = new HashMap<>();
+        jedisDataMap.put("template-id", this.templateId);
+        jedisDataMap.put("count", String.valueOf(this.count));
+        int count = 0;
+        for (RunicItemTag tag : this.tags) {
+            jedisDataMap.put("tags:" + count, tag.getIdentifier());
+            count++;
+        }
+        return jedisDataMap;
+    }
+
+    public void assignId(Long id) {
+        this.id = id;
+    }
+
+    public ItemStack generateGUIItem() {
+        ItemStack item = generateItem();
+        NBTItem nbtItem = new NBTItem(item, true);
+        nbtItem.setBoolean("isRI", true);
+        nbtItem.removeKey("id");
+        return item;
+    }
 
     public ItemStack generateItem() {
         ItemStack item = this.displayableItem.generateItem(this.count);
@@ -74,6 +98,9 @@ public abstract class RunicItem {
                 lore.add("");
             }
         }
+        if (this.tags.size() >= 1) {
+            lore.add("");
+        }
         for (RunicItemTag tag : this.tags) {
             lore.add(tag.getDisplay());
         }
@@ -101,25 +128,7 @@ public abstract class RunicItem {
         return item;
     }
 
-    public ItemStack generateGUIItem() {
-        ItemStack item = generateItem();
-        NBTItem nbtItem = new NBTItem(item, true);
-        nbtItem.setBoolean("isRI", true);
-        nbtItem.removeKey("id");
-        return item;
-    }
-
-    public DisplayableItem getDisplayableItem() {
-        return this.displayableItem;
-    }
-
-    public String getTemplateId() {
-        return this.templateId;
-    }
-
-    public List<RunicItemTag> getTags() {
-        return this.tags;
-    }
+    protected abstract ItemLoreSection[] generateLore();
 
     public int getCount() {
         return this.count;
@@ -133,42 +142,52 @@ public abstract class RunicItem {
         return this.data;
     }
 
-    /**
-     * @param section
-     * @param root
-     */
-    public void addToDataSection(Data section, String root) {
-        section.set(root + ".template-id", this.templateId);
-        section.set(root + ".count", this.count);
-        int count = 0;
-        for (RunicItemTag tag : this.tags) {
-            section.set(root + ".tags." + count, tag.getIdentifier());
-            count++;
-        }
-        // This is not needed as item data is static for the template it comes from. Use RunicItemDynamic instead.
-        /*for (String dataKey : this.data.keySet()) {
-            section.set(ItemManager.getInventoryPath() + "." + root + ".data." + dataKey, this.data.get(dataKey));
-        }*/
+    public DisplayableItem getDisplayableItem() {
+        return this.displayableItem;
     }
 
     public Long getId() {
         return this.id;
     }
 
-    public void assignId(Long id) {
-        this.id = id;
+    public List<RunicItemTag> getTags() {
+        return this.tags;
+    }
+
+    public String getTemplateId() {
+        return this.templateId;
     }
 
     public boolean hasId() {
         return this.id != null;
     }
 
+    public boolean isMenuDisplay() {
+        return this.isMenuDisplay;
+    }
+
     public void setIsMenuDisplay(boolean isMenuDisplay) {
         this.isMenuDisplay = isMenuDisplay;
     }
 
-    public boolean isMenuDisplay() {
-        return this.isMenuDisplay;
+    /**
+     * Method to write this item to a mongo document
+     *
+     * @param source   the item to write
+     * @param document the document to write to
+     * @return the document with modified fields
+     */
+    public Document writeToDocument(RunicItem source, Document document) {
+        document.put("template-id", source.getTemplateId());
+        document.put("count", source.getCount());
+        Map<String, String> tagsMap = new HashMap<>();
+        int tagCount = 0;
+        for (RunicItemTag tag : source.getTags()) {
+            tagsMap.put(String.valueOf(tagCount), tag.getIdentifier());
+            tagCount++;
+        }
+        document.put("tags", tagsMap);
+        return document;
     }
 
 }

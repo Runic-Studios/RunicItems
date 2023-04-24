@@ -1,6 +1,5 @@
 package com.runicrealms.runicitems.item;
 
-import com.runicrealms.plugin.database.Data;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.GemBonus;
@@ -29,31 +28,6 @@ public class RunicItemGem extends RunicItem {
 
     public RunicItemGem(RunicItemGemTemplate template, int count, long id, GemBonus bonus) {
         this(template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id, bonus);
-    }
-
-    public GemBonus getBonus() {
-        return this.bonus;
-    }
-
-    @Override
-    public ItemStack generateItem() {
-        ItemStack item = super.generateItem();
-        NBTItem nbtItem = new NBTItem(item, true);
-        for (Stat stat : this.bonus.getStats().keySet()) {
-            nbtItem.setInteger("gem-" + stat.getIdentifier(), this.bonus.getStats().get(stat));
-        }
-        if (this.bonus.getHealth() != 0) nbtItem.setInteger("gem-health", this.bonus.getHealth());
-        nbtItem.setString("gem-main", this.bonus.getMainStat().getIdentifier());
-        nbtItem.setInteger("gem-tier", this.bonus.getTier());
-        return item;
-    }
-
-    @Override
-    public void addToDataSection(Data section, String root) {
-        super.addToDataSection(section, root);
-        for (Stat statType : this.bonus.getStats().keySet()) {
-            section.set(root + ".gem-stats." + statType.getIdentifier(), this.bonus.getStats().get(statType));
-        }
     }
 
     public static RunicItemGem getFromItemStack(ItemStack item) {
@@ -88,6 +62,28 @@ public class RunicItemGem extends RunicItem {
     }
 
     @Override
+    public Map<String, String> addToJedis() {
+        Map<String, String> jedisDataMap = super.addToJedis();
+        for (Stat statType : this.bonus.getStats().keySet()) {
+            jedisDataMap.put("gem-stats:" + statType.getIdentifier(), String.valueOf(this.bonus.getStats().get(statType)));
+        }
+        return jedisDataMap;
+    }
+
+    @Override
+    public ItemStack generateItem() {
+        ItemStack item = super.generateItem();
+        NBTItem nbtItem = new NBTItem(item, true);
+        for (Stat stat : this.bonus.getStats().keySet()) {
+            nbtItem.setInteger("gem-" + stat.getIdentifier(), this.bonus.getStats().get(stat));
+        }
+        if (this.bonus.getHealth() != 0) nbtItem.setInteger("gem-health", this.bonus.getHealth());
+        nbtItem.setString("gem-main", this.bonus.getMainStat().getIdentifier());
+        nbtItem.setInteger("gem-tier", this.bonus.getTier());
+        return item;
+    }
+
+    @Override
     protected ItemLoreSection[] generateLore() {
         List<String> lore = new ArrayList<>();
 
@@ -110,6 +106,21 @@ public class RunicItemGem extends RunicItem {
                 }),
         };
 
+    }
+
+    @Override
+    public org.bson.Document writeToDocument(RunicItem source, org.bson.Document document) {
+        document = super.writeToDocument(source, document);
+        Map<String, Double> gemStatsMap = new HashMap<>();
+        for (Stat statType : this.bonus.getStats().keySet()) {
+            gemStatsMap.put(statType.getIdentifier(), Double.valueOf(this.bonus.getStats().get(statType)));
+        }
+        document.put("gem-stats", gemStatsMap);
+        return document;
+    }
+
+    public GemBonus getBonus() {
+        return this.bonus;
     }
 
 }
