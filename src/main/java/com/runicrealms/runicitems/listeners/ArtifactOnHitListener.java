@@ -1,6 +1,6 @@
 package com.runicrealms.runicitems.listeners;
 
-import com.runicrealms.plugin.events.WeaponDamageEvent;
+import com.runicrealms.plugin.events.PhysicalDamageEvent;
 import com.runicrealms.runicitems.item.event.RunicArtifactOnHitEvent;
 import com.runicrealms.runicitems.item.util.RunicArtifactAbilityTrigger;
 import com.runicrealms.runicitems.util.ArtifactUtil;
@@ -13,20 +13,24 @@ import org.bukkit.inventory.ItemStack;
 public class ArtifactOnHitListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onWeaponDamage(WeaponDamageEvent e) {
-        if (e.isCancelled()) return;
-        if (!e.isBasicAttack()) return;
-        ItemStack itemStack = e.getPlayer().getInventory().getItemInMainHand();
-        ArtifactUtil.ArtifactAndBooleanWrapper artifactAndBooleanWrapper = ArtifactUtil.checkForArtifactTrigger(itemStack, RunicArtifactAbilityTrigger.ON_HIT);
+    public void onWeaponDamage(PhysicalDamageEvent event) {
+        if (event.isCancelled()) return;
+        if (!event.isBasicAttack()) return;
+        ItemStack itemStack = event.getPlayer().getInventory().getItemInMainHand();
+        ArtifactUtil.ArtifactAndBooleanWrapper artifactAndBooleanWrapper = ArtifactUtil.checkForArtifactTrigger
+                (
+                        itemStack,
+                        RunicArtifactAbilityTrigger.ON_HIT
+                );
         if (!artifactAndBooleanWrapper.isTrigger()) return;
         Bukkit.getPluginManager().callEvent(new RunicArtifactOnHitEvent
                 (
-                        e.getPlayer(),
+                        event.getPlayer(),
                         artifactAndBooleanWrapper.getRunicItemArtifact(),
                         itemStack,
                         RunicArtifactAbilityTrigger.ON_HIT,
                         null,
-                        e.getVictim()
+                        event.getVictim()
                 )
         );
     }

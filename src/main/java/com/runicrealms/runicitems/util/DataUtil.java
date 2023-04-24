@@ -19,6 +19,8 @@ public class DataUtil {
                     return Color.FUCHSIA;
                 case "green":
                     return Color.GREEN;
+                case "lime":
+                    return Color.LIME;
                 case "orange":
                     return Color.ORANGE;
                 case "red":

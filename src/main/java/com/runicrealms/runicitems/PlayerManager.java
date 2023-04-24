@@ -1,7 +1,7 @@
 package com.runicrealms.runicitems;
 
 import com.runicrealms.plugin.ArmorType;
-import com.runicrealms.plugin.character.api.CharacterSelectEvent;
+import com.runicrealms.plugin.character.api.CharacterLoadedEvent;
 import com.runicrealms.plugin.events.ArmorEquipEvent;
 import com.runicrealms.runicitems.player.PlayerStatHolder;
 import org.bukkit.Bukkit;
@@ -17,21 +17,10 @@ import java.util.Map;
 import java.util.UUID;
 
 public class PlayerManager implements Listener {
-
     private static final Map<UUID, PlayerStatHolder> cachedPlayerStats = new HashMap<>();
 
-    /**
-     * Fire before character loaded events so checking stats functions properly
-     */
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onCharacterLoad(CharacterSelectEvent e) {
-        cachedPlayerStats.put(e.getPlayer().getUniqueId(), new PlayerStatHolder(e.getPlayer()));
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    // Fire after other character load events so checking stats functions properly
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        cachedPlayerStats.remove(event.getPlayer().getUniqueId());
+    public static Map<UUID, PlayerStatHolder> getCachedPlayerStats() {
+        return cachedPlayerStats;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -57,6 +46,14 @@ public class PlayerManager implements Listener {
         });
     }
 
+    /**
+     * Fire before character loaded events so checking stats functions properly
+     */
+    @EventHandler(priority = EventPriority.LOW)
+    public void onCharacterLoad(CharacterLoadedEvent event) {
+        cachedPlayerStats.put(event.getPlayer().getUniqueId(), new PlayerStatHolder(event.getPlayer()));
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerItemHeld(PlayerItemHeldEvent event) {
         if (!cachedPlayerStats.containsKey(event.getPlayer().getUniqueId())) return;
@@ -64,8 +61,10 @@ public class PlayerManager implements Listener {
         Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(event.getPlayer().getUniqueId()).updateWeapon());
     }
 
-    public static Map<UUID, PlayerStatHolder> getCachedPlayerStats() {
-        return cachedPlayerStats;
+    @EventHandler(priority = EventPriority.HIGHEST)
+    // Fire after other character load events so checking stats functions properly
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        cachedPlayerStats.remove(event.getPlayer().getUniqueId());
     }
 
 }

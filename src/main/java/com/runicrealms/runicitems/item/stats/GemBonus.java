@@ -26,24 +26,24 @@ public class GemBonus {
         this.tier = tier;
     }
 
-    public LinkedHashMap<Stat, Integer> getStats() {
-        return this.stats;
-    }
-
     public int getHealth() {
         return this.health;
-    }
-
-    public boolean hasHealth() {
-        return this.health != 0;
     }
 
     public Stat getMainStat() {
         return this.mainStat;
     }
 
+    public LinkedHashMap<Stat, Integer> getStats() {
+        return this.stats;
+    }
+
     public int getTier() {
         return this.tier;
+    }
+
+    public boolean hasHealth() {
+        return this.health != 0;
     }
 
 }
