@@ -41,8 +41,8 @@ public enum Stat {
     Combat multipliers
      */
     // Dexterity
-    private static final double ATTACK_SPEED = 0.005; // .5%
-    private static final double ABILITY_HASTE = 0.004; // .4%
+    private static final double RANGED_ATTACK_SPEED = 0.005; // .5%
+    private static final double ABILITY_HASTE = 0.0025; // .25%
     // Intelligence
     private static final double MANA_REGEN_MULT = 0.04; // 4%
     private static final double MAGIC_DMG_MULT = 0.01; // 1%
@@ -90,8 +90,8 @@ public enum Stat {
         return ABILITY_HASTE;
     }
 
-    public static double getAttackSpeed() {
-        return ATTACK_SPEED;
+    public static double getRangedAttackSpeed() {
+        return RANGED_ATTACK_SPEED;
     }
 
     public static double getExpMult() {

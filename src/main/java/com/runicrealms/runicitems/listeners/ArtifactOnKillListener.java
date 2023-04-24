@@ -15,25 +15,6 @@ import org.bukkit.inventory.ItemStack;
 
 public class ArtifactOnKillListener implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGHEST) // last
-    public void onMobKill(MythicMobDeathEvent e) {
-        if (e.getKiller() == null) return;
-        if (!(e.getKiller() instanceof Player)) return;
-        Player killer = (Player) e.getKiller();
-        ItemStack itemStack = killer.getInventory().getItemInMainHand();
-        checkForKillTrigger(killer, itemStack, e.getEntity());
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST) // last
-    public void onPlayerKill(RunicDeathEvent e) {
-        if (e.isCancelled()) return;
-        if (e.getKiller() == null) return;
-        if (!(e.getKiller()[0] instanceof Player)) return;
-        Player killer = (Player) e.getKiller()[0];
-        ItemStack itemStack = killer.getInventory().getItemInMainHand();
-        checkForKillTrigger(killer, itemStack, e.getVictim());
-    }
-
     /**
      * Checks to see if an artifact ON-KILL event should be called
      *
@@ -54,5 +35,25 @@ public class ArtifactOnKillListener implements Listener {
                         entity
                 )
         );
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST) // last
+    public void onMobKill(MythicMobDeathEvent event) {
+        if (event.getKiller() == null) return;
+        if (!(event.getKiller() instanceof Player)) return;
+        Player killer = (Player) event.getKiller();
+        ItemStack itemStack = killer.getInventory().getItemInMainHand();
+        checkForKillTrigger(killer, itemStack, event.getEntity());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST) // last
+    public void onPlayerKill(RunicDeathEvent event) {
+        if (event.isCancelled()) return;
+        if (event.getKiller() == null) return;
+        if (event.getKiller().length <= 0) return;
+        if (!(event.getKiller()[0] instanceof Player)) return;
+        Player killer = (Player) event.getKiller()[0];
+        ItemStack itemStack = killer.getInventory().getItemInMainHand();
+        checkForKillTrigger(killer, itemStack, event.getVictim());
     }
 }
