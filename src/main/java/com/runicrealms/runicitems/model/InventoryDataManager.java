@@ -29,12 +29,12 @@ import java.util.*;
 import java.util.logging.Level;
 
 public class InventoryDataManager implements DataAPI, Listener {
-
     public static final TaskChainAbortAction<Player, String, ?> CONSOLE_LOG = new TaskChainAbortAction<Player, String, Object>() {
         public void onAbort(TaskChain<?> chain, Player player, String message) {
             Bukkit.getLogger().log(Level.SEVERE, message);
         }
     };
+    private static final int REDIS_TASK_PERIOD = 30; // Seconds
     /*
     Only used to load data during CharacterLoadEvent. Not used during session
      */
@@ -42,6 +42,7 @@ public class InventoryDataManager implements DataAPI, Listener {
 
     public InventoryDataManager() {
         Bukkit.getPluginManager().registerEvents(this, RunicItems.getInstance());
+        startInventorySaveTask();
     }
 
     @Override
@@ -125,25 +126,8 @@ public class InventoryDataManager implements DataAPI, Listener {
     @EventHandler(priority = EventPriority.LOW) // fires early
     public void onCharacterQuit(CharacterQuitEvent event) {
         Player player = event.getPlayer();
-        UUID uuid = player.getUniqueId();
         int slot = event.getSlot();
-        TaskChain<?> chain = RunicItems.newChain();
-        chain
-                .asyncFirst(() -> loadInventoryData(uuid, slot))
-                .abortIfNull(CONSOLE_LOG, player, "RunicItems failed to save on quit!")
-                .sync(inventoryData -> {
-                    // Sync current inventory to object from Redis/Mongo (ensure they match)
-                    inventoryData.getContentsMap().put(event.getSlot(),
-                            InventoryData.getRunicItemContents(event.getPlayer().getInventory().getContents()));
-                    return inventoryData;
-                    // todo: prevent them from logging in during this time
-                })
-                .asyncLast(inventoryData -> {
-                    try (Jedis jedis = RunicCore.getRedisAPI().getNewJedisResource()) {
-                        inventoryData.writeToJedis(jedis);
-                    }
-                })
-                .execute();
+        saveInventory(player, slot);
     }
 
     /**
@@ -186,6 +170,41 @@ public class InventoryDataManager implements DataAPI, Listener {
         RunicItems.getMongoTask().getTask().cancel();
         // Manually save all data (flush players marked for save)
         RunicItems.getMongoTask().saveAllToMongo(() -> event.markPluginSaved("items"));
+    }
+
+    private void saveInventory(Player player, int slot) {
+        UUID uuid = player.getUniqueId();
+        TaskChain<?> chain = RunicItems.newChain();
+        chain
+                .asyncFirst(() -> loadInventoryData(uuid, slot))
+                .abortIfNull(CONSOLE_LOG, player, "RunicItems failed to save on quit!")
+                .sync(inventoryData -> {
+                    // Sync current inventory to object from Redis/Mongo (ensure they match)
+                    inventoryData.getContentsMap().put(slot,
+                            InventoryData.getRunicItemContents(player.getInventory().getContents()));
+                    return inventoryData;
+                    // todo: prevent them from logging in during this time
+                })
+                .asyncLast(inventoryData -> {
+                    try (Jedis jedis = RunicCore.getRedisAPI().getNewJedisResource()) {
+                        inventoryData.writeToJedis(jedis);
+                    }
+                })
+                .execute();
+    }
+
+    /**
+     * Periodic task to save player items
+     */
+    private void startInventorySaveTask() {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(RunicCore.getInstance(), () -> {
+            for (UUID uuid : RunicCore.getCharacterAPI().getLoadedCharacters()) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null) continue; // Player not online
+                int slot = RunicCore.getCharacterAPI().getCharacterSlot(uuid);
+                saveInventory(player, slot);
+            }
+        }, 0, REDIS_TASK_PERIOD * 20L);
     }
 
 }
