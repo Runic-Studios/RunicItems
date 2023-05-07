@@ -2,6 +2,7 @@ package com.runicrealms.runicitems.listeners;
 
 import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.RunicItemsAPI;
+import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,7 +17,9 @@ public class ItemSpawnListener implements Listener {
     private static final double ITEM_MERGE_RADIUS = 1.5; // blocks
 
     private void findNearbyItemsAndMerge(Item newItem) {
+        if (newItem == null) return;
         ItemStack newItemStack = newItem.getItemStack();
+        if (newItemStack.getType() == Material.AIR) return;
         newItem.getNearbyEntities(ITEM_MERGE_RADIUS, ITEM_MERGE_RADIUS, ITEM_MERGE_RADIUS).forEach(entity -> {
             if (entity instanceof Item nearbyItem) {
                 ItemStack nearbyItemStack = nearbyItem.getItemStack();
