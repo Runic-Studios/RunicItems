@@ -12,32 +12,21 @@ public class NBTUtil {
     public static Object getNBTObject(NBTItem nbtItem, String key) {
         if (!nbtItem.hasNBTData() || !nbtItem.hasKey(key))
             throw new IllegalArgumentException("NBTItem does not contain key \"" + key + "\"!");
-        switch (nbtItem.getType(key)) {
-            case NBTTagByte:
-                return nbtItem.getByte(key);
-            case NBTTagByteArray:
-                return nbtItem.getByteArray(key);
-            case NBTTagCompound:
-                return nbtItem.getCompound(key);
-            case NBTTagDouble:
-                return nbtItem.getDouble(key);
-            case NBTTagFloat:
-                return nbtItem.getFloat(key);
-            case NBTTagInt:
-                return nbtItem.getInteger(key);
-            case NBTTagIntArray:
-                return nbtItem.getIntArray(key);
-            case NBTTagList:
-                return nbtItem.getStringList(key);
-            case NBTTagLong:
-                return nbtItem.getLong(key);
-            case NBTTagShort:
-                return nbtItem.getShort(key);
-            case NBTTagString:
-                return nbtItem.getString(key);
-            default:
-                throw new IllegalArgumentException("Unknown NBTItem key type \"" + key + "\"!");
-        }
+        return switch (nbtItem.getType(key)) {
+            case NBTTagByte -> nbtItem.getByte(key);
+            case NBTTagByteArray -> nbtItem.getByteArray(key);
+            case NBTTagCompound -> nbtItem.getCompound(key);
+            case NBTTagDouble -> nbtItem.getDouble(key);
+            case NBTTagFloat -> nbtItem.getFloat(key);
+            case NBTTagInt -> nbtItem.getInteger(key);
+            case NBTTagIntArray -> nbtItem.getIntArray(key);
+            case NBTTagList -> nbtItem.getStringList(key);
+            case NBTTagLong -> nbtItem.getLong(key);
+            case NBTTagShort -> nbtItem.getShort(key);
+            case NBTTagString -> nbtItem.getString(key);
+            default ->
+                    throw new IllegalArgumentException("Unknown NBTItem key type \"" + key + "\"!");
+        };
     }
 
     public static boolean isNBTSimilar(ItemStack itemOne, ItemStack itemTwo, boolean checkId, boolean checkLastCount) {
