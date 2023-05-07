@@ -44,7 +44,7 @@ public enum Stat {
     private static final double RANGED_ATTACK_SPEED = 0.005; // .5%
     private static final double ABILITY_HASTE = 0.0025; // .25%
     // Intelligence
-    private static final double MANA_REGEN_MULT = 0.02; // 2%
+    private static final double MANA_REGEN_MULT = 0.01; // 1%
     private static final double MAGIC_DMG_MULT = 0.01; // 1%
     // Strength
     private static final double PHYSICAL_DMG_MULT = 0.0075; // 0.75%
