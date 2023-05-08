@@ -33,10 +33,9 @@ public class RunicItemGem extends RunicItem {
     public static RunicItemGem getFromItemStack(ItemStack item) {
         if (item == null || item.getType() == Material.AIR) return null;
         NBTItem nbtItem = new NBTItem(item);
-        RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
-        if (!(uncastedTemplate instanceof RunicItemGemTemplate))
+        RunicItemTemplate uncastTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
+        if (!(uncastTemplate instanceof RunicItemGemTemplate template))
             throw new IllegalArgumentException("ItemStack is not a gem item!");
-        RunicItemGemTemplate template = (RunicItemGemTemplate) uncastedTemplate;
         Set<String> keys = nbtItem.getKeys();
         Map<Stat, Integer> stats = new HashMap<>();
         int health = 0;
@@ -62,8 +61,8 @@ public class RunicItemGem extends RunicItem {
     }
 
     @Override
-    public Map<String, String> addToJedis() {
-        Map<String, String> jedisDataMap = super.addToJedis();
+    public Map<String, String> addToRedis() {
+        Map<String, String> jedisDataMap = super.addToRedis();
         for (Stat statType : this.bonus.getStats().keySet()) {
             jedisDataMap.put("gem-stats:" + statType.getIdentifier(), String.valueOf(this.bonus.getStats().get(statType)));
         }

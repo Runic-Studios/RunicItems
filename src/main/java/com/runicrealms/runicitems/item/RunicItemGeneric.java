@@ -49,9 +49,8 @@ public class RunicItemGeneric extends RunicItem {
         if (item == null || item.getType() == Material.AIR) return null;
         NBTItem nbtItem = new NBTItem(item);
         RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
-        if (!(uncastedTemplate instanceof RunicItemGenericTemplate))
+        if (!(uncastedTemplate instanceof RunicItemGenericTemplate template))
             throw new IllegalArgumentException("ItemStack is not a generic item!");
-        RunicItemGenericTemplate template = (RunicItemGenericTemplate) uncastedTemplate;
         return new RunicItemGeneric(template, item.getAmount(), nbtItem.getInteger("id"));
     }
 

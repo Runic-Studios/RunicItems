@@ -177,7 +177,7 @@ public class InventoryData implements SessionDataMongo, SessionDataNested {
     @Override
     public Map<String, String> toMap(Object nestedObject) {
         RunicItem runicItem = (RunicItem) nestedObject;
-        return runicItem.addToJedis();
+        return runicItem.addToRedis();
     }
 
     @Override
@@ -198,8 +198,8 @@ public class InventoryData implements SessionDataMongo, SessionDataNested {
             String key = getJedisKey(this.uuid, slot);
             RunicItem[] contents = contentsMap.get(slot);
             for (int i = 0; i < contents.length; i++) {
-                if (contents[i] != null) {
-                    RunicItem runicItem = contents[i];
+                if (contents[i] != null) { // There is an item
+                    RunicItem runicItem = contents[i]; // We can properly map it to a RunicItem
                     if (runicItem != null) {
                         try {
                             pipeline.hmset(database + ":" + key + ":" + i, this.toMap(runicItem));

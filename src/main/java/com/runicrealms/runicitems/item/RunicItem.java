@@ -45,13 +45,18 @@ public abstract class RunicItem {
     }
 
     /**
-     * @return
+     * @return a map to store in Redis
      */
-    public Map<String, String> addToJedis() {
+    public Map<String, String> addToRedis() {
         Map<String, String> jedisDataMap = new HashMap<>();
         jedisDataMap.put("template-id", this.templateId);
         jedisDataMap.put("count", String.valueOf(this.count));
         int count = 0;
+        // Data
+        for (String dataKey : this.data.keySet()) {
+            jedisDataMap.put(dataKey, this.data.get(dataKey));
+        }
+        // Tags
         for (RunicItemTag tag : this.tags) {
             jedisDataMap.put("tags:" + count, tag.getIdentifier());
             count++;

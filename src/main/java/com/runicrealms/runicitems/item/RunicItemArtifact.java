@@ -38,30 +38,12 @@ public class RunicItemArtifact extends RunicItemWeapon {
         );
     }
 
-    public RunicArtifactAbility getAbility() {
-        return this.ability;
-    }
-
-    public RunicItemRarity getRarity() {
-        return this.rarity;
-    }
-
-    @Override
-    public ItemStack generateItem() {
-        ItemStack item = super.generateItem();
-        NBTItem nbtItem = new NBTItem(item, true);
-        nbtItem.setString("ability-id", this.ability.getIdentifier());
-        nbtItem.setString("ability-trigger", this.ability.getTrigger().getIdentifier());
-        return item;
-    }
-
     public static RunicItemArtifact getFromItemStack(ItemStack item) {
         if (item == null || item.getType() == Material.AIR) return null;
         NBTItem nbtItem = new NBTItem(item);
         RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
-        if (!(uncastedTemplate instanceof RunicItemArtifactTemplate))
+        if (!(uncastedTemplate instanceof RunicItemArtifactTemplate template))
             throw new IllegalArgumentException("ItemStack is not an artifact item!");
-        RunicItemArtifactTemplate template = (RunicItemArtifactTemplate) uncastedTemplate;
         Set<String> keys = nbtItem.getKeys();
         int amountOfStats = 0;
         for (String key : keys) {
@@ -86,6 +68,15 @@ public class RunicItemArtifact extends RunicItemWeapon {
             stats.put(stat.first, stat.second);
         }
         return new RunicItemArtifact(template, item.getAmount(), nbtItem.getInteger("id"), stats);
+    }
+
+    @Override
+    public ItemStack generateItem() {
+        ItemStack item = super.generateItem();
+        NBTItem nbtItem = new NBTItem(item, true);
+        nbtItem.setString("ability-id", this.ability.getIdentifier());
+        nbtItem.setString("ability-trigger", this.ability.getTrigger().getIdentifier());
+        return item;
     }
 
     @Override
@@ -116,6 +107,14 @@ public class RunicItemArtifact extends RunicItemWeapon {
             sections[4] = new ItemLoreSection(lore);
         }
         return sections;
+    }
+
+    public RunicItemRarity getRarity() {
+        return this.rarity;
+    }
+
+    public RunicArtifactAbility getAbility() {
+        return this.ability;
     }
 
 }

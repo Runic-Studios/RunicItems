@@ -63,9 +63,8 @@ public class RunicItemArmor extends RunicItem {
         if (item == null || item.getType() == Material.AIR) return null;
         NBTItem nbtItem = new NBTItem(item);
         RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
-        if (!(uncastedTemplate instanceof RunicItemArmorTemplate))
+        if (!(uncastedTemplate instanceof RunicItemArmorTemplate template))
             throw new IllegalArgumentException("ItemStack is not an armor item!");
-        RunicItemArmorTemplate template = (RunicItemArmorTemplate) uncastedTemplate;
         Set<String> keys = nbtItem.getKeys();
         int amountOfStats = 0;
         for (String key : keys) {
@@ -98,7 +97,6 @@ public class RunicItemArmor extends RunicItem {
         for (String key : keys) {
             String[] split = key.split("-");
             if (split[0].equals("gem")) {
-                ;
 
                 int gemNumber = Integer.parseInt(split[1]);
                 if (!gemStats.containsKey(gemNumber))
@@ -131,8 +129,8 @@ public class RunicItemArmor extends RunicItem {
     }
 
     @Override
-    public Map<String, String> addToJedis() {
-        Map<String, String> jedisDataMap = super.addToJedis();
+    public Map<String, String> addToRedis() {
+        Map<String, String> jedisDataMap = super.addToRedis();
         for (Stat statType : this.stats.keySet()) {
             jedisDataMap.put("stats:" + statType.getIdentifier(), String.valueOf(this.stats.get(statType).getRollPercentage()));
         }

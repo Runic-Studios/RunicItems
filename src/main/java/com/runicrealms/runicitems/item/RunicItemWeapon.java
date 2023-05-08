@@ -100,8 +100,8 @@ public class RunicItemWeapon extends RunicItem {
     }
 
     @Override
-    public Map<String, String> addToJedis() {
-        Map<String, String> jedisDataMap = super.addToJedis();
+    public Map<String, String> addToRedis() {
+        Map<String, String> jedisDataMap = super.addToRedis();
         for (Stat statType : this.stats.keySet()) {
             jedisDataMap.put("stats:" + statType.getIdentifier(), String.valueOf(this.stats.get(statType).getRollPercentage()));
         }

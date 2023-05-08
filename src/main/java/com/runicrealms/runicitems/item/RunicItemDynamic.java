@@ -93,37 +93,10 @@ public class RunicItemDynamic extends RunicItemGeneric {
     }
 
     @Override
-    public Map<String, String> addToJedis() {
-        Map<String, String> jedisDataMap = super.addToJedis();
+    public Map<String, String> addToRedis() {
+        Map<String, String> jedisDataMap = super.addToRedis();
         jedisDataMap.put(DYNAMIC_FIELD_STRING, String.valueOf(this.getDynamicField()));
         return jedisDataMap;
-    }
-
-    @Override
-    public ItemStack generateItem() {
-        ItemStack item = super.generateItem();
-        ItemMeta meta = item.getItemMeta();
-        meta.addItemFlags(ItemFlag.HIDE_DESTROYS);
-        meta.setDestroyableKeys(destroyBlocks());
-        String dynamicLore = ColorUtil.format(this.getData().get("dynamicLore") != null ? this.getData().get("dynamicLore") : "");
-        if (this.getDynamicField() > 0) {
-            meta.setDisplayName
-                    (
-                            this.getDisplayableItem().getDisplayName() + " " +
-                                    ChatColor.WHITE + this.getDynamicField() + dynamicLore
-                    ); // show dynamic data
-        }
-        item.setItemMeta(meta);
-        NBTItem nbtItem = new NBTItem(item, true);
-        nbtItem.setInteger(DYNAMIC_FIELD_STRING, this.getDynamicField());
-        return item;
-    }
-
-    @Override
-    public org.bson.Document writeToDocument(RunicItem source, org.bson.Document document) {
-        document = super.writeToDocument(source, document);
-        document.put(DYNAMIC_FIELD_STRING, this.getDynamicField());
-        return document;
     }
 
     private Collection<Namespaced> destroyBlocks() {
@@ -167,6 +140,33 @@ public class RunicItemDynamic extends RunicItemGeneric {
                         dark_oak_log,
                         jungle_log
                 );
+    }
+
+    @Override
+    public ItemStack generateItem() {
+        ItemStack item = super.generateItem();
+        ItemMeta meta = item.getItemMeta();
+        meta.addItemFlags(ItemFlag.HIDE_DESTROYS);
+        meta.setDestroyableKeys(destroyBlocks());
+        String dynamicLore = ColorUtil.format(this.getData().get("dynamicLore") != null ? this.getData().get("dynamicLore") : "");
+        if (this.getDynamicField() > 0) {
+            meta.setDisplayName
+                    (
+                            this.getDisplayableItem().getDisplayName() + " " +
+                                    ChatColor.WHITE + this.getDynamicField() + dynamicLore
+                    ); // show dynamic data
+        }
+        item.setItemMeta(meta);
+        NBTItem nbtItem = new NBTItem(item, true);
+        nbtItem.setInteger(DYNAMIC_FIELD_STRING, this.getDynamicField());
+        return item;
+    }
+
+    @Override
+    public org.bson.Document writeToDocument(RunicItem source, org.bson.Document document) {
+        document = super.writeToDocument(source, document);
+        document.put(DYNAMIC_FIELD_STRING, this.getDynamicField());
+        return document;
     }
 
     public int getDynamicField() {
