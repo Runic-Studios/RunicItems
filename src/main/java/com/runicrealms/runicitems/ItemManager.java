@@ -6,6 +6,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.runicrealms.runicitems.api.InventoryAPI;
 import com.runicrealms.runicitems.item.*;
 import com.runicrealms.runicitems.item.event.RunicItemGenericTriggerEvent;
 import com.runicrealms.runicitems.item.template.*;
@@ -37,10 +38,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ItemManager implements Listener {
+public class ItemManager implements InventoryAPI, Listener {
     private static int TICK_COUNTER = 0;
 
     public ItemManager() {
+        Bukkit.getPluginManager().registerEvents(this, RunicItems.getInstance());
         Bukkit.getScheduler().runTaskTimer(RunicItems.getInstance(), () -> {
             TICK_COUNTER++;
             if (TICK_COUNTER >= 10) {

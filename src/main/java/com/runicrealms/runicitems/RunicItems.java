@@ -7,6 +7,7 @@ import com.runicrealms.libs.taskchain.TaskChain;
 import com.runicrealms.libs.taskchain.TaskChainFactory;
 import com.runicrealms.plugin.database.event.MongoSaveEvent;
 import com.runicrealms.runicitems.api.DataAPI;
+import com.runicrealms.runicitems.api.InventoryAPI;
 import com.runicrealms.runicitems.command.RunicItemCommand;
 import com.runicrealms.runicitems.config.AbilityLoader;
 import com.runicrealms.runicitems.config.ConfigUtil;
@@ -33,6 +34,7 @@ public class RunicItems extends JavaPlugin implements Listener {
     private static DataAPI dataAPI;
     private static MongoTask mongoTask;
     private static JDA jda;
+    private static InventoryAPI INVENTORY_API;
 
     private static boolean databaseLoadingEnabled = true;
     private static TaskChainFactory taskChainFactory;
@@ -57,8 +59,8 @@ public class RunicItems extends JavaPlugin implements Listener {
         return taskChainFactory.newChain();
     }
 
-    public static <T> TaskChain<T> newSharedChain(String name) {
-        return taskChainFactory.newSharedChain(name);
+    public static InventoryAPI getInventoryAPI() {
+        return INVENTORY_API;
     }
 
     public static JDA getJda() {
@@ -80,6 +82,7 @@ public class RunicItems extends JavaPlugin implements Listener {
         taskChainFactory = BukkitTaskChainFactory.create(this);
         dataAPI = new InventoryDataManager();
         mongoTask = new MongoTask();
+        INVENTORY_API = new ItemManager();
         new RunicItemReadConverter();
         new RunicItemWriteConverter();
         ConfigUtil.initDirs();
@@ -94,8 +97,8 @@ public class RunicItems extends JavaPlugin implements Listener {
         }
 
         // Register Listeners
-        Bukkit.getPluginManager().registerEvents(new ItemManager(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerMTIListener(), this);
+        Bukkit.getPluginManager().registerEvents(new MoveToInventoryListener(), this);
         Bukkit.getPluginManager().registerEvents(new ItemSpawnListener(), this);
         Bukkit.getPluginManager().registerEvents(new DupeManager(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerManager(), this);
