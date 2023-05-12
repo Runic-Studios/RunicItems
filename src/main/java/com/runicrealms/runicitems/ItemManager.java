@@ -13,7 +13,10 @@ import com.runicrealms.runicitems.item.util.ClickTrigger;
 import com.runicrealms.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import net.minecraft.server.v1_16_R3.PacketPlayOutCollect;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,7 +29,6 @@ import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -35,16 +37,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
 public class ItemManager implements Listener {
-
-    private static int tickCounter = 0;
+    private static int TICK_COUNTER = 0;
 
     public ItemManager() {
         Bukkit.getScheduler().runTaskTimer(RunicItems.getInstance(), () -> {
-            tickCounter++;
-            if (tickCounter >= 10) {
-                tickCounter = 0;
+            TICK_COUNTER++;
+            if (TICK_COUNTER >= 10) {
+                TICK_COUNTER = 0;
             }
         }, 0L, 1L);
 
@@ -75,85 +75,36 @@ public class ItemManager implements Listener {
         });
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getHand() == EquipmentSlot.HAND
-                && (event.getAction() == Action.LEFT_CLICK_AIR
-                || event.getAction() == Action.LEFT_CLICK_BLOCK
-                || event.getAction() == Action.RIGHT_CLICK_AIR
-                || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
-            PlayerInventory inventory = event.getPlayer().getInventory();
-            if (event.getHand() == null) return;
-            ItemStack itemStack = inventory.getItem(event.getHand());
-            if (itemStack.getType() == Material.AIR) return;
-            RunicItem item = getRunicItemFromItemStack(itemStack);
-            if (!(item instanceof RunicItemGeneric)) return;
-            RunicItemGeneric generic = (RunicItemGeneric) item;
-            ClickTrigger clickTrigger = ClickTrigger.getFromInteractAction(event.getAction(), event.getPlayer());
-            if (generic.getTriggers().containsKey(clickTrigger)) {
-                boolean isDuped = event.getPlayer().getGameMode() != GameMode.CREATIVE && DupeManager.checkInventoryForDupes(inventory, event.getItem(), event, event.getPlayer(), event.getPlayer().getInventory().getHeldItemSlot());
-                if (!isDuped)
-                    Bukkit.getPluginManager().callEvent(new RunicItemGenericTriggerEvent(event.getPlayer(), generic, itemStack, clickTrigger, generic.getTriggers().get(clickTrigger)));
-            }
+    public static RunicItem getRunicItemFromItemStack(ItemStack itemStack) {
+        if (itemStack == null || itemStack.getType() == Material.AIR) return null;
+        NBTItem nbtItem = new NBTItem(itemStack);
+        if ((!nbtItem.hasNBTData()) || (!nbtItem.hasKey("template-id"))) return null;
+        RunicItemTemplate template = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
+        if (template == null) return null;
+        if (template instanceof RunicItemArmorTemplate) {
+            return RunicItemArmor.getFromItemStack(itemStack);
+        } else if (template instanceof RunicItemArtifactTemplate) {
+            return RunicItemArtifact.getFromItemStack(itemStack);
+        } else if (template instanceof RunicItemBookTemplate) {
+            return RunicItemBook.getFromItemStack(itemStack);
+        } else if (template instanceof RunicItemDynamicTemplate) {
+            return RunicItemDynamic.getFromItemStack(itemStack);
+        } else if (template instanceof RunicItemGenericTemplate) {
+            return RunicItemGeneric.getFromItemStack(itemStack);
+        } else if (template instanceof RunicItemOffhandTemplate) {
+            return RunicItemOffhand.getFromItemStack(itemStack);
+        } else if (template instanceof RunicItemWeaponTemplate) {
+            return RunicItemWeapon.getFromItemStack(itemStack);
+        } else if (template instanceof RunicItemGemTemplate) {
+            return RunicItemGem.getFromItemStack(itemStack);
         }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onSwapWithCursor(InventoryClickEvent event) {
-        if (event.isCancelled()) return;
-        if (!(event.getWhoClicked() instanceof Player)) return;
-
-        if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
-        if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) return;
-
-        if (event.getAction() == InventoryAction.SWAP_WITH_CURSOR) {
-            if (NBTUtil.isNBTSimilar(event.getCurrentItem(), event.getCursor(), false, false)) {
-                if (event.isLeftClick()) {
-                    if (event.getCurrentItem().getAmount() + event.getCursor().getAmount() == event.getCurrentItem().getMaxStackSize()) {
-                        ItemStack item = event.getCurrentItem();
-                        item.setAmount(event.getCurrentItem().getMaxStackSize());
-                        event.setCurrentItem(item);
-                        event.setCursor(null);
-                        event.setCancelled(true);
-                    } else if (event.getCurrentItem().getAmount() + event.getCursor().getAmount() > event.getCurrentItem().getMaxStackSize()) {
-                        ItemStack cursorItem = event.getCursor();
-                        cursorItem.setAmount(event.getCursor().getAmount() - (event.getCurrentItem().getMaxStackSize() - event.getCurrentItem().getAmount()));
-                        ItemStack currentItem = event.getCurrentItem();
-                        currentItem.setAmount(currentItem.getMaxStackSize());
-                        event.setCursor(cursorItem);
-                        event.setCurrentItem(currentItem);
-                        event.setCancelled(true);
-                    } else if (event.getCurrentItem().getAmount() + event.getCursor().getAmount() < event.getCurrentItem().getMaxStackSize()) {
-                        ItemStack item = event.getCurrentItem();
-                        item.setAmount(item.getAmount() + event.getCursor().getAmount());
-                        event.setCurrentItem(item);
-                        event.setCursor(null);
-                        event.setCancelled(true);
-                    }
-                } else if (event.isRightClick() && !event.isShiftClick()) {
-                    if (event.getCurrentItem().getAmount() != event.getCurrentItem().getMaxStackSize()) {
-                        ItemStack currentItem = event.getCurrentItem();
-                        currentItem.setAmount(currentItem.getAmount() + 1);
-                        event.setCurrentItem(currentItem);
-                        if (event.getCursor().getAmount() > 1) {
-                            ItemStack cursor = event.getCursor();
-                            cursor.setAmount(cursor.getAmount() - 1);
-                            event.setCursor(cursor);
-                        } else {
-                            event.setCursor(null);
-                        }
-                        event.setCancelled(true);
-                    }
-                }
-            }
-        }
+        return null;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onCollectToCursor(InventoryClickEvent event) {
         if (event.isCancelled()) return;
-        if (!(event.getWhoClicked() instanceof Player)) return;
-        Player player = (Player) event.getWhoClicked();
+        if (!(event.getWhoClicked() instanceof Player player)) return;
 
         if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
             ItemStack cursor = event.getCursor();
@@ -192,60 +143,25 @@ public class ItemManager implements Listener {
                     }
                 }
                 cursor.setAmount(cursorAmount);
-                event.setCursor(cursor); // only deprecated because it can create server-client desync, don't care lol
+                event.setCursor(cursor); // only deprecated because it can create server-client de-sync, don't care lol
             }
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onMoveToOtherInventory(InventoryClickEvent event) {
-
-        Inventory clickedInventory = event.getClickedInventory();
-        Inventory targetInventory = event.getClickedInventory() instanceof PlayerInventory ? event.getView().getTopInventory() : event.getWhoClicked().getInventory();
-
-        String inventoryTitle = ChatColor.stripColor(event.getView().getTitle());
-        if (inventoryTitle.equalsIgnoreCase("Guild Bank")) return;
-
+    public void onDrop(PlayerDropItemEvent event) {
         if (event.isCancelled()) return;
-        if (!(event.getWhoClicked() instanceof Player)) return;
-
-        if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
-
-        if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-            int amountLeft = event.getCurrentItem().getAmount();
-            if (clickedInventory != null) {
-                for (ItemStack item : targetInventory) {
-                    if (item == null || item.getType() == Material.AIR) continue;
-                    if (item.getAmount() == item.getMaxStackSize()) continue;
-                    if (!NBTUtil.isNBTSimilar(item, event.getCurrentItem(), false, false)) continue;
-                    if (item.getAmount() + amountLeft <= item.getMaxStackSize()) {
-                        item.setAmount(item.getAmount() + amountLeft);
-                        clickedInventory.remove(event.getCurrentItem());
-                        event.setCurrentItem(null);
-                        event.setCancelled(true);
-                        amountLeft = 0;
-                        break;
-                    } else {
-                        amountLeft -= item.getMaxStackSize() - item.getAmount();
-                        item.setAmount(item.getMaxStackSize());
-                    }
-                }
-            }
-            if (amountLeft > 0) {
-                event.getCurrentItem().setAmount(amountLeft);
-            }
-            ((Player) event.getWhoClicked()).updateInventory();
-        }
+        ItemStack item = event.getItemDrop().getItemStack().clone();
+        NBTItem nbtItem = new NBTItem(item, true);
+        if (!nbtItem.hasNBTData()) return;
+        if (nbtItem.hasKey("last-count")) nbtItem.removeKey("last-count");
+        if (nbtItem.hasKey("id")) nbtItem.removeKey("id");
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPickup(PlayerAttemptPickupItemEvent event) {
-
-        //if (!event.getFlyAtPlayer()) return;
-
         if (event.isCancelled()) return;
-
-        if (tickCounter != 0) {
+        if (TICK_COUNTER != 0) {
             event.setCancelled(true);
             return;
         }
@@ -343,39 +259,77 @@ public class ItemManager implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDrop(PlayerDropItemEvent event) {
-        if (event.isCancelled()) return;
-        ItemStack item = event.getItemDrop().getItemStack().clone();
-        NBTItem nbtItem = new NBTItem(item, true);
-        if (!nbtItem.hasNBTData()) return;
-        if (nbtItem.hasKey("last-count")) nbtItem.removeKey("last-count");
-        if (nbtItem.hasKey("id")) nbtItem.removeKey("id");
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getHand() == EquipmentSlot.HAND
+                && (event.getAction() == Action.LEFT_CLICK_AIR
+                || event.getAction() == Action.LEFT_CLICK_BLOCK
+                || event.getAction() == Action.RIGHT_CLICK_AIR
+                || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
+            PlayerInventory inventory = event.getPlayer().getInventory();
+            if (event.getHand() == null) return;
+            ItemStack itemStack = inventory.getItem(event.getHand());
+            if (itemStack == null || itemStack.getType() == Material.AIR) return;
+            RunicItem item = getRunicItemFromItemStack(itemStack);
+            if (!(item instanceof RunicItemGeneric generic)) return;
+            ClickTrigger clickTrigger = ClickTrigger.getFromInteractAction(event.getAction(), event.getPlayer());
+            if (generic.getTriggers().containsKey(clickTrigger)) {
+                boolean isDuped = event.getPlayer().getGameMode() != GameMode.CREATIVE && DupeManager.checkInventoryForDupes(inventory, event.getItem(), event, event.getPlayer(), event.getPlayer().getInventory().getHeldItemSlot());
+                if (!isDuped)
+                    Bukkit.getPluginManager().callEvent(new RunicItemGenericTriggerEvent(event.getPlayer(), generic, itemStack, clickTrigger, generic.getTriggers().get(clickTrigger)));
+            }
+        }
     }
 
-    public static RunicItem getRunicItemFromItemStack(ItemStack itemStack) {
-        if (itemStack == null || itemStack.getType() == Material.AIR) return null;
-        NBTItem nbtItem = new NBTItem(itemStack);
-        if ((!nbtItem.hasNBTData()) || (!nbtItem.hasKey("template-id"))) return null;
-        RunicItemTemplate template = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
-        if (template == null) return null;
-        if (template instanceof RunicItemArmorTemplate) {
-            return RunicItemArmor.getFromItemStack(itemStack);
-        } else if (template instanceof RunicItemArtifactTemplate) {
-            return RunicItemArtifact.getFromItemStack(itemStack);
-        } else if (template instanceof RunicItemBookTemplate) {
-            return RunicItemBook.getFromItemStack(itemStack);
-        } else if (template instanceof RunicItemDynamicTemplate) {
-            return RunicItemDynamic.getFromItemStack(itemStack);
-        } else if (template instanceof RunicItemGenericTemplate) {
-            return RunicItemGeneric.getFromItemStack(itemStack);
-        } else if (template instanceof RunicItemOffhandTemplate) {
-            return RunicItemOffhand.getFromItemStack(itemStack);
-        } else if (template instanceof RunicItemWeaponTemplate) {
-            return RunicItemWeapon.getFromItemStack(itemStack);
-        } else if (template instanceof RunicItemGemTemplate) {
-            return RunicItemGem.getFromItemStack(itemStack);
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onSwapWithCursor(InventoryClickEvent event) {
+        if (event.isCancelled()) return;
+        if (!(event.getWhoClicked() instanceof Player)) return;
+
+        if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)
+            return;
+        if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) return;
+
+        if (event.getAction() == InventoryAction.SWAP_WITH_CURSOR) {
+            if (NBTUtil.isNBTSimilar(event.getCurrentItem(), event.getCursor(), false, false)) {
+                if (event.isLeftClick()) {
+                    if (event.getCurrentItem().getAmount() + event.getCursor().getAmount() == event.getCurrentItem().getMaxStackSize()) {
+                        ItemStack item = event.getCurrentItem();
+                        item.setAmount(event.getCurrentItem().getMaxStackSize());
+                        event.setCurrentItem(item);
+                        event.setCursor(null);
+                        event.setCancelled(true);
+                    } else if (event.getCurrentItem().getAmount() + event.getCursor().getAmount() > event.getCurrentItem().getMaxStackSize()) {
+                        ItemStack cursorItem = event.getCursor();
+                        cursorItem.setAmount(event.getCursor().getAmount() - (event.getCurrentItem().getMaxStackSize() - event.getCurrentItem().getAmount()));
+                        ItemStack currentItem = event.getCurrentItem();
+                        currentItem.setAmount(currentItem.getMaxStackSize());
+                        event.setCursor(cursorItem);
+                        event.setCurrentItem(currentItem);
+                        event.setCancelled(true);
+                    } else if (event.getCurrentItem().getAmount() + event.getCursor().getAmount() < event.getCurrentItem().getMaxStackSize()) {
+                        ItemStack item = event.getCurrentItem();
+                        item.setAmount(item.getAmount() + event.getCursor().getAmount());
+                        event.setCurrentItem(item);
+                        event.setCursor(null);
+                        event.setCancelled(true);
+                    }
+                } else if (event.isRightClick() && !event.isShiftClick()) {
+                    if (event.getCurrentItem().getAmount() != event.getCurrentItem().getMaxStackSize()) {
+                        ItemStack currentItem = event.getCurrentItem();
+                        currentItem.setAmount(currentItem.getAmount() + 1);
+                        event.setCurrentItem(currentItem);
+                        if (event.getCursor().getAmount() > 1) {
+                            ItemStack cursor = event.getCursor();
+                            cursor.setAmount(cursor.getAmount() - 1);
+                            event.setCursor(cursor);
+                        } else {
+                            event.setCursor(null);
+                        }
+                        event.setCancelled(true);
+                    }
+                }
+            }
         }
-        return null;
     }
 
 }

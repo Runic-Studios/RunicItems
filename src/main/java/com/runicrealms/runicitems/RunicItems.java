@@ -95,6 +95,7 @@ public class RunicItems extends JavaPlugin implements Listener {
 
         // Register Listeners
         Bukkit.getPluginManager().registerEvents(new ItemManager(), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerMTIListener(), this);
         Bukkit.getPluginManager().registerEvents(new ItemSpawnListener(), this);
         Bukkit.getPluginManager().registerEvents(new DupeManager(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerManager(), this);
