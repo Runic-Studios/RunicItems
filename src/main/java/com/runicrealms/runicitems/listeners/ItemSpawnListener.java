@@ -6,46 +6,55 @@ import org.bukkit.event.Listener;
  * Used to combine similar ItemStacks on the floor
  */
 public class ItemSpawnListener implements Listener {
-//    private static final double ITEM_MERGE_RADIUS = 1.5; // blocks
+    private static final double ITEM_MERGE_RADIUS = 1.5; // blocks
+
+//    private void mergeItemStacks(Item spawnedItem) {
+//        ItemStack spawnedStack = spawnedItem.getItemStack();
+//        if (spawnedStack.getType() == Material.AIR) return;
+//        Location location = spawnedItem.getLocation();
+//        int maxStack = spawnedStack.getMaxStackSize();
 //
-//    private void findNearbyItemsAndMerge(Item newItem) {
-//        if (newItem == null) return;
-//        ItemStack newItemStack = newItem.getItemStack();
-//        if (newItemStack.getType() == Material.AIR) return;
-//        newItem.getNearbyEntities(ITEM_MERGE_RADIUS, ITEM_MERGE_RADIUS, ITEM_MERGE_RADIUS).forEach(entity -> {
-//            if (entity instanceof Item nearbyItem) {
-//                ItemStack nearbyItemStack = nearbyItem.getItemStack();
+//        // Check for nearby items of the same type
+//        for (Item nearbyItem : location.getWorld().getNearbyEntitiesByType(Item.class, location, ITEM_MERGE_RADIUS, item -> !item.equals(spawnedItem))) {
+//            ItemStack nearbyStack = nearbyItem.getItemStack();
 //
-//                // Check if items are the same and can be merged
-//                if (RunicItemsAPI.isRunicItemSimilar(newItemStack, nearbyItemStack)) {
-//                    int totalAmount = newItemStack.getAmount() + nearbyItemStack.getAmount();
-//                    int maxStackSize = newItemStack.getMaxStackSize();
+//            // Check if the items are similar using your custom method
+//            if (!RunicItemsAPI.isRunicItemSimilar(spawnedStack, nearbyStack)) continue;
 //
-//                    if (totalAmount <= maxStackSize) {
-//                        // Merge items into one stack
-//                        newItemStack.setAmount(totalAmount);
-//                        nearbyItem.remove();
-//                    } else {
-//                        // Fill the stack to the maximum and reduce the amount of the nearby item
-//                        newItemStack.setAmount(maxStackSize);
-//                        nearbyItemStack.setAmount(totalAmount - maxStackSize);
-//                    }
-//                }
+//            // Combine the stacks if the total amount doesn't exceed the max stack size
+////            Bukkit.broadcastMessage("new stack amount is " + spawnedStack.getAmount());
+////            Bukkit.broadcastMessage("nearby stack amount is " + nearbyStack.getAmount());
+//            int total = spawnedStack.getAmount() + nearbyStack.getAmount();
+//            if (total <= maxStack) {
+//                spawnedStack.setAmount(total);
+//                nearbyItem.remove();
+//            } else {
+//                // If the total exceeds the max stack size, set the nearby item stack to the remaining amount
+//                spawnedStack.setAmount(maxStack);
+//                nearbyStack.setAmount(total - maxStack);
+//                nearbyItem.setItemStack(nearbyStack);
 //            }
-//        });
-//    }
 //
-//    @EventHandler
+//            // If the spawned item stack is now at the max stack size, stop checking for more items
+//            if (spawnedStack.getAmount() == maxStack) {
+//                break;
+//            }
+//        }
+//
+//        spawnedItem.setItemStack(spawnedStack);
+//    }
+
+//    @EventHandler(priority = EventPriority.HIGH)
 //    public void onItemSpawn(ItemSpawnEvent event) {
-//        Item newItem = event.getEntity();
+//        Item spawnedItem = event.getEntity();
 //        // Create a repeating task to check for the item's velocity.
 //        new BukkitRunnable() {
 //            @Override
 //            public void run() {
 //                // Check if the item is resting on the ground (velocity is near zero).
-//                if (newItem.getVelocity().lengthSquared() < 0.01) {
+//                if (spawnedItem.getVelocity().lengthSquared() < 0.01) {
 //                    this.cancel();
-//                    findNearbyItemsAndMerge(newItem);
+//                    mergeItemStacks(spawnedItem);
 //                }
 //            }
 //        }.runTaskTimer(RunicItems.getInstance(), 0, 10L);

@@ -103,52 +103,52 @@ public class ItemManager implements InventoryAPI, Listener {
         return null;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onCollectToCursor(InventoryClickEvent event) {
-        if (event.isCancelled()) return;
-        if (!(event.getWhoClicked() instanceof Player player)) return;
-
-        if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
-            ItemStack cursor = event.getCursor();
-            if (cursor != null && cursor.getType() != Material.AIR) {
-                int cursorAmount = cursor.getAmount();
-                if (cursorAmount != cursor.getMaxStackSize()) {
-                    if (event.getClickedInventory() != null) {
-                        for (ItemStack item : event.getClickedInventory()) {
-                            if (item == null || item.getType() == Material.AIR) continue;
-                            if (item.getAmount() == item.getMaxStackSize()) continue;
-                            if (!NBTUtil.isNBTSimilar(item, cursor, false, false)) continue;
-                            if (cursorAmount + item.getAmount() <= cursor.getMaxStackSize()) {
-                                cursorAmount += item.getAmount();
-                                player.getInventory().remove(item);
-                            } else {
-                                item.setAmount(item.getAmount() - cursor.getMaxStackSize() + cursorAmount);
-                                cursorAmount = cursor.getMaxStackSize();
-                                break;
-                            }
-                        }
-                    }
-                    if (event.getWhoClicked().getInventory() != event.getClickedInventory()) {
-                        for (ItemStack item : event.getWhoClicked().getInventory()) {
-                            if (item == null || item.getType() == Material.AIR) continue;
-                            if (item.getAmount() == item.getMaxStackSize()) continue;
-                            if (!NBTUtil.isNBTSimilar(item, cursor, false, false)) continue;
-                            if (cursorAmount + item.getAmount() <= cursor.getMaxStackSize()) {
-                                cursorAmount += item.getAmount();
-                                player.getInventory().remove(item);
-                            } else {
-                                item.setAmount(item.getAmount() - cursor.getMaxStackSize() + cursorAmount);
-                                cursorAmount = cursor.getMaxStackSize();
-                                break;
-                            }
-                        }
-                    }
-                }
-                cursor.setAmount(cursorAmount);
-                event.setCursor(cursor); // only deprecated because it can create server-client de-sync, don't care lol
-            }
-        }
-    }
+//    @EventHandler(priority = EventPriority.HIGHEST)
+//    public void onCollectToCursor(InventoryClickEvent event) {
+//        if (event.isCancelled()) return;
+//        if (!(event.getWhoClicked() instanceof Player player)) return;
+//
+//        if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
+//            ItemStack cursor = event.getCursor();
+//            if (cursor != null && cursor.getType() != Material.AIR) {
+//                int cursorAmount = cursor.getAmount();
+//                if (cursorAmount != cursor.getMaxStackSize()) {
+//                    if (event.getClickedInventory() != null) {
+//                        for (ItemStack item : event.getClickedInventory()) {
+//                            if (item == null || item.getType() == Material.AIR) continue;
+//                            if (item.getAmount() == item.getMaxStackSize()) continue;
+//                            if (!NBTUtil.isNBTSimilar(item, cursor, false, false)) continue;
+//                            if (cursorAmount + item.getAmount() <= cursor.getMaxStackSize()) {
+//                                cursorAmount += item.getAmount();
+//                                ItemRemover.takeItem(player, item, item.getAmount());
+//                            } else {
+//                                item.setAmount(item.getAmount() - cursor.getMaxStackSize() + cursorAmount);
+//                                cursorAmount = cursor.getMaxStackSize();
+//                                break;
+//                            }
+//                        }
+//                    }
+//                    if (event.getWhoClicked().getInventory() != event.getClickedInventory()) {
+//                        for (ItemStack item : event.getWhoClicked().getInventory()) {
+//                            if (item == null || item.getType() == Material.AIR) continue;
+//                            if (item.getAmount() == item.getMaxStackSize()) continue;
+//                            if (!NBTUtil.isNBTSimilar(item, cursor, false, false)) continue;
+//                            if (cursorAmount + item.getAmount() <= cursor.getMaxStackSize()) {
+//                                cursorAmount += item.getAmount();
+//                                ItemRemover.takeItem(player, item, item.getAmount());
+//                            } else {
+//                                item.setAmount(item.getAmount() - cursor.getMaxStackSize() + cursorAmount);
+//                                cursorAmount = cursor.getMaxStackSize();
+//                                break;
+//                            }
+//                        }
+//                    }
+//                }
+//                cursor.setAmount(cursorAmount);
+//                event.setCursor(cursor); // only deprecated because it can create server-client de-sync, don't care lol
+//            }
+//        }
+//    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDrop(PlayerDropItemEvent event) {
