@@ -8,12 +8,12 @@ public enum Stat {
     DEXTERITY
             (
                     "dexterity", "Dexterity", "DEX", ChatColor.YELLOW, "✦",
-                    "Gain increased attack speed and ability haste!"
+                    "Gain increased ranged attack speed and ability haste!"
             ),
     INTELLIGENCE
             (
                     "intelligence", "Intelligence", "INT", ChatColor.DARK_AQUA, "ʔ",
-                    "Deal more magic damage and gain more max mana!"
+                    "Deal more magic damage and gain more mana regen!"
             ),
     STRENGTH
             (
@@ -28,7 +28,7 @@ public enum Stat {
     WISDOM
             (
                     "wisdom", "Wisdom", "WIS", ChatColor.GREEN, "✸",
-                    "Gain more spell healing, shielding, mana regen and experience!"
+                    "Gain more spell healing, shielding, max mana and experience!"
             );
 
     public static final Stat[] PLAYER_STATS = new Stat[]{DEXTERITY, INTELLIGENCE, STRENGTH, VITALITY, WISDOM};
