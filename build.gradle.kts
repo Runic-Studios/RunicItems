@@ -19,8 +19,6 @@ dependencies {
     compileOnly(commonLibs.mongodbdrivercore)
     compileOnly(commonLibs.mongodbdriversync)
     compileOnly(commonLibs.jedis)
-    compileOnly(project(":Projects:Guilds"))
-    compileOnly(project(":Projects:Bank"))
     compileOnly(project(":Projects:Core"))
 }
 

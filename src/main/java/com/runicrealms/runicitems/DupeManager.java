@@ -3,6 +3,7 @@ package com.runicrealms.runicitems;
 import com.runicrealms.plugin.RunicBank;
 import com.runicrealms.plugin.RunicCore;
 import com.runicrealms.runicguilds.util.GuildBankUtil;
+import com.runicrealms.runicitems.api.AntiDupeInventoryHandler;
 import com.runicrealms.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -22,6 +23,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.awt.Color;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DupeManager implements Listener {
 
@@ -31,6 +34,12 @@ public class DupeManager implements Listener {
     private static TextChannel channel;
 
     private static long nextId = Long.MIN_VALUE;
+
+    private static Set<AntiDupeInventoryHandler> antiDupeInventoryHandlers = new HashSet();
+
+    public static void registerAntiDupeInventoryHandler(AntiDupeInventoryHandler handler) {
+        antiDupeInventoryHandlers.add(handler);
+    }
 
     public static void setupJda() {
         channel = RunicItems.getJda().getTextChannelById(TEXT_CHANNEL_ID);
@@ -202,13 +211,12 @@ public class DupeManager implements Listener {
                 currentItem = event.getCursor();
                 type = CurrentItemType.CURSOR;
             } else return;
-            if (GuildBankUtil.isViewingBank(player.getUniqueId())) {
-                if (player.getGameMode() != GameMode.CREATIVE && checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player))
-                    return;
-            }
-            if (RunicBank.getAPI().isViewingBank(player.getUniqueId())) {
-                if (player.getGameMode() != GameMode.CREATIVE && checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player))
-                    return;
+
+            for (AntiDupeInventoryHandler handler : antiDupeInventoryHandlers) {
+                if (handler.isViewingInventory(player)) {
+                    if (player.getGameMode() != GameMode.CREATIVE && checkInventoryForDupes(player.getOpenInventory().getTopInventory(), currentItem, type, event, player))
+                        return;
+                }
             }
             if (player.getGameMode() != GameMode.CREATIVE)
                 checkInventoryForDupes(player.getInventory(), currentItem, type, event, player);

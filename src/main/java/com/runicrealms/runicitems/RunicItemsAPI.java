@@ -1,5 +1,6 @@
 package com.runicrealms.runicitems;
 
+import com.runicrealms.runicitems.api.AntiDupeInventoryHandler;
 import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
@@ -280,6 +281,14 @@ public class RunicItemsAPI {
         if (!nbtItem.hasNBTData()) return null;
         if (!nbtItem.hasKey("template-id")) return null;
         return TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
+    }
+
+    /**
+     * Registers a handler for plugins that aim to prevent dupes when the player has a specific inventory open.
+     * @param handler Handler
+     */
+    public static void registerAntiDupeInventoryHandler(AntiDupeInventoryHandler handler) {
+        DupeManager.registerAntiDupeInventoryHandler(handler);
     }
 
 }
