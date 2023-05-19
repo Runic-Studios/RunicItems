@@ -8,7 +8,7 @@ public enum Stat {
     DEXTERITY
             (
                     "dexterity", "Dexterity", "DEX", ChatColor.YELLOW, "✦",
-                    "Gain ability haste, reducing your ability cooldowns!"
+                    "Gain spell haste, reducing your spell cooldowns!"
             ),
     INTELLIGENCE
             (

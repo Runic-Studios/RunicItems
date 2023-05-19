@@ -1,7 +1,7 @@
 package com.runicrealms.runicitems.model;
 
-import co.aikar.taskchain.TaskChain;
-import co.aikar.taskchain.TaskChainAbortAction;
+import com.runicrealms.libs.taskchain.TaskChain;
+import com.runicrealms.libs.taskchain.TaskChainAbortAction;
 import com.runicrealms.plugin.RunicCore;
 import com.runicrealms.plugin.character.api.CharacterDeleteEvent;
 import com.runicrealms.plugin.character.api.CharacterLoadedEvent;
@@ -33,7 +33,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 public class InventoryDataManager implements DataAPI, Listener {
-    public static final TaskChainAbortAction<Player, String, ?> CONSOLE_LOG = new TaskChainAbortAction<Player, String, Object>() {
+    public static final TaskChainAbortAction<Player, String, ?> CONSOLE_LOG = new TaskChainAbortAction<>() {
         public void onAbort(TaskChain<?> chain, Player player, String message) {
             Bukkit.getLogger().log(Level.SEVERE, message);
         }
