@@ -8,7 +8,7 @@ public enum Stat {
     DEXTERITY
             (
                     "dexterity", "Dexterity", "DEX", ChatColor.YELLOW, "✦",
-                    "Gain increased ranged attack speed and ability haste!"
+                    "Gain ability haste, reducing your ability cooldowns!"
             ),
     INTELLIGENCE
             (
@@ -41,7 +41,6 @@ public enum Stat {
     Combat multipliers
      */
     // Dexterity
-    private static final double RANGED_ATTACK_SPEED = 0.005; // .5%
     private static final double ABILITY_HASTE = 0.0025; // .25%
     // Intelligence
     private static final double MANA_REGEN_MULT = 0.01; // 1%
@@ -88,10 +87,6 @@ public enum Stat {
 
     public static double getAbilityHaste() {
         return ABILITY_HASTE;
-    }
-
-    public static double getRangedAttackSpeed() {
-        return RANGED_ATTACK_SPEED;
     }
 
     public static double getExpMult() {
