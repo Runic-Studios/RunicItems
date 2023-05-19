@@ -17,6 +17,8 @@ import com.runicrealms.runicitems.converter.RunicItemWriteConverter;
 import com.runicrealms.runicitems.listeners.ArtifactOnCastListener;
 import com.runicrealms.runicitems.listeners.ArtifactOnHitListener;
 import com.runicrealms.runicitems.listeners.ArtifactOnKillListener;
+import com.runicrealms.runicitems.listeners.GoldPouchListener;
+import com.runicrealms.runicitems.listeners.ItemSpawnListener;
 import com.runicrealms.runicitems.listeners.MoveToInventoryListener;
 import com.runicrealms.runicitems.listeners.PlayerMTIListener;
 import com.runicrealms.runicitems.listeners.SoulboundListener;

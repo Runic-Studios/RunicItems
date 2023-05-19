@@ -7,6 +7,7 @@ import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.Conditions;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.Syntax;
 import com.runicrealms.plugin.RunicCore;
 import com.runicrealms.runicitems.DupeManager;
 import com.runicrealms.runicitems.ItemManager;

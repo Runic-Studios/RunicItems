@@ -21,6 +21,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.awt.Color;
+
 public class DupeManager implements Listener {
 
     public static final String TEXT_CHANNEL_ID = "813580198133628928";
