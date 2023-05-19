@@ -14,6 +14,7 @@ dependencies {
     compileOnly(commonLibs.nbtapi)
     compileOnly(commonLibs.craftbukkit)
     compileOnly(commonLibs.taskchain)
+    compileOnly(commonLibs.mythicmobs)
     compileOnly(commonLibs.springdatamongodb)
     compileOnly(commonLibs.mongodbdrivercore)
     compileOnly(commonLibs.mongodbdriversync)
