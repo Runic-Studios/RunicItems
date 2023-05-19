@@ -4,7 +4,11 @@ import com.runicrealms.plugin.api.Pair;
 import com.runicrealms.plugin.utilities.ChatUtils;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
-import com.runicrealms.runicitems.item.stats.*;
+import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
+import com.runicrealms.runicitems.item.stats.RunicItemRarity;
+import com.runicrealms.runicitems.item.stats.RunicItemStat;
+import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
+import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.template.RunicItemArtifactTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
@@ -15,7 +19,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class RunicItemArtifact extends RunicItemWeapon {
 

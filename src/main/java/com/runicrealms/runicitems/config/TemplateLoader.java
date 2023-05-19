@@ -8,7 +8,15 @@ import com.runicrealms.runicitems.item.RunicItemDynamic;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
-import com.runicrealms.runicitems.item.template.*;
+import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
+import com.runicrealms.runicitems.item.template.RunicItemArtifactTemplate;
+import com.runicrealms.runicitems.item.template.RunicItemBookTemplate;
+import com.runicrealms.runicitems.item.template.RunicItemDynamicTemplate;
+import com.runicrealms.runicitems.item.template.RunicItemGemTemplate;
+import com.runicrealms.runicitems.item.template.RunicItemGenericTemplate;
+import com.runicrealms.runicitems.item.template.RunicItemOffhandTemplate;
+import com.runicrealms.runicitems.item.template.RunicItemTemplate;
+import com.runicrealms.runicitems.item.template.RunicItemWeaponTemplate;
 import com.runicrealms.runicitems.item.util.ClickTrigger;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
@@ -18,7 +26,11 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 public class TemplateLoader {

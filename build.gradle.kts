@@ -1,26 +1,26 @@
 plugins {
     `java-library`
     `maven-publish`
-    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 group = "com.runicrealms.plugin"
 version = "1.0-SNAPSHOT"
 
-repositories {
-    maven("https://jcenter.bintray.com")
-}
-
 dependencies {
-    compileOnly(commonLibs.mythicmobs)
+    compileOnly(commonLibs.acf)
     compileOnly(commonLibs.paper)
     compileOnly(commonLibs.protocollib)
-    compileOnly(project(":Projects:Core"))
-    implementation("net.dv8tion.JDA.4.2.0_229")
+    compileOnly(commonLibs.jda)
     compileOnly(commonLibs.nbtapi)
     compileOnly(commonLibs.craftbukkit)
+    compileOnly(commonLibs.taskchain)
+    compileOnly(commonLibs.springdatamongodb)
+    compileOnly(commonLibs.mongodbdrivercore)
+    compileOnly(commonLibs.mongodbdriversync)
+    compileOnly(commonLibs.jedis)
     compileOnly(project(":Projects:Guilds"))
-    compileOnly(projects(":Projects:Bank"))
+    compileOnly(project(":Projects:Bank"))
+    compileOnly(project(":Projects:Core"))
 }
 
 java {
@@ -36,12 +36,6 @@ publishing {
             from(components["java"])
         }
     }
-}
-
-tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-//    build {
-//        dependsOn(shadowJar)
-//    }
 }
 
 tasks.register("wrapper")
