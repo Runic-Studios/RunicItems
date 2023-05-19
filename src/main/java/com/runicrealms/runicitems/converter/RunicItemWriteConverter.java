@@ -1,7 +1,15 @@
 package com.runicrealms.runicitems.converter;
 
 import com.runicrealms.plugin.RunicCore;
-import com.runicrealms.runicitems.item.*;
+import com.runicrealms.runicitems.item.RunicItem;
+import com.runicrealms.runicitems.item.RunicItemArmor;
+import com.runicrealms.runicitems.item.RunicItemArtifact;
+import com.runicrealms.runicitems.item.RunicItemBook;
+import com.runicrealms.runicitems.item.RunicItemDynamic;
+import com.runicrealms.runicitems.item.RunicItemGem;
+import com.runicrealms.runicitems.item.RunicItemGeneric;
+import com.runicrealms.runicitems.item.RunicItemOffhand;
+import com.runicrealms.runicitems.item.RunicItemWeapon;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.convert.converter.Converter;

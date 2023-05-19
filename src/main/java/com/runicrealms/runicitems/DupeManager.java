@@ -21,7 +21,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class DupeManager implements Listener {
 
