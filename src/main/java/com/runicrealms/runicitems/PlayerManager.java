@@ -1,8 +1,8 @@
 package com.runicrealms.runicitems;
 
-import com.runicrealms.plugin.ArmorType;
-import com.runicrealms.plugin.character.api.CharacterLoadedEvent;
-import com.runicrealms.plugin.events.ArmorEquipEvent;
+import com.runicrealms.plugin.common.event.ArmorEquipEvent;
+import com.runicrealms.plugin.common.util.ArmorType;
+import com.runicrealms.plugin.rdb.event.CharacterLoadedEvent;
 import com.runicrealms.runicitems.player.PlayerStatHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

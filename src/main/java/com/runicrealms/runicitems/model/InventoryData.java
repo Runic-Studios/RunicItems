@@ -1,8 +1,8 @@
 package com.runicrealms.runicitems.model;
 
-import com.runicrealms.plugin.RunicCore;
-import com.runicrealms.plugin.model.SessionDataMongo;
-import com.runicrealms.plugin.model.SessionDataNested;
+import com.runicrealms.plugin.rdb.RunicDatabase;
+import com.runicrealms.plugin.rdb.model.SessionDataMongo;
+import com.runicrealms.plugin.rdb.model.SessionDataNested;
 import com.runicrealms.runicitems.DupeManager;
 import com.runicrealms.runicitems.RunicItemsAPI;
 import com.runicrealms.runicitems.config.ItemLoader;
@@ -62,9 +62,9 @@ public class InventoryData implements SessionDataMongo, SessionDataNested {
      */
     public InventoryData(UUID uuid, Jedis jedis, int slotToLoad) {
         this.uuid = uuid;
-        String database = RunicCore.getDataAPI().getMongoDatabase().getName();
+        String database = RunicDatabase.getAPI().getDataAPI().getMongoDatabase().getName();
         if (slotToLoad == -1) { // Load all slots
-            for (int slot = 1; slot <= RunicCore.getDataAPI().getMaxCharacterSlot(); slot++) {
+            for (int slot = 1; slot <= RunicDatabase.getAPI().getDataAPI().getMaxCharacterSlot(); slot++) {
                 if (jedis.smembers(database + ":" + uuid + ":itemData").contains(String.valueOf(slot))) {
                     loadInventoryForSlot(slot, jedis);
                 }
@@ -128,7 +128,7 @@ public class InventoryData implements SessionDataMongo, SessionDataNested {
     @SuppressWarnings("unchecked")
     @Override
     public InventoryData addDocumentToMongo() {
-        MongoTemplate mongoTemplate = RunicCore.getDataAPI().getMongoTemplate();
+        MongoTemplate mongoTemplate = RunicDatabase.getAPI().getDataAPI().getMongoTemplate();
         return mongoTemplate.save(this);
     }
 
@@ -174,6 +174,10 @@ public class InventoryData implements SessionDataMongo, SessionDataNested {
         return uuid;
     }
 
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     @Override
     public Map<String, String> toMap(Object nestedObject) {
         RunicItem runicItem = (RunicItem) nestedObject;
@@ -182,7 +186,7 @@ public class InventoryData implements SessionDataMongo, SessionDataNested {
 
     @Override
     public void writeToJedis(Jedis jedis, int... ignored) {
-        String database = RunicCore.getDataAPI().getMongoDatabase().getName();
+        String database = RunicDatabase.getAPI().getDataAPI().getMongoDatabase().getName();
         // Remove all sub-keys to prevent duplication of items
         for (int slot : this.contentsMap.keySet()) {
             String key = getJedisKey(this.uuid, slot);
@@ -194,7 +198,7 @@ public class InventoryData implements SessionDataMongo, SessionDataNested {
         for (int slot : this.contentsMap.keySet()) {
             // Ensure the system knows that there is data in redis
             pipeline.sadd(database + ":" + this.uuid + ":itemData", String.valueOf(slot));
-            pipeline.expire(database + ":" + this.uuid + ":itemData", RunicCore.getRedisAPI().getExpireTime());
+            pipeline.expire(database + ":" + this.uuid + ":itemData", RunicDatabase.getAPI().getRedisAPI().getExpireTime());
             String key = getJedisKey(this.uuid, slot);
             RunicItem[] contents = contentsMap.get(slot);
             for (int i = 0; i < contents.length; i++) {
@@ -203,7 +207,7 @@ public class InventoryData implements SessionDataMongo, SessionDataNested {
                     if (runicItem != null) {
                         try {
                             pipeline.hmset(database + ":" + key + ":" + i, this.toMap(runicItem));
-                            pipeline.expire(database + ":" + key + ":" + i, RunicCore.getRedisAPI().getExpireTime());
+                            pipeline.expire(database + ":" + key + ":" + i, RunicDatabase.getAPI().getRedisAPI().getExpireTime());
                         } catch (Exception e) {
                             // Log the exception and/or handle it accordingly
                             Bukkit.getLogger().severe("Failed to serialize RunicItem for slot " + slot + ", index " + i + ": " + e.getMessage());
@@ -216,10 +220,6 @@ public class InventoryData implements SessionDataMongo, SessionDataNested {
         pipeline.sync(); // Sends Redis commands as a single command
     }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
-
     public ObjectId getId() {
         return id;
     }
@@ -229,7 +229,7 @@ public class InventoryData implements SessionDataMongo, SessionDataNested {
     }
 
     private void loadContentsFromRedis(RunicItem[] contents, String parentKey, Jedis jedis) {
-        String database = RunicCore.getDataAPI().getMongoDatabase().getName();
+        String database = RunicDatabase.getAPI().getDataAPI().getMongoDatabase().getName();
         for (int i = 0; i < contents.length; i++) {
             if (jedis.exists(database + ":" + parentKey + ":" + i)) {
                 Map<String, String> itemDataMap = jedis.hgetAll(database + ":" + parentKey + ":" + i); // get all the item data

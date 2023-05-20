@@ -1,6 +1,6 @@
 package com.runicrealms.runicitems.converter;
 
-import com.runicrealms.plugin.RunicCore;
+import com.runicrealms.plugin.rdb.RunicDatabase;
 import com.runicrealms.runicitems.item.RunicItem;
 import com.runicrealms.runicitems.item.RunicItemArmor;
 import com.runicrealms.runicitems.item.RunicItemArtifact;
@@ -19,7 +19,7 @@ import org.springframework.data.convert.WritingConverter;
 public class RunicItemWriteConverter implements Converter<RunicItem, Document> {
 
     public RunicItemWriteConverter() {
-        RunicCore.getConverterAPI().addDataConverter(this);
+        RunicDatabase.getAPI().getConverterAPI().addDataConverter(this);
     }
 
     @Override

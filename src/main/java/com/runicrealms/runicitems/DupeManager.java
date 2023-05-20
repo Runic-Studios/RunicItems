@@ -1,8 +1,6 @@
 package com.runicrealms.runicitems;
 
-import com.runicrealms.plugin.RunicBank;
-import com.runicrealms.plugin.RunicCore;
-import com.runicrealms.runicguilds.util.GuildBankUtil;
+import com.runicrealms.plugin.rdb.RunicDatabase;
 import com.runicrealms.runicitems.api.AntiDupeInventoryHandler;
 import com.runicrealms.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
@@ -181,7 +179,7 @@ public class DupeManager implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getWhoClicked() instanceof Player) {
             final Player player = (Player) event.getWhoClicked();
-            if (!RunicCore.getCharacterAPI().getLoadedCharacters().contains(player.getUniqueId()))
+            if (!RunicDatabase.getAPI().getCharacterAPI().getLoadedCharacters().contains(player.getUniqueId()))
                 return;
             final ItemStack currentItem;
             final CurrentItemType type;

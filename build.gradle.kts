@@ -19,7 +19,8 @@ dependencies {
     compileOnly(commonLibs.mongodbdrivercore)
     compileOnly(commonLibs.mongodbdriversync)
     compileOnly(commonLibs.jedis)
-    compileOnly(project(":Projects:Core"))
+    compileOnly(project(":Projects:Database"))
+    compileOnly(project(":Projects:Common"))
 }
 
 java {

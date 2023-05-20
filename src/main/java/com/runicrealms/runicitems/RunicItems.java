@@ -1,11 +1,11 @@
 package com.runicrealms.runicitems;
 
-import com.runicrealms.libs.acf.ConditionFailedException;
-import com.runicrealms.libs.acf.PaperCommandManager;
-import com.runicrealms.libs.taskchain.BukkitTaskChainFactory;
-import com.runicrealms.libs.taskchain.TaskChain;
-import com.runicrealms.libs.taskchain.TaskChainFactory;
-import com.runicrealms.plugin.database.event.MongoSaveEvent;
+import co.aikar.commands.ConditionFailedException;
+import co.aikar.commands.PaperCommandManager;
+import co.aikar.taskchain.BukkitTaskChainFactory;
+import co.aikar.taskchain.TaskChain;
+import co.aikar.taskchain.TaskChainFactory;
+import com.runicrealms.plugin.rdb.event.MongoSaveEvent;
 import com.runicrealms.runicitems.api.DataAPI;
 import com.runicrealms.runicitems.api.InventoryAPI;
 import com.runicrealms.runicitems.command.RunicItemCommand;
@@ -14,9 +14,6 @@ import com.runicrealms.runicitems.config.ConfigUtil;
 import com.runicrealms.runicitems.config.TemplateLoader;
 import com.runicrealms.runicitems.converter.RunicItemReadConverter;
 import com.runicrealms.runicitems.converter.RunicItemWriteConverter;
-import com.runicrealms.runicitems.listeners.ArtifactOnCastListener;
-import com.runicrealms.runicitems.listeners.ArtifactOnHitListener;
-import com.runicrealms.runicitems.listeners.ArtifactOnKillListener;
 import com.runicrealms.runicitems.listeners.GoldPouchListener;
 import com.runicrealms.runicitems.listeners.ItemSpawnListener;
 import com.runicrealms.runicitems.listeners.MoveToInventoryListener;
@@ -112,9 +109,6 @@ public class RunicItems extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new GemManager(), this);
         Bukkit.getPluginManager().registerEvents(new SoulboundListener(), this);
         Bukkit.getPluginManager().registerEvents(new GoldPouchListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ArtifactOnCastListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ArtifactOnHitListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ArtifactOnKillListener(), this);
 
         // Register Commands
         commandManager = new PaperCommandManager(this);

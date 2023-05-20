@@ -1,7 +1,7 @@
 package com.runicrealms.runicitems;
 
-import com.runicrealms.plugin.ArmorType;
-import com.runicrealms.plugin.events.ArmorEquipEvent;
+import com.runicrealms.plugin.common.event.ArmorEquipEvent;
+import com.runicrealms.plugin.common.util.ArmorType;
 import com.runicrealms.runicitems.item.RunicItemArmor;
 import com.runicrealms.runicitems.item.RunicItemGem;
 import com.runicrealms.runicitems.item.stats.GemBonus;
@@ -23,6 +23,14 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 public class GemManager implements Listener {
+
+    private static Integer parseInt(String value) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException exception) {
+            return null;
+        }
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onGemApply(InventoryClickEvent event) {
@@ -85,14 +93,6 @@ public class GemManager implements Listener {
             });
 
         event.setCancelled(true);
-    }
-
-    private static Integer parseInt(String value) {
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException exception) {
-            return null;
-        }
     }
 
 }
