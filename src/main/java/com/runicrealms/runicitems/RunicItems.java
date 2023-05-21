@@ -5,6 +5,7 @@ import co.aikar.commands.PaperCommandManager;
 import co.aikar.taskchain.BukkitTaskChainFactory;
 import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
+import com.runicrealms.plugin.rdb.event.DatabaseInitializeEvent;
 import com.runicrealms.plugin.rdb.event.MongoSaveEvent;
 import com.runicrealms.runicitems.api.DataAPI;
 import com.runicrealms.runicitems.api.InventoryAPI;
@@ -84,11 +85,7 @@ public class RunicItems extends JavaPlugin implements Listener {
         // Setup base
         instance = this;
         taskChainFactory = BukkitTaskChainFactory.create(this);
-        dataAPI = new InventoryDataManager();
-        mongoTask = new MongoTask();
         INVENTORY_API = new ItemManager();
-        new RunicItemReadConverter();
-        new RunicItemWriteConverter();
         ConfigUtil.initDirs();
 
         // Load YML files
@@ -132,6 +129,14 @@ public class RunicItems extends JavaPlugin implements Listener {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+    }
+
+    @EventHandler
+    public void onDatabaseLoad(DatabaseInitializeEvent event) {
+        dataAPI = new InventoryDataManager();
+        mongoTask = new MongoTask();
+        new RunicItemReadConverter();
+        new RunicItemWriteConverter();
     }
 
 //    @EventHandler
