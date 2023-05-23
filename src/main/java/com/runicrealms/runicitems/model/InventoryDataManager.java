@@ -170,6 +170,8 @@ public class InventoryDataManager implements DataAPI, Listener {
      */
     @EventHandler
     public void onDatabaseSave(MongoSaveEvent event) {
+        // Shutdown JDA
+        RunicItems.getJda().shutdownNow();
         // Cancel the task timer
         RunicItems.getMongoTask().getTask().cancel();
         // Manually save all data (flush players marked for save)
