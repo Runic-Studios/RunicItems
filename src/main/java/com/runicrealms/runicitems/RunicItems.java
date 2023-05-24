@@ -1,11 +1,11 @@
 package com.runicrealms.runicitems;
 
-import com.runicrealms.libs.acf.ConditionFailedException;
-import com.runicrealms.libs.acf.PaperCommandManager;
-import com.runicrealms.libs.taskchain.BukkitTaskChainFactory;
-import com.runicrealms.libs.taskchain.TaskChain;
-import com.runicrealms.libs.taskchain.TaskChainFactory;
-import com.runicrealms.plugin.database.event.MongoSaveEvent;
+import co.aikar.commands.ConditionFailedException;
+import co.aikar.commands.PaperCommandManager;
+import co.aikar.taskchain.BukkitTaskChainFactory;
+import co.aikar.taskchain.TaskChain;
+import co.aikar.taskchain.TaskChainFactory;
+import com.runicrealms.plugin.rdb.event.DatabaseInitializeEvent;
 import com.runicrealms.runicitems.api.DataAPI;
 import com.runicrealms.runicitems.api.InventoryAPI;
 import com.runicrealms.runicitems.command.RunicItemCommand;
@@ -14,14 +14,7 @@ import com.runicrealms.runicitems.config.ConfigUtil;
 import com.runicrealms.runicitems.config.TemplateLoader;
 import com.runicrealms.runicitems.converter.RunicItemReadConverter;
 import com.runicrealms.runicitems.converter.RunicItemWriteConverter;
-import com.runicrealms.runicitems.listeners.ArtifactOnCastListener;
-import com.runicrealms.runicitems.listeners.ArtifactOnHitListener;
-import com.runicrealms.runicitems.listeners.ArtifactOnKillListener;
-import com.runicrealms.runicitems.listeners.GoldPouchListener;
-import com.runicrealms.runicitems.listeners.ItemSpawnListener;
-import com.runicrealms.runicitems.listeners.MoveToInventoryListener;
-import com.runicrealms.runicitems.listeners.PlayerMTIListener;
-import com.runicrealms.runicitems.listeners.SoulboundListener;
+import com.runicrealms.runicitems.listeners.*;
 import com.runicrealms.runicitems.model.InventoryDataManager;
 import com.runicrealms.runicitems.model.MongoTask;
 import net.dv8tion.jda.api.JDA;
@@ -31,7 +24,6 @@ import net.dv8tion.jda.api.entities.Activity;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -87,11 +79,7 @@ public class RunicItems extends JavaPlugin implements Listener {
         // Setup base
         instance = this;
         taskChainFactory = BukkitTaskChainFactory.create(this);
-        dataAPI = new InventoryDataManager();
-        mongoTask = new MongoTask();
         INVENTORY_API = new ItemManager();
-        new RunicItemReadConverter();
-        new RunicItemWriteConverter();
         ConfigUtil.initDirs();
 
         // Load YML files
@@ -104,6 +92,7 @@ public class RunicItems extends JavaPlugin implements Listener {
         }
 
         // Register Listeners
+        Bukkit.getPluginManager().registerEvents(this, this);
         Bukkit.getPluginManager().registerEvents(new PlayerMTIListener(), this);
         Bukkit.getPluginManager().registerEvents(new MoveToInventoryListener(), this);
         Bukkit.getPluginManager().registerEvents(new ItemSpawnListener(), this);
@@ -112,9 +101,6 @@ public class RunicItems extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new GemManager(), this);
         Bukkit.getPluginManager().registerEvents(new SoulboundListener(), this);
         Bukkit.getPluginManager().registerEvents(new GoldPouchListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ArtifactOnCastListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ArtifactOnHitListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ArtifactOnKillListener(), this);
 
         // Register Commands
         commandManager = new PaperCommandManager(this);
@@ -140,17 +126,12 @@ public class RunicItems extends JavaPlugin implements Listener {
         }
     }
 
-//    @EventHandler
-//    public void onPreShutdown(PreshutdownEvent)
-
-    /**
-     * Properly shut down JDA during a save
-     */
-    @EventHandler(priority = EventPriority.LOW)
-    public void onMongoSave(MongoSaveEvent event) {
-        jda.shutdownNow();
-//        jda.shutdown();
-        jda = null;
+    @EventHandler
+    public void onDatabaseLoad(DatabaseInitializeEvent event) {
+        dataAPI = new InventoryDataManager();
+        mongoTask = new MongoTask();
+        new RunicItemReadConverter();
+        new RunicItemWriteConverter();
     }
 
 }

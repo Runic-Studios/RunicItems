@@ -1,6 +1,6 @@
 package com.runicrealms.runicitems.converter;
 
-import com.runicrealms.plugin.RunicCore;
+import com.runicrealms.plugin.rdb.RunicDatabase;
 import com.runicrealms.runicitems.DupeManager;
 import com.runicrealms.runicitems.config.ItemLoader;
 import com.runicrealms.runicitems.item.RunicItem;
@@ -13,7 +13,7 @@ import org.springframework.data.convert.ReadingConverter;
 public class RunicItemReadConverter implements Converter<Document, RunicItem> {
 
     public RunicItemReadConverter() {
-        RunicCore.getConverterAPI().addDataConverter(this);
+        RunicDatabase.getAPI().getConverterAPI().addDataConverter(this);
     }
 
     @Override

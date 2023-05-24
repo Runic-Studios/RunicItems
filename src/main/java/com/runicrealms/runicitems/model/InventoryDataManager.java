@@ -1,14 +1,14 @@
 package com.runicrealms.runicitems.model;
 
-import com.runicrealms.libs.taskchain.TaskChain;
-import com.runicrealms.libs.taskchain.TaskChainAbortAction;
-import com.runicrealms.plugin.RunicCore;
-import com.runicrealms.plugin.character.api.CharacterDeleteEvent;
-import com.runicrealms.plugin.character.api.CharacterLoadedEvent;
-import com.runicrealms.plugin.character.api.CharacterQuitEvent;
-import com.runicrealms.plugin.character.api.CharacterSelectEvent;
-import com.runicrealms.plugin.database.event.MongoSaveEvent;
-import com.runicrealms.plugin.model.CharacterField;
+import co.aikar.taskchain.TaskChain;
+import co.aikar.taskchain.TaskChainAbortAction;
+import com.runicrealms.plugin.rdb.RunicDatabase;
+import com.runicrealms.plugin.rdb.event.CharacterDeleteEvent;
+import com.runicrealms.plugin.rdb.event.CharacterLoadedEvent;
+import com.runicrealms.plugin.rdb.event.CharacterQuitEvent;
+import com.runicrealms.plugin.rdb.event.CharacterSelectEvent;
+import com.runicrealms.plugin.rdb.event.MongoSaveEvent;
+import com.runicrealms.plugin.rdb.model.CharacterField;
 import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.api.DataAPI;
 import com.runicrealms.runicitems.item.RunicItem;
@@ -52,16 +52,16 @@ public class InventoryDataManager implements DataAPI, Listener {
     @Override
     public InventoryData loadInventoryData(UUID uuid, int slotToLoad) {
         // Step 1: Check if inventory data is cached in redis
-        try (Jedis jedis = RunicCore.getRedisAPI().getNewJedisResource()) {
-            Set<String> redisInventoryList = RunicCore.getRedisAPI().getRedisDataSet(uuid, "itemData", jedis);
-            boolean dataInRedis = RunicCore.getRedisAPI().determineIfDataInRedis(redisInventoryList, slotToLoad);
+        try (Jedis jedis = RunicDatabase.getAPI().getRedisAPI().getNewJedisResource()) {
+            Set<String> redisInventoryList = RunicDatabase.getAPI().getRedisAPI().getRedisDataSet(uuid, "itemData", jedis);
+            boolean dataInRedis = RunicDatabase.getAPI().getRedisAPI().determineIfDataInRedis(redisInventoryList, slotToLoad);
             if (dataInRedis) {
                 return new InventoryData(uuid, jedis, slotToLoad);
             }
             // Step 2: Check the mongo database
             Query query = new Query();
             query.addCriteria(Criteria.where(CharacterField.PLAYER_UUID.getField()).is(uuid));
-            MongoTemplate mongoTemplate = RunicCore.getDataAPI().getMongoTemplate();
+            MongoTemplate mongoTemplate = RunicDatabase.getAPI().getDataAPI().getMongoTemplate();
             List<InventoryData> results = mongoTemplate.find(query, InventoryData.class);
             if (results.size() > 0) {
                 InventoryData result = results.get(0);
@@ -89,13 +89,13 @@ public class InventoryDataManager implements DataAPI, Listener {
         UUID uuid = player.getUniqueId();
         int slot = event.getSlot();
         // Removes player from the save task
-        try (Jedis jedis = RunicCore.getRedisAPI().getNewJedisResource()) {
-            String database = RunicCore.getDataAPI().getMongoDatabase().getName();
+        try (Jedis jedis = RunicDatabase.getAPI().getRedisAPI().getNewJedisResource()) {
+            String database = RunicDatabase.getAPI().getDataAPI().getMongoDatabase().getName();
             jedis.srem(database + ":markedForSave:items", String.valueOf(player.getUniqueId()));
         }
         // 1. Delete from Redis
-        String database = RunicCore.getDataAPI().getMongoDatabase().getName();
-        try (Jedis jedis = RunicCore.getRedisAPI().getNewJedisResource()) {
+        String database = RunicDatabase.getAPI().getDataAPI().getMongoDatabase().getName();
+        try (Jedis jedis = RunicDatabase.getAPI().getRedisAPI().getNewJedisResource()) {
             jedis.srem(database + ":" + uuid + ":itemData", String.valueOf(slot));
         }
         // 2. Delete from Mongo
@@ -103,7 +103,7 @@ public class InventoryDataManager implements DataAPI, Listener {
         query.addCriteria(Criteria.where(CharacterField.PLAYER_UUID.getField()).is(uuid));
         Update update = new Update();
         update.unset("contentsMap." + slot);
-        MongoTemplate mongoTemplate = RunicCore.getDataAPI().getMongoTemplate();
+        MongoTemplate mongoTemplate = RunicDatabase.getAPI().getDataAPI().getMongoTemplate();
         mongoTemplate.updateFirst(query, update, InventoryData.class);
         // 3. Mark this deletion as complete
         event.getPluginsToDeleteData().remove("items");
@@ -170,6 +170,8 @@ public class InventoryDataManager implements DataAPI, Listener {
      */
     @EventHandler
     public void onDatabaseSave(MongoSaveEvent event) {
+        // Shutdown JDA
+        RunicItems.getJda().shutdownNow();
         // Cancel the task timer
         RunicItems.getMongoTask().getTask().cancel();
         // Manually save all data (flush players marked for save)
@@ -190,7 +192,7 @@ public class InventoryDataManager implements DataAPI, Listener {
                     // todo: prevent them from logging in during this time
                 })
                 .asyncLast(inventoryData -> {
-                    try (Jedis jedis = RunicCore.getRedisAPI().getNewJedisResource()) {
+                    try (Jedis jedis = RunicDatabase.getAPI().getRedisAPI().getNewJedisResource()) {
                         inventoryData.writeToJedis(jedis);
                     }
                 })
@@ -201,11 +203,11 @@ public class InventoryDataManager implements DataAPI, Listener {
      * Periodic task to save player items
      */
     private void startInventorySaveTask() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(RunicCore.getInstance(), () -> {
-            for (UUID uuid : RunicCore.getCharacterAPI().getLoadedCharacters()) {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(RunicItems.getInstance(), () -> {
+            for (UUID uuid : RunicDatabase.getAPI().getCharacterAPI().getLoadedCharacters()) {
                 Player player = Bukkit.getPlayer(uuid);
                 if (player == null) continue; // Player not online
-                int slot = RunicCore.getCharacterAPI().getCharacterSlot(uuid);
+                int slot = RunicDatabase.getAPI().getCharacterAPI().getCharacterSlot(uuid);
                 saveInventory(player, slot);
             }
         }, 0, REDIS_TASK_PERIOD * 20L);

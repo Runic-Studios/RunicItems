@@ -1,6 +1,6 @@
 package com.runicrealms.runicitems.util;
 
-import com.runicrealms.plugin.api.Pair;
+import com.runicrealms.plugin.common.util.Pair;
 import com.runicrealms.runicitems.Stat;
 
 import java.util.ArrayList;

@@ -2,37 +2,16 @@ package com.runicrealms.runicitems.config;
 
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
-import com.runicrealms.runicitems.item.RunicItem;
-import com.runicrealms.runicitems.item.RunicItemArmor;
-import com.runicrealms.runicitems.item.RunicItemArtifact;
-import com.runicrealms.runicitems.item.RunicItemBook;
-import com.runicrealms.runicitems.item.RunicItemDynamic;
-import com.runicrealms.runicitems.item.RunicItemGem;
-import com.runicrealms.runicitems.item.RunicItemGeneric;
-import com.runicrealms.runicitems.item.RunicItemOffhand;
-import com.runicrealms.runicitems.item.RunicItemWeapon;
+import com.runicrealms.runicitems.item.*;
 import com.runicrealms.runicitems.item.stats.GemBonus;
 import com.runicrealms.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
-import com.runicrealms.runicitems.item.template.RunicItemArmorTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemArtifactTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemBookTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemDynamicTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemGemTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemGenericTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemOffhandTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemTemplate;
-import com.runicrealms.runicitems.item.template.RunicItemWeaponTemplate;
+import com.runicrealms.runicitems.item.template.*;
 import com.runicrealms.runicitems.util.StatUtil;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 
 public class ItemLoader {
@@ -121,8 +100,9 @@ public class ItemLoader {
                         gemTemplate.getTier()));
             }
         } catch (Exception exception) {
-            Bukkit.getLogger().severe("[RunicItems] Could not load item " + itemDataMap.get("template-id") + " from redis in ItemLoader.java!");
-            exception.printStackTrace();
+            // Items only fail with console outputs, since we may change template ids from time to time
+            Bukkit.getLogger().warning("[RunicItems] Could not load item " + itemDataMap.get("template-id") + " from redis in ItemLoader.java!");
+            Bukkit.getLogger().warning("[RunicItems] It is likely that the template id no longer exists or was changed.");
             return null;
         }
         return null;

@@ -1,7 +1,7 @@
 package com.runicrealms.runicitems.item;
 
-import com.runicrealms.plugin.api.Pair;
-import com.runicrealms.plugin.utilities.ChatUtils;
+import com.runicrealms.plugin.common.util.ChatUtils;
+import com.runicrealms.plugin.common.util.Pair;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;

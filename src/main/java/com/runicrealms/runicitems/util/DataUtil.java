@@ -10,23 +10,16 @@ public class DataUtil {
     public static Color getColorFromData(RunicItem runicItem) {
         try {
             String color = runicItem.getData().get("color").toLowerCase();
-            switch (color) {
-                case "aqua":
-                    return Color.AQUA;
-                case "black":
-                    return Color.BLACK;
-                case "fuchsia":
-                    return Color.FUCHSIA;
-                case "green":
-                    return Color.GREEN;
-                case "lime":
-                    return Color.LIME;
-                case "orange":
-                    return Color.ORANGE;
-                case "red":
-                    return Color.RED;
-            }
-            return Color.WHITE; // oops
+            return switch (color) {
+                case "aqua" -> Color.AQUA;
+                case "black" -> Color.BLACK;
+                case "fuchsia" -> Color.FUCHSIA;
+                case "green" -> Color.GREEN;
+                case "lime" -> Color.LIME;
+                case "orange" -> Color.ORANGE;
+                case "red" -> Color.RED;
+                default -> Color.WHITE;
+            };
         } catch (NullPointerException e) {
             Bukkit.getLogger().info(ChatColor.RED + "A potion is missing a color field");
             return Color.WHITE;

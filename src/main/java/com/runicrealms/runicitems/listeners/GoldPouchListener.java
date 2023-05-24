@@ -1,13 +1,12 @@
 package com.runicrealms.runicitems.listeners;
 
-import com.runicrealms.plugin.RunicCore;
-import com.runicrealms.plugin.item.util.ItemRemover;
-import com.runicrealms.plugin.utilities.CurrencyUtil;
 import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.RunicItemsAPI;
 import com.runicrealms.runicitems.item.RunicItemDynamic;
 import com.runicrealms.runicitems.item.event.RunicItemGenericTriggerEvent;
 import com.runicrealms.runicitems.item.util.ClickTrigger;
+import com.runicrealms.runicitems.util.CurrencyUtil;
+import com.runicrealms.runicitems.util.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -45,8 +44,8 @@ public class GoldPouchListener implements Listener {
         int maxAmount = Integer.parseInt(runicItemDynamic.getData().get("maxCoins"));
         int amountToFill = maxAmount - currentAmount;
         // if player has enough coins to fill the pouch, fill it
-        if (RunicCore.getShopAPI().hasItem(player, CurrencyUtil.goldCoin(), amountToFill)) {
-            ItemRemover.takeItem(player, CurrencyUtil.goldCoin(), amountToFill);
+        if (ItemUtils.hasItem(player, CurrencyUtil.goldCoin(), amountToFill)) {
+            ItemUtils.takeItem(player, CurrencyUtil.goldCoin(), amountToFill);
             runicItemDynamic.setDynamicField(maxAmount);
             return;
         }
@@ -76,7 +75,7 @@ public class GoldPouchListener implements Listener {
             player.playSound(player.getLocation(), Sound.ENTITY_HORSE_SADDLE, 0.5f, 1.0f);
             int currentCoins = emptyPouch(goldPouch);
             ItemStack emptyPouch = goldPouch.generateItem();
-            ItemRemover.takeItem(player, event.getItemStack(), 1);
+            ItemUtils.takeItem(player, event.getItemStack(), 1);
             // todo: is take item working?
             // give coins contained inside, drops remaining coins on the floor
             int remaining = currentCoins;
@@ -94,7 +93,7 @@ public class GoldPouchListener implements Listener {
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 1.0f);
             fillPouch(player, goldPouch);
             ItemStack filledPouch = goldPouch.generateItem();
-            ItemRemover.takeItem(player, event.getItemStack(), 1);
+            ItemUtils.takeItem(player, event.getItemStack(), 1);
             RunicItemsAPI.addItem(player.getInventory(), filledPouch);
         }
         Bukkit.getScheduler().runTaskLater(RunicItems.getInstance(), () -> playersUpdatingPouches.remove(player.getUniqueId()), GOLD_POUCH_INTERACT_DELAY);
@@ -110,11 +109,13 @@ public class GoldPouchListener implements Listener {
      * @return the new current amount of coins in the pouch
      */
     private int removeGoldStackSize(int currentAmount, int maxAmount, Player player, int stackSize) {
-        while (RunicCore.getShopAPI().hasItem(player, CurrencyUtil.goldCoin(), stackSize) && currentAmount < maxAmount) {
+        while (ItemUtils.hasItem(player, CurrencyUtil.goldCoin(), stackSize) && currentAmount < maxAmount) {
             // remove it, add to pouch
-            ItemRemover.takeItem(player, CurrencyUtil.goldCoin(), stackSize);
+            ItemUtils.takeItem(player, CurrencyUtil.goldCoin(), stackSize);
             currentAmount += stackSize;
         }
         return currentAmount;
     }
+
+
 }
