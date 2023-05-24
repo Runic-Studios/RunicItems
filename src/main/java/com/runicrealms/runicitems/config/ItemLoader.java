@@ -100,6 +100,7 @@ public class ItemLoader {
                         gemTemplate.getTier()));
             }
         } catch (Exception exception) {
+            // Items only fail with console outputs, since we may change template ids from time to time
             Bukkit.getLogger().warning("[RunicItems] Could not load item " + itemDataMap.get("template-id") + " from redis in ItemLoader.java!");
             Bukkit.getLogger().warning("[RunicItems] It is likely that the template id no longer exists or was changed.");
             return null;
