@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.common.util.ColorUtil;
+import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
@@ -95,6 +96,7 @@ public abstract class RunicItem {
         List<String> lore = new ArrayList<>();
         for (ItemLoreSection section : this.loreSections) {
             for (String s : section.getLore()) {
+                s = s.replace("<3", Stat.HEALTH_ICON);
                 lore.add(ColorUtil.format(s));
             }
             if (!section.isEmpty()
