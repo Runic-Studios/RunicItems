@@ -244,45 +244,38 @@ public class RunicItemArmor extends RunicItem {
             healthString = "" + ChatColor.GRAY + ChatColor.STRIKETHROUGH + health + Stat.HEALTH_ICON + ChatColor.RESET + " " + ChatColor.RED + finalHealth + Stat.HEALTH_ICON;
         }
 
-        if (level > 0) {
-            StringBuilder gemTextBuilder = new StringBuilder(ChatColor.GRAY.toString())
-                    .append("Gem Slots: ")
-                    .append(ChatColor.WHITE)
-                    .append("[ ");
-            int counter = 0;
-            for (GemBonus gemBonus : gemBonuses) {
-                for (int i = 0; i < StatUtil.getGemSlots(gemBonus.getTier()); i++) {
-                    gemTextBuilder.append(gemBonus.getMainStat().getChatColor()).append(gemBonus.getMainStat().getIcon()).append(" ");
-                    counter++;
-                }
+        StringBuilder gemTextBuilder = new StringBuilder(ChatColor.GRAY.toString())
+                .append("Gem Slots: ")
+                .append(ChatColor.WHITE)
+                .append("[ ");
+        int counter = 0;
+        for (GemBonus gemBonus : gemBonuses) {
+            for (int i = 0; i < StatUtil.getGemSlots(gemBonus.getTier()); i++) {
+                gemTextBuilder.append(gemBonus.getMainStat().getChatColor()).append(gemBonus.getMainStat().getIcon()).append(" ");
+                counter++;
             }
-            gemTextBuilder.append(ChatColor.GRAY);
-            for (int i = counter; i < maxGemSlots; i++) {
-                gemTextBuilder.append(Stat.EMPTY_GEM_ICON).append(" ");
-            }
-            gemTextBuilder.append(ChatColor.WHITE).append("]");
-            return new ItemLoreSection[]{
-                    (maxGemSlots > 0
-                            ? new ItemLoreSection(new String[]{
-                            ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
-                            gemTextBuilder.toString()})
-                            : new ItemLoreSection(new String[]{
-                            ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level,
-                    })),
-                    new ItemLoreSection(new String[]{healthString}),
-                    new ItemLoreSection(lore),
-                    new ItemLoreSection(new String[]{
-                            rarity.getDisplay(),
-                            ChatColor.GRAY + runicClass.getDisplay()
-                    }),
-            };
-        } else {
-            return new ItemLoreSection[]{
-                    new ItemLoreSection(new String[]{healthString}),
-                    new ItemLoreSection(lore),
-                    new ItemLoreSection(new String[]{rarity.getDisplay(), ChatColor.GRAY + runicClass.getDisplay()}),
-            };
         }
+        gemTextBuilder.append(ChatColor.GRAY);
+        for (int i = counter; i < maxGemSlots; i++) {
+            gemTextBuilder.append(Stat.EMPTY_GEM_ICON).append(" ");
+        }
+        gemTextBuilder.append(ChatColor.WHITE).append("]");
+        String levelString = level > 0 ? String.valueOf(level) : "None";
+        return new ItemLoreSection[]{
+                (maxGemSlots > 0
+                        ? new ItemLoreSection(new String[]{
+                        ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + levelString,
+                        gemTextBuilder.toString()})
+                        : new ItemLoreSection(new String[]{
+                        ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + levelString,
+                })),
+                new ItemLoreSection(new String[]{healthString}),
+                new ItemLoreSection(lore),
+                new ItemLoreSection(new String[]{
+                        rarity.getDisplay(),
+                        ChatColor.GRAY + runicClass.getDisplay()
+                }),
+        };
     }
 
     @Override
