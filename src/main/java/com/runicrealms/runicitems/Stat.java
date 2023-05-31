@@ -55,7 +55,7 @@ public enum Stat {
 
     // Vitality
     private static final double DAMAGE_REDUCTION_MULT = 0.004; // 0.4%
-    private static final double HEALTH_REGEN_MULT = 0.02; // 2%
+    private static final double HEALTH_REGEN_MULT = 0.01; // 1%
 
     /*
     Capped values
