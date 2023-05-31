@@ -57,7 +57,6 @@ public class GemManager implements Listener {
 
         int gemSlotsUsed = 0;
         for (GemBonus gem : armor.getGems()) gemSlotsUsed += StatUtil.getGemSlots(gem.getTier());
-        Bukkit.broadcastMessage(armor.getMaxGemSlots() + " is max gem slots");
         if (gemSlotsUsed + StatUtil.getGemSlots(gemItem.getBonus().getTier()) > armor.getMaxGemSlots()) {
             event.getWhoClicked().sendMessage(ChatColor.RED + "This item doesn't have enough free gem slots!");
             return;
