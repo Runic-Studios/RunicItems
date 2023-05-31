@@ -1,6 +1,5 @@
 package com.runicrealms.runicitems.item;
 
-import com.runicrealms.plugin.common.util.ChatUtils;
 import com.runicrealms.plugin.common.util.Pair;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
@@ -20,7 +19,6 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,29 +78,29 @@ public class RunicItemArtifact extends RunicItemWeapon {
         return new RunicItemArtifact(template, item.getAmount(), nbtItem.getInteger("id"), stats);
     }
 
-    @Override
-    public ItemStack generateItem() {
-        ItemStack item = super.generateItem();
-        NBTItem nbtItem = new NBTItem(item, true);
-        nbtItem.setString("ability-id", this.ability.getIdentifier());
-        nbtItem.setString("ability-trigger", this.ability.getTrigger().getIdentifier());
-        return item;
-    }
+//    @Override
+//    public ItemStack generateItem() {
+//        ItemStack item = super.generateItem();
+//        NBTItem nbtItem = new NBTItem(item, true);
+//        nbtItem.setString("ability-id", this.ability.getIdentifier());
+//        nbtItem.setString("ability-trigger", this.ability.getTrigger().getIdentifier());
+//        return item;
+//    }
 
     @Override
     protected ItemLoreSection[] generateLore() {
-        ItemLoreSection[] sections = new ItemLoreSection[4 + (stats.size() > 0 ? 1 : 0)];
+        ItemLoreSection[] sections = new ItemLoreSection[3 + (stats.size() > 0 ? 1 : 0)]; // 4
         sections[0] = new ItemLoreSection(new String[]{ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level});
         sections[1] = new ItemLoreSection(new String[]{ChatColor.RED + "" + damageRange.getMin() + "-" + damageRange.getMax() + " DMG"});
-        List<String> formattedDescription = new ArrayList<>(Collections.singleton
-                (
-                        ability.getTrigger().getDisplay() + " " + ChatColor.RESET +
-                                ChatColor.GREEN + ability.getAbilityName()
-                ));
-        formattedDescription.addAll(ChatUtils.formattedText(ability.getDescription()));
-        String[] artifactLore = new String[formattedDescription.size()];
-        formattedDescription.toArray(artifactLore);
-        sections[2] = new ItemLoreSection(artifactLore);
+//        List<String> formattedDescription = new ArrayList<>(Collections.singleton
+//                (
+//                        ability.getTrigger().getDisplay() + " " + ChatColor.RESET +
+//                                ChatColor.GREEN + ability.getAbilityName()
+//                ));
+//        formattedDescription.addAll(ChatUtils.formattedText(ability.getDescription()));
+//        String[] artifactLore = new String[formattedDescription.size()];
+//        formattedDescription.toArray(artifactLore);
+//        sections[2] = new ItemLoreSection(artifactLore);
         List<String> lore = new LinkedList<>();
         for (Map.Entry<Stat, RunicItemStat> entry : stats.entrySet()) {
             lore.add(
@@ -112,9 +110,9 @@ public class RunicItemArtifact extends RunicItemWeapon {
                             + entry.getKey().getIcon()
             );
         }
-        sections[3] = new ItemLoreSection(new String[]{rarity.getDisplay(), ChatColor.GRAY + runicClass.getDisplay()});
+        sections[2] = new ItemLoreSection(new String[]{rarity.getDisplay(), ChatColor.GRAY + runicClass.getDisplay()});
         if (stats.size() > 0) {
-            sections[4] = new ItemLoreSection(lore);
+            sections[3] = new ItemLoreSection(lore);
         }
         return sections;
     }
