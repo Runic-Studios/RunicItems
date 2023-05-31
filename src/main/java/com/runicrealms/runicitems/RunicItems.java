@@ -8,15 +8,21 @@ import co.aikar.taskchain.TaskChainFactory;
 import com.runicrealms.plugin.rdb.event.DatabaseInitializeEvent;
 import com.runicrealms.runicitems.api.DataAPI;
 import com.runicrealms.runicitems.api.InventoryAPI;
+import com.runicrealms.runicitems.api.WeaponSkinAPI;
 import com.runicrealms.runicitems.command.RunicItemCommand;
 import com.runicrealms.runicitems.config.AbilityLoader;
 import com.runicrealms.runicitems.config.ConfigUtil;
 import com.runicrealms.runicitems.config.TemplateLoader;
 import com.runicrealms.runicitems.converter.RunicItemReadConverter;
 import com.runicrealms.runicitems.converter.RunicItemWriteConverter;
-import com.runicrealms.runicitems.listeners.*;
+import com.runicrealms.runicitems.listeners.GoldPouchListener;
+import com.runicrealms.runicitems.listeners.ItemSpawnListener;
+import com.runicrealms.runicitems.listeners.MoveToInventoryListener;
+import com.runicrealms.runicitems.listeners.PlayerMTIListener;
+import com.runicrealms.runicitems.listeners.SoulboundListener;
 import com.runicrealms.runicitems.model.InventoryDataManager;
 import com.runicrealms.runicitems.model.MongoTask;
+import com.runicrealms.runicitems.weaponskin.WeaponSkinManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -31,6 +37,7 @@ public class RunicItems extends JavaPlugin implements Listener {
     private static RunicItems instance;
     private static PaperCommandManager commandManager;
     private static DataAPI dataAPI;
+    private static WeaponSkinAPI weaponSkinAPI;
     private static MongoTask mongoTask;
     private static JDA jda;
     private static InventoryAPI INVENTORY_API;
@@ -60,6 +67,10 @@ public class RunicItems extends JavaPlugin implements Listener {
 
     public static InventoryAPI getInventoryAPI() {
         return INVENTORY_API;
+    }
+
+    public static WeaponSkinAPI getWeaponSkinAPI() {
+        return weaponSkinAPI;
     }
 
     public static JDA getJda() {
@@ -132,6 +143,7 @@ public class RunicItems extends JavaPlugin implements Listener {
         mongoTask = new MongoTask();
         new RunicItemReadConverter();
         new RunicItemWriteConverter();
+        weaponSkinAPI = new WeaponSkinManager();
     }
 
 }
