@@ -11,6 +11,7 @@ import com.runicrealms.runicitems.api.InventoryAPI;
 import com.runicrealms.runicitems.api.WeaponSkinAPI;
 import com.runicrealms.runicitems.command.RunicItemCommand;
 import com.runicrealms.runicitems.command.WeaponSkinCommand;
+import com.runicrealms.runicitems.command.WeaponryCommand;
 import com.runicrealms.runicitems.config.AbilityLoader;
 import com.runicrealms.runicitems.config.ConfigUtil;
 import com.runicrealms.runicitems.config.TemplateLoader;
@@ -24,6 +25,7 @@ import com.runicrealms.runicitems.listeners.SoulboundListener;
 import com.runicrealms.runicitems.model.InventoryDataManager;
 import com.runicrealms.runicitems.model.MongoTask;
 import com.runicrealms.runicitems.weaponskin.WeaponSkinManager;
+import com.runicrealms.runicitems.weaponskin.gui.WeaponryGUIListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -113,6 +115,7 @@ public class RunicItems extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new GemManager(), this);
         Bukkit.getPluginManager().registerEvents(new SoulboundListener(), this);
         Bukkit.getPluginManager().registerEvents(new GoldPouchListener(), this);
+        Bukkit.getPluginManager().registerEvents(new WeaponryGUIListener(), this);
 
         // Register Commands
         commandManager = new PaperCommandManager(this);
@@ -126,6 +129,7 @@ public class RunicItems extends JavaPlugin implements Listener {
         });
         commandManager.registerCommand(new RunicItemCommand());
         commandManager.registerCommand(new WeaponSkinCommand());
+        commandManager.registerCommand(new WeaponryCommand());
 
         // Start JDA
         try {

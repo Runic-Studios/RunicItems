@@ -15,13 +15,14 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class WeaponSkinManager implements WeaponSkinAPI {
 
-    private final Set<WeaponSkin> weaponSkins = WeaponSkinConfigLoader.loadFromConfig(new File(RunicItems.getInstance().getDataFolder(), "weapon-skins.yml"));
+    private final List<WeaponSkin> weaponSkins = WeaponSkinConfigLoader.loadFromConfig(new File(RunicItems.getInstance().getDataFolder(), "weapon-skins.yml"));
     private final Map<Material, Set<WeaponSkin>> materialWeaponSkins = new HashMap<>();
     private final Map<String, WeaponSkin> idWeaponSkins = new HashMap<>();
 
@@ -57,8 +58,6 @@ public class WeaponSkinManager implements WeaponSkinAPI {
             if (item == null) continue;
             if (item.getType() == skin.material()) {
                 skin.apply(item);
-                NBTItem nbtItem = new NBTItem(item, true);
-                nbtItem.setString("weapon-skin", skin.id());
             }
         }
     }
@@ -74,7 +73,7 @@ public class WeaponSkinManager implements WeaponSkinAPI {
     }
 
     @Override
-    public Set<WeaponSkin> getAllSkins() {
+    public List<WeaponSkin> getAllSkins() {
         return weaponSkins;
     }
 

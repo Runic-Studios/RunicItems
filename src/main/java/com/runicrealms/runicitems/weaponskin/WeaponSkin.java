@@ -1,5 +1,7 @@
 package com.runicrealms.runicitems.weaponskin;
 
+import com.runicrealms.plugin.common.CharacterClass;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
@@ -11,6 +13,7 @@ public record WeaponSkin(
         String name,
         Material material,
         int damage,
+        CharacterClass classType,
         @Nullable String achievementID,
         @Nullable String rank,
         String permission
@@ -38,6 +41,8 @@ public record WeaponSkin(
             throw new IllegalArgumentException("Cannot apply weapon skin to non-damageable item!");
         meta.setDamage(damage());
         itemStack.setItemMeta((ItemMeta) meta);
+        NBTItem nbtItem = new NBTItem(itemStack, true);
+        nbtItem.setString("weapon-skin", id());
     }
 
 }

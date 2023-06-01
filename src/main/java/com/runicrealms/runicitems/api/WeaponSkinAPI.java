@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 public interface WeaponSkinAPI {
 
@@ -29,7 +29,7 @@ public interface WeaponSkinAPI {
     /**
      * Gets a list of all skins loaded from config
      */
-    Set<WeaponSkin> getAllSkins();
+    List<WeaponSkin> getAllSkins();
 
     /**
      * Reverts an itemstack's skin to the default defined by runic items.

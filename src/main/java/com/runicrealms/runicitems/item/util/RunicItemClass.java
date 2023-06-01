@@ -1,5 +1,7 @@
 package com.runicrealms.runicitems.item.util;
 
+import com.runicrealms.plugin.common.CharacterClass;
+
 public enum RunicItemClass {
 
     WARRIOR("Warrior", "warrior"),
@@ -17,6 +19,15 @@ public enum RunicItemClass {
         this.identifier = identifier;
     }
 
+    public static RunicItemClass getFromIdentifier(String identifier) {
+        for (RunicItemClass itemClass : RunicItemClass.values()) {
+            if (itemClass.getIdentifier().equalsIgnoreCase(identifier)) {
+                return itemClass;
+            }
+        }
+        return null;
+    }
+
     public String getDisplay() {
         return this.display;
     }
@@ -25,13 +36,8 @@ public enum RunicItemClass {
         return this.identifier;
     }
 
-    public static RunicItemClass getFromIdentifier(String identifier) {
-        for (RunicItemClass itemClass : RunicItemClass.values()) {
-            if (itemClass.getIdentifier().equalsIgnoreCase(identifier)) {
-                return itemClass;
-            }
-        }
-        return null;
+    public CharacterClass toCharacterClass() {
+        return CharacterClass.getFromName(this.identifier);
     }
 
 }
