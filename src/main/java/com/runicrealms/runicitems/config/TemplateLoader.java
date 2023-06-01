@@ -47,12 +47,17 @@ public class TemplateLoader {
             FileConfiguration itemConfig;
             itemConfig = ConfigUtil.getYamlConfigFile(file.getName(), templateFiles.get(file));
             RunicItemTemplate template;
-            template = loadTemplate(itemConfig);
-            if (template == null) {
-                Bukkit.getLogger().log(Level.INFO, "[RunicItems] WARNING: failed to load template " + file.getName());
-                continue;
+            try {
+                template = loadTemplate(itemConfig);
+                if (template == null) {
+                    Bukkit.getLogger().log(Level.INFO, "[RunicItems] WARNING: failed to load template " + file.getName());
+                    continue;
+                }
+                templates.put(template.getId(), template);
+            } catch (Exception exception) {
+                Bukkit.getLogger().log(Level.INFO, "Error loading template: " + file.getName());
+                exception.printStackTrace();
             }
-            templates.put(template.getId(), template);
         }
         TemplateManager.setTemplates(templates);
     }

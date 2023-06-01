@@ -1,4 +1,4 @@
-package com.runicrealms.runicitems.weaponskin.gui;
+package com.runicrealms.runicitems.weaponskin.ui;
 
 import com.runicrealms.plugin.common.CharacterClass;
 import com.runicrealms.plugin.common.util.ColorUtil;
@@ -26,14 +26,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WeaponryGUI implements InventoryHolder {
+public class WeaponryUI implements InventoryHolder {
     private static List<Pair<CharacterClass, List<WeaponSkin>>> pages = null;
 
     private final Inventory inventory;
     private final Player player;
     private final int pageNumber;
 
-    public WeaponryGUI(Player player, int pageNumber) {
+    public WeaponryUI(Player player, int pageNumber) {
         this.player = player;
         this.pageNumber = pageNumber;
         this.inventory = Bukkit.createInventory(this, 54, ColorUtil.format("&eWeaponry Custom Skins"));
@@ -41,7 +41,7 @@ public class WeaponryGUI implements InventoryHolder {
     }
 
 
-    public WeaponryGUI(Player player) {
+    public WeaponryUI(Player player) {
         this(player, getDefaultPageNumber(player));
     }
 

@@ -8,7 +8,7 @@ import com.runicrealms.plugin.common.util.ColorUtil;
 import com.runicrealms.runicitems.RunicItemsAPI;
 import com.runicrealms.runicitems.item.template.RunicItemArtifactTemplate;
 import com.runicrealms.runicitems.item.template.RunicItemWeaponTemplate;
-import com.runicrealms.runicitems.weaponskin.gui.WeaponryGUI;
+import com.runicrealms.runicitems.weaponskin.ui.WeaponryUI;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -24,7 +24,7 @@ public class WeaponryCommand extends BaseCommand {
             player.sendMessage(ColorUtil.format("&cYou must be holding a weapon while opening the weaponry!"));
             return;
         }
-        player.openInventory(new WeaponryGUI(player).getInventory());
+        player.openInventory(new WeaponryUI(player).getInventory());
     }
 
 }
