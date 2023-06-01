@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -285,10 +286,30 @@ public class RunicItemsAPI {
 
     /**
      * Registers a handler for plugins that aim to prevent dupes when the player has a specific inventory open.
+     *
      * @param handler Handler
      */
     public static void registerAntiDupeInventoryHandler(AntiDupeInventoryHandler handler) {
         DupeManager.registerAntiDupeInventoryHandler(handler);
+    }
+
+    /**
+     * Gets a collection of all item templates that have been loaded.
+     *
+     * @return Template collection
+     */
+    public static Collection<RunicItemTemplate> getTemplates() {
+        return TemplateManager.getTemplates().values();
+    }
+
+    /**
+     * Checks if a given string is a valid ID of a loaded template
+     *
+     * @param templateId Template ID (String)
+     * @return Is a template?
+     */
+    public static boolean isTemplate(String templateId) {
+        return TemplateManager.getTemplateFromId(templateId) != null;
     }
 
 }
