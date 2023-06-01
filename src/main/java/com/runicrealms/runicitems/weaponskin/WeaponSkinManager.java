@@ -28,7 +28,7 @@ public class WeaponSkinManager implements WeaponSkinAPI {
     public WeaponSkinManager() {
         RunicItems.getCommandManager().getCommandCompletions().registerCompletion("weaponskins", (context) ->
                 weaponSkins.stream()
-                        .map(WeaponSkin::customName)
+                        .map(WeaponSkin::id)
                         .collect(Collectors.toSet()));
         for (WeaponSkin skin : weaponSkins) {
             if (!materialWeaponSkins.containsKey(skin.material()))
@@ -36,7 +36,7 @@ public class WeaponSkinManager implements WeaponSkinAPI {
             materialWeaponSkins.get(skin.material()).add(skin);
         }
         for (WeaponSkin skin : weaponSkins) {
-            idWeaponSkins.put(skin.customName(), skin);
+            idWeaponSkins.put(skin.id(), skin);
         }
     }
 
@@ -51,14 +51,14 @@ public class WeaponSkinManager implements WeaponSkinAPI {
     @Override
     public void activateSkin(Player player, WeaponSkin skin) {
         if (!canActivateSkin(player, skin))
-            throw new IllegalStateException("Player " + player.getName() + " cannot equip skin " + skin.customName());
+            throw new IllegalStateException("Player " + player.getName() + " cannot equip skin " + skin.id());
 
         for (ItemStack item : player.getInventory()) {
             if (item == null) continue;
             if (item.getType() == skin.material()) {
                 skin.apply(item);
                 NBTItem nbtItem = new NBTItem(item, true);
-                nbtItem.setString("weapon-skin", skin.customName());
+                nbtItem.setString("weapon-skin", skin.id());
             }
         }
     }

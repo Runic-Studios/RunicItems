@@ -7,7 +7,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 public record WeaponSkin(
-        String customName,
+        String id,
+        String name,
         Material material,
         int damage,
         @Nullable String achievementID,
@@ -29,7 +30,7 @@ public record WeaponSkin(
 
     @Override
     public boolean equals(Object object) {
-        return object instanceof WeaponSkin && ((WeaponSkin) object).customName.equalsIgnoreCase(this.customName);
+        return object instanceof WeaponSkin && ((WeaponSkin) object).id.equalsIgnoreCase(this.id);
     }
 
     public void apply(ItemStack itemStack) {

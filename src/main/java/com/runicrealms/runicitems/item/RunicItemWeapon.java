@@ -122,7 +122,7 @@ public class RunicItemWeapon extends RunicItem {
             jedisDataMap.put("stats:" + statType.getIdentifier(), String.valueOf(this.stats.get(statType).getRollPercentage()));
         }
         if (this.activeSkin != null) {
-            jedisDataMap.put("weapon-skin", this.activeSkin.customName());
+            jedisDataMap.put("weapon-skin", this.activeSkin.id());
         }
         return jedisDataMap;
     }
@@ -140,7 +140,7 @@ public class RunicItemWeapon extends RunicItem {
             count++;
         }
         if (this.activeSkin != null) {
-            nbtItem.setString("weapon-skin", this.activeSkin.customName());
+            nbtItem.setString("weapon-skin", this.activeSkin.id());
             item = nbtItem.getItem();
             this.activeSkin.apply(item);
         }
@@ -175,7 +175,7 @@ public class RunicItemWeapon extends RunicItem {
         }
         document.put("stats", statsMap);
         if (this.activeSkin != null) {
-            document.put("weapon-skin", this.activeSkin.customName());
+            document.put("weapon-skin", this.activeSkin.id());
         }
         return document;
     }

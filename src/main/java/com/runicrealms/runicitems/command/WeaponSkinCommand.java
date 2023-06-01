@@ -30,7 +30,7 @@ public class WeaponSkinCommand extends BaseCommand {
         for (String skinName : args) {
             WeaponSkin weaponSkin = RunicItems.getWeaponSkinAPI().getAllSkins()
                     .stream()
-                    .filter((skin) -> skin.customName().equalsIgnoreCase(skinName))
+                    .filter((skin) -> skin.id().equalsIgnoreCase(skinName))
                     .findFirst().orElse(null);
             if (weaponSkin == null) {
                 player.sendMessage(ColorUtil.format("&cFailed to find skin: " + skinName));
@@ -51,7 +51,7 @@ public class WeaponSkinCommand extends BaseCommand {
         for (String skinName : args) {
             WeaponSkin weaponSkin = RunicItems.getWeaponSkinAPI().getAllSkins()
                     .stream()
-                    .filter((skin) -> skin.customName().equalsIgnoreCase(skinName))
+                    .filter((skin) -> skin.id().equalsIgnoreCase(skinName))
                     .findFirst().orElse(null);
             if (weaponSkin == null) {
                 player.sendMessage(ColorUtil.format("&cFailed to find skin: " + skinName));
@@ -64,7 +64,7 @@ public class WeaponSkinCommand extends BaseCommand {
 
     @Subcommand("list")
     public void onCommandList(Player player) {
-        player.sendMessage(ColorUtil.format("&aAll skins: " + RunicItems.getWeaponSkinAPI().getAllSkins().stream().map(WeaponSkin::customName).collect(Collectors.joining(", "))));
+        player.sendMessage(ColorUtil.format("&aAll skins: " + RunicItems.getWeaponSkinAPI().getAllSkins().stream().map(WeaponSkin::id).collect(Collectors.joining(", "))));
     }
 
 }
