@@ -10,6 +10,7 @@ import com.runicrealms.runicitems.api.DataAPI;
 import com.runicrealms.runicitems.api.InventoryAPI;
 import com.runicrealms.runicitems.api.WeaponSkinAPI;
 import com.runicrealms.runicitems.command.RunicItemCommand;
+import com.runicrealms.runicitems.command.WeaponSkinCommand;
 import com.runicrealms.runicitems.config.AbilityLoader;
 import com.runicrealms.runicitems.config.ConfigUtil;
 import com.runicrealms.runicitems.config.TemplateLoader;
@@ -124,6 +125,7 @@ public class RunicItems extends JavaPlugin implements Listener {
                 throw new ConditionFailedException("You must be an operator to run this command!");
         });
         commandManager.registerCommand(new RunicItemCommand());
+        commandManager.registerCommand(new WeaponSkinCommand());
 
         // Start JDA
         try {

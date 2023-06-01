@@ -4,36 +4,40 @@ import com.runicrealms.plugin.common.RunicCommon;
 import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.RunicItemsAPI;
 import com.runicrealms.runicitems.api.WeaponSkinAPI;
-import org.bukkit.Bukkit;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class WeaponSkinManager implements WeaponSkinAPI, Listener {
+public class WeaponSkinManager implements WeaponSkinAPI {
 
     private final Set<WeaponSkin> weaponSkins = WeaponSkinConfigLoader.loadFromConfig(new File(RunicItems.getInstance().getDataFolder(), "weapon-skins.yml"));
-    private final Map<UUID, WeaponSkinHolder> playerWeaponSkins = new HashMap<>();
+    private final Map<Material, Set<WeaponSkin>> materialWeaponSkins = new HashMap<>();
+    private final Map<String, WeaponSkin> idWeaponSkins = new HashMap<>();
 
     public WeaponSkinManager() {
-        Bukkit.getPluginManager().registerEvents(this, RunicItems.getInstance());
         RunicItems.getCommandManager().getCommandCompletions().registerCompletion("weaponskins", (context) ->
                 weaponSkins.stream()
                         .map(WeaponSkin::customName)
                         .collect(Collectors.toSet()));
+        for (WeaponSkin skin : weaponSkins) {
+            if (!materialWeaponSkins.containsKey(skin.material()))
+                materialWeaponSkins.put(skin.material(), new HashSet<>());
+            materialWeaponSkins.get(skin.material()).add(skin);
+        }
+        for (WeaponSkin skin : weaponSkins) {
+            idWeaponSkins.put(skin.customName(), skin);
+        }
     }
 
     @Override
@@ -46,24 +50,21 @@ public class WeaponSkinManager implements WeaponSkinAPI, Listener {
 
     @Override
     public void activateSkin(Player player, WeaponSkin skin) {
-        playerWeaponSkins.get(player.getUniqueId()).setSkinActive(skin, true);
         if (!canActivateSkin(player, skin))
             throw new IllegalStateException("Player " + player.getName() + " cannot equip skin " + skin.customName());
 
         for (ItemStack item : player.getInventory()) {
             if (item == null) continue;
             if (item.getType() == skin.material()) {
-                Damageable meta = (Damageable) item.getItemMeta();
-                meta.setDamage(skin.damage());
-                item.setItemMeta((ItemMeta) meta);
+                skin.apply(item);
+                NBTItem nbtItem = new NBTItem(item, true);
+                nbtItem.setString("weapon-skin", skin.customName());
             }
         }
     }
 
     @Override
     public void deactivateSkin(Player player, WeaponSkin skin) {
-        playerWeaponSkins.get(player.getUniqueId()).setSkinActive(skin, false);
-
         for (ItemStack item : player.getInventory()) {
             if (item == null) continue;
             if (item.getType() == skin.material()) {
@@ -78,54 +79,47 @@ public class WeaponSkinManager implements WeaponSkinAPI, Listener {
     }
 
     @Override
-    public boolean hasWeaponSkin(Player player, WeaponSkin skin) {
-        return playerWeaponSkins.get(player.getUniqueId()).ownsSkin(skin);
-    }
-
-    @Override
-    public boolean weaponSkinActive(Player player, WeaponSkin skin) {
-        return playerWeaponSkins.get(player.getUniqueId()).skinActive(skin);
-    }
-
-    @Override
-    public boolean weaponSkinActive(Player player, Material material) {
-        return playerWeaponSkins.get(player.getUniqueId()).getSkinsOwned()
-                .stream()
-                .filter((skin) -> playerWeaponSkins.get(player.getUniqueId()).skinActive(skin))
-                .anyMatch((skin) -> skin.material() == material);
-    }
-
-    @Nullable
-    @Override
-    public WeaponSkin getWeaponSkin(Player player, Material material) {
-        return playerWeaponSkins.get(player.getUniqueId()).getSkinsOwned()
-                .stream()
-                .filter((skin) -> playerWeaponSkins.get(player.getUniqueId()).skinActive(skin)
-                        && skin.material() == material)
-                .findFirst().orElse(null);
-    }
-
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        playerWeaponSkins.put(event.getPlayer().getUniqueId(), new WeaponSkinHolder(event.getPlayer().getUniqueId()));
-        for (WeaponSkin skin : weaponSkins) {
-            if (canActivateSkin(event.getPlayer(), skin)) {
-                playerWeaponSkins.get(event.getPlayer().getUniqueId()).setSkinActive(skin, false);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        playerWeaponSkins.remove(event.getPlayer().getUniqueId());
-    }
-
-    @Override
     public ItemStack disableSkin(ItemStack itemStack) {
-        Damageable meta = (Damageable) itemStack.getItemMeta();
-        meta.setDamage(RunicItemsAPI.getItemStackTemplate(itemStack).getDisplayableItem().getDamage());
-        itemStack.setItemMeta((ItemMeta) meta);
+        if (itemStack == null) return null;
+        if (!itemStack.hasItemMeta()) return itemStack;
+        if (!(itemStack.getItemMeta() instanceof Damageable)) return itemStack;
+        NBTItem nbtItem = new NBTItem(itemStack, true);
+        if (!nbtItem.hasNBTData()) return itemStack;
+        if (!nbtItem.hasKey("weapon-skin")) return itemStack;
+        return forceDisableSkin(itemStack);
+    }
+
+    @Override
+    public ItemStack disableDisallowedSkin(Player owner, ItemStack itemStack) {
+        if (itemStack == null) return null;
+        if (!itemStack.hasItemMeta()) return itemStack;
+        if (!(itemStack.getItemMeta() instanceof Damageable)) return itemStack;
+        NBTItem nbtItem = new NBTItem(itemStack, true);
+        if (!nbtItem.hasNBTData()) return itemStack;
+        if (!nbtItem.hasKey("weapon-skin")) return itemStack;
+        WeaponSkin skin = getWeaponSkin(nbtItem.getString("weapon-skin"));
+        if (skin == null) return itemStack;
+        if (!canActivateSkin(owner, skin)) return forceDisableSkin(itemStack);
         return itemStack;
+    }
+
+    @Override
+    public Collection<WeaponSkin> getMaterialSkins(Material material) {
+        return materialWeaponSkins.get(material);
+    }
+
+    @Override
+    public WeaponSkin getWeaponSkin(String weaponSkinID) {
+        return idWeaponSkins.get(weaponSkinID);
+    }
+
+    private ItemStack forceDisableSkin(ItemStack item) {
+        Damageable meta = (Damageable) item.getItemMeta();
+        meta.setDamage(RunicItemsAPI.getItemStackTemplate(item).getDisplayableItem().getDamage());
+        item.setItemMeta((ItemMeta) meta);
+        NBTItem nbtItem = new NBTItem(item);
+        nbtItem.removeKey("weapon-skin");
+        return nbtItem.getItem();
     }
 
 }

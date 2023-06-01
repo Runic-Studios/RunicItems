@@ -1,18 +1,18 @@
 package com.runicrealms.runicitems.item.template;
 
- import com.runicrealms.runicitems.Stat;
- import com.runicrealms.runicitems.item.RunicItemArtifact;
- import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
- import com.runicrealms.runicitems.item.stats.RunicItemRarity;
- import com.runicrealms.runicitems.item.stats.RunicItemStat;
- import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
- import com.runicrealms.runicitems.item.stats.RunicItemTag;
- import com.runicrealms.runicitems.item.util.DisplayableItem;
- import com.runicrealms.runicitems.item.util.RunicItemClass;
+import com.runicrealms.runicitems.Stat;
+import com.runicrealms.runicitems.item.RunicItemArtifact;
+import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
+import com.runicrealms.runicitems.item.stats.RunicItemRarity;
+import com.runicrealms.runicitems.item.stats.RunicItemStat;
+import com.runicrealms.runicitems.item.stats.RunicItemStatRange;
+import com.runicrealms.runicitems.item.stats.RunicItemTag;
+import com.runicrealms.runicitems.item.util.DisplayableItem;
+import com.runicrealms.runicitems.item.util.RunicItemClass;
 
- import java.util.LinkedHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
- import java.util.Map;
+import java.util.Map;
 
 public class RunicItemArtifactTemplate extends RunicRarityLevelItemTemplate {
 
@@ -46,7 +46,7 @@ public class RunicItemArtifactTemplate extends RunicRarityLevelItemTemplate {
         return new RunicItemArtifact(
                 this.id, this.displayableItem, tags, data, count, id,
                 this.ability, this.damageRange, rolledStats,
-                this.level, this.rarity, this.runicClass
+                this.level, this.rarity, this.runicClass, null
         );
     }
 

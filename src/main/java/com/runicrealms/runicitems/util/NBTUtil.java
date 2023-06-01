@@ -24,19 +24,22 @@ public class NBTUtil {
             case NBTTagLong -> nbtItem.getLong(key);
             case NBTTagShort -> nbtItem.getShort(key);
             case NBTTagString -> nbtItem.getString(key);
-            default ->
-                    throw new IllegalArgumentException("Unknown NBTItem key type \"" + key + "\"!");
+            default -> throw new IllegalArgumentException("Unknown NBTItem key type \"" + key + "\"!");
         };
     }
 
     public static boolean isNBTSimilar(ItemStack itemOne, ItemStack itemTwo, boolean checkId, boolean checkLastCount) {
         if (itemOne.getType() != itemTwo.getType()) return false;
-        if (itemOne.getItemMeta() instanceof Damageable && itemTwo.getItemMeta() instanceof Damageable) {
-            if (((Damageable) itemOne.getItemMeta()).getDamage() != ((Damageable) itemTwo.getItemMeta()).getDamage())
-                return false;
-        }
+
         NBTItem nbtItemOne = new NBTItem(itemOne);
         NBTItem nbtItemTwo = new NBTItem(itemTwo);
+
+        if (!nbtItemOne.hasKey("weapon-skin") && !nbtItemTwo.hasKey("weapon-skin")) {
+            if (itemOne.getItemMeta() instanceof Damageable && itemTwo.getItemMeta() instanceof Damageable) {
+                if (((Damageable) itemOne.getItemMeta()).getDamage() != ((Damageable) itemTwo.getItemMeta()).getDamage())
+                    return false;
+            }
+        }
         Set<String> keys = new HashSet<>(nbtItemOne.getKeys());
         keys.addAll(nbtItemTwo.getKeys());
         if (!checkId) {
@@ -51,6 +54,7 @@ public class NBTUtil {
         keys.remove("AttributeModifiers");
         keys.remove("isRI");
         keys.remove("CanDestroy"); // for gathering tools
+        keys.remove("weapon-skin");
         try {
             for (String key : keys) {
                 if (

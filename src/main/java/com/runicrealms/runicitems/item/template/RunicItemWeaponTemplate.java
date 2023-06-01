@@ -43,7 +43,7 @@ public class RunicItemWeaponTemplate extends RunicRarityLevelItemTemplate {
         return new RunicItemWeapon(
                 this.id, this.displayableItem, tags, data, count, id,
                 this.damageRange, rolledStats,
-                this.level, this.rarity, this.runicClass
+                this.level, this.rarity, this.runicClass, null
         );
     }
 

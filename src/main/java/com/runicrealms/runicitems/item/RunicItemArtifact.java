@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.common.util.Pair;
+import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
@@ -13,10 +14,12 @@ import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
+import com.runicrealms.runicitems.weaponskin.WeaponSkin;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -32,17 +35,17 @@ public class RunicItemArtifact extends RunicItemWeapon {
 
     public RunicItemArtifact(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
                              RunicArtifactAbility ability, RunicItemStatRange damageRange, LinkedHashMap<Stat, RunicItemStat> stats,
-                             int level, RunicItemRarity rarity, RunicItemClass runicClass) {
-        super(templateId, displayableItem, tags, data, count, id, damageRange, stats, level, rarity, runicClass);
+                             int level, RunicItemRarity rarity, RunicItemClass runicClass, WeaponSkin activeSkin) {
+        super(templateId, displayableItem, tags, data, count, id, damageRange, stats, level, rarity, runicClass, activeSkin);
         this.ability = ability;
         this.rarity = rarity;
     }
 
-    public RunicItemArtifact(RunicItemArtifactTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats) {
+    public RunicItemArtifact(RunicItemArtifactTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats, WeaponSkin activeSkin) {
         this(
                 template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id,
                 template.getAbility(), template.getDamageRange(), stats,
-                template.getLevel(), template.getRarity(), template.getRunicClass()
+                template.getLevel(), template.getRarity(), template.getRunicClass(), activeSkin
         );
     }
 
@@ -75,7 +78,19 @@ public class RunicItemArtifact extends RunicItemWeapon {
         for (Pair<Stat, RunicItemStat> stat : statsList) {
             stats.put(stat.first, stat.second);
         }
-        return new RunicItemArtifact(template, item.getAmount(), nbtItem.getInteger("id"), stats);
+        WeaponSkin skin = null;
+        if (item instanceof Damageable) {
+            Damageable meta = (Damageable) item.getItemMeta();
+            if (meta.hasDamage() && meta.getDamage() != template.getDisplayableItem().getDamage()) {
+                for (WeaponSkin target : RunicItems.getWeaponSkinAPI().getMaterialSkins(item.getType())) {
+                    if (target.damage() == meta.getDamage()) {
+                        skin = target;
+                        break;
+                    }
+                }
+            }
+        }
+        return new RunicItemArtifact(template, item.getAmount(), nbtItem.getInteger("id"), stats, skin);
     }
 
 //    @Override

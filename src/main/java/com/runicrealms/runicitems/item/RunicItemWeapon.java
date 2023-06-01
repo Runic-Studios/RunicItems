@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item;
 
 import com.runicrealms.plugin.common.util.Pair;
+import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.Stat;
 import com.runicrealms.runicitems.TemplateManager;
 import com.runicrealms.runicitems.item.stats.RunicItemRarity;
@@ -12,11 +13,13 @@ import com.runicrealms.runicitems.item.template.RunicItemWeaponTemplate;
 import com.runicrealms.runicitems.item.util.DisplayableItem;
 import com.runicrealms.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.runicitems.item.util.RunicItemClass;
+import com.runicrealms.runicitems.weaponskin.WeaponSkin;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -37,6 +40,7 @@ public class RunicItemWeapon extends RunicItem {
     protected RunicItemClass runicClass;
     protected RunicItemStatRange damageRange;
     protected LinkedHashMap<Stat, RunicItemStat> stats;
+    protected @Nullable WeaponSkin activeSkin;
 
     @SuppressWarnings("unused")
     public RunicItemWeapon() {
@@ -55,20 +59,22 @@ public class RunicItemWeapon extends RunicItem {
             LinkedHashMap<Stat, RunicItemStat> stats,
             int level,
             RunicItemRarity rarity,
-            RunicItemClass runicClass) {
+            RunicItemClass runicClass,
+            @Nullable WeaponSkin activeSkin) {
         super(templateId, displayableItem, tags, data, count, id);
         this.level = level;
         this.rarity = rarity;
         this.runicClass = runicClass;
         this.damageRange = damageRange;
         this.stats = stats;
+        this.activeSkin = activeSkin;
     }
 
-    public RunicItemWeapon(RunicItemWeaponTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats) {
+    public RunicItemWeapon(RunicItemWeaponTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats, @Nullable WeaponSkin activeSkin) {
         this(
                 template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id,
                 template.getDamageRange(), stats,
-                template.getLevel(), template.getRarity(), template.getRunicClass()
+                template.getLevel(), template.getRarity(), template.getRunicClass(), activeSkin
         );
     }
 
@@ -102,7 +108,11 @@ public class RunicItemWeapon extends RunicItem {
         for (Pair<Stat, RunicItemStat> stat : statsList) {
             stats.put(stat.first, stat.second);
         }
-        return new RunicItemWeapon(template, item.getAmount(), nbtItem.getInteger("id"), stats);
+        WeaponSkin skin = null;
+        if (nbtItem.hasNBTData() && nbtItem.hasKey("weapon-skin")) {
+            skin = RunicItems.getWeaponSkinAPI().getWeaponSkin(nbtItem.getString("weapon-skin"));
+        }
+        return new RunicItemWeapon(template, item.getAmount(), nbtItem.getInteger("id"), stats, skin);
     }
 
     @Override
@@ -110,6 +120,9 @@ public class RunicItemWeapon extends RunicItem {
         Map<String, String> jedisDataMap = super.addToRedis();
         for (Stat statType : this.stats.keySet()) {
             jedisDataMap.put("stats:" + statType.getIdentifier(), String.valueOf(this.stats.get(statType).getRollPercentage()));
+        }
+        if (this.activeSkin != null) {
+            jedisDataMap.put("weapon-skin", this.activeSkin.customName());
         }
         return jedisDataMap;
     }
@@ -125,6 +138,11 @@ public class RunicItemWeapon extends RunicItem {
         for (Stat statType : this.stats.keySet()) {
             nbtItem.setDouble("stat-" + count + "-" + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
             count++;
+        }
+        if (this.activeSkin != null) {
+            nbtItem.setString("weapon-skin", this.activeSkin.customName());
+            item = nbtItem.getItem();
+            this.activeSkin.apply(item);
         }
         return item;
     }
@@ -156,6 +174,9 @@ public class RunicItemWeapon extends RunicItem {
             statsMap.put(statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
         }
         document.put("stats", statsMap);
+        if (this.activeSkin != null) {
+            document.put("weapon-skin", this.activeSkin.customName());
+        }
         return document;
     }
 

@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Set;
 
 public interface WeaponSkinAPI {
@@ -31,30 +32,27 @@ public interface WeaponSkinAPI {
     Set<WeaponSkin> getAllSkins();
 
     /**
-     * Checks if a player owns a weapon skin (has permission to use it)
-     */
-    boolean hasWeaponSkin(Player player, WeaponSkin skin);
-
-    /**
-     * Checks if a player has a given weapon skin activated currently
-     */
-    boolean weaponSkinActive(Player player, WeaponSkin skin);
-
-    /**
-     * Checks if a player has a weapon skin currently activated for a given material
-     */
-    boolean weaponSkinActive(Player player, Material material);
-
-    /**
-     * Gets the player's current weapon skin activated for a material, or null
-     */
-    @Nullable
-    WeaponSkin getWeaponSkin(Player player, Material material);
-
-    /**
-     * Reverts an itemstack's skin to the default defined by runic items
+     * Reverts an itemstack's skin to the default defined by runic items.
+     * Performs nothing if not applicable.
      */
     ItemStack disableSkin(ItemStack itemStack);
 
+    /**
+     * Reverts an itemstack's skin to the default defined by runic items,
+     * ...IF AND ONLY IF the owner does not have permission to be using this skin.
+     * Performs nothing if not applicable.
+     */
+    ItemStack disableDisallowedSkin(Player owner, ItemStack itemStack);
+
+    /**
+     * Gets all existing weapon skins for a given material
+     */
+    Collection<WeaponSkin> getMaterialSkins(Material material);
+
+    /**
+     * Gets a weapon skin by its custom ID in the weapon skins file
+     */
+    @Nullable
+    WeaponSkin getWeaponSkin(String weaponSkinID);
 
 }
