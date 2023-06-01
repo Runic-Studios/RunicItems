@@ -58,6 +58,10 @@ public class WeaponryGUIListener implements Listener {
             String weaponSkinID = nbtItem.getString("weapon-skin-menu");
             WeaponSkin skin = RunicItems.getWeaponSkinAPI().getWeaponSkin(weaponSkinID);
             if (skin == null) return;
+            if (skin.material() != player.getInventory().getItemInMainHand().getType()) {
+                player.closeInventory();
+                player.sendMessage(ColorUtil.format("&7You must be holding a weapon for class type &e" + skin.classType().getName() + "&c to equip the &e" + skin.name() + "&c skin."));
+            }
             if (event.getClick() == ClickType.LEFT) {
                 if (!RunicItems.getWeaponSkinAPI().canActivateSkin(player, skin)) return;
                 skin.apply(player.getInventory().getItemInMainHand());
