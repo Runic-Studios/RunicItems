@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.weaponskin.ui;
 
 import com.runicrealms.plugin.common.CharacterClass;
+import com.runicrealms.plugin.common.util.ChatUtils;
 import com.runicrealms.plugin.common.util.ColorUtil;
 import com.runicrealms.plugin.common.util.GUIUtil;
 import com.runicrealms.plugin.common.util.Pair;
@@ -26,22 +27,22 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WeaponryUI implements InventoryHolder {
+public class WeaponAppearancesUI implements InventoryHolder {
     private static List<Pair<CharacterClass, List<WeaponSkin>>> pages = null;
 
     private final Inventory inventory;
     private final Player player;
     private final int pageNumber;
 
-    public WeaponryUI(Player player, int pageNumber) {
+    public WeaponAppearancesUI(Player player, int pageNumber) {
         this.player = player;
         this.pageNumber = pageNumber;
-        this.inventory = Bukkit.createInventory(this, 54, ColorUtil.format("&eWeaponry Custom Skins"));
+        this.inventory = Bukkit.createInventory(this, 54, ColorUtil.format("&eWeapon Appearances"));
         generateMenu();
     }
 
 
-    public WeaponryUI(Player player) {
+    public WeaponAppearancesUI(Player player) {
         this(player, getDefaultPageNumber(player));
     }
 
@@ -142,14 +143,13 @@ public class WeaponryUI implements InventoryHolder {
             topElement.setItemMeta((ItemMeta) damageable);
         }
         ItemMeta meta = topElement.getItemMeta();
-        meta.setDisplayName(ColorUtil.format("&eWeaponry Custom Skins"));
+        meta.setDisplayName(ColorUtil.format("&eWeapon Appearances"));
         meta.setUnbreakable(true);
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
         List<String> lore = new ArrayList<>();
         lore.add(ColorUtil.format("&7" + getPages().get(pageNumber).first.getName()));
         lore.add("");
-        lore.add(ColorUtil.format("&7Weapon skins only modify the appearance of your weapons and artifacts"));
-        lore.add(ColorUtil.format("&7Donator ranks grant you access to more weapon skins!"));
+        lore.addAll(ChatUtils.formattedText("&7Weapon skins only modify the appearance of your weapons and artifacts. Donor ranks grant you access to more weapon skins!"));
         meta.setLore(lore);
         topElement.setItemMeta(meta);
 

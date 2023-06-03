@@ -16,18 +16,18 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 
-public class WeaponryUIListener implements Listener {
+public class WeaponAppearancesUIListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getClickedInventory() == null) return;
-        if (!(event.getView().getTopInventory().getHolder() instanceof WeaponryUI)) return;
+        if (!(event.getView().getTopInventory().getHolder() instanceof WeaponAppearancesUI)) return;
         if (event.getClickedInventory().getType() == InventoryType.PLAYER) {
             event.setCancelled(true);
             return;
         }
-        WeaponryUI weaponryUI = (WeaponryUI) event.getClickedInventory().getHolder();
-        if (!event.getWhoClicked().equals(weaponryUI.getPlayer())) {
+        WeaponAppearancesUI weaponAppearancesUI = (WeaponAppearancesUI) event.getClickedInventory().getHolder();
+        if (!event.getWhoClicked().equals(weaponAppearancesUI.getPlayer())) {
             event.setCancelled(true);
             event.getWhoClicked().closeInventory();
             return;
@@ -35,15 +35,15 @@ public class WeaponryUIListener implements Listener {
 
         Player player = (Player) event.getWhoClicked();
         if (event.getCurrentItem() == null) return;
-        if (weaponryUI.getInventory().getItem(event.getRawSlot()) == null) return;
+        if (weaponAppearancesUI.getInventory().getItem(event.getRawSlot()) == null) return;
 
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.0f);
         event.setCancelled(true);
 
         if (event.getSlot() == 0 && event.getCurrentItem().getType() == Material.GRAY_STAINED_GLASS_PANE) {
-            player.openInventory(new WeaponryUI(player, weaponryUI.getPageNumber() - 1).getInventory());
+            player.openInventory(new WeaponAppearancesUI(player, weaponAppearancesUI.getPageNumber() - 1).getInventory());
         } else if (event.getSlot() == 8 && event.getCurrentItem().getType() == Material.BROWN_STAINED_GLASS_PANE) {
-            player.openInventory(new WeaponryUI(player, weaponryUI.getPageNumber() + 1).getInventory());
+            player.openInventory(new WeaponAppearancesUI(player, weaponAppearancesUI.getPageNumber() + 1).getInventory());
         } else if (event.getSlot() >= 9) {
             if (player.getInventory().getItemInMainHand().getType() == Material.AIR
                     || (!(RunicItemsAPI.getItemStackTemplate(player.getInventory().getItemInMainHand()) instanceof RunicItemWeaponTemplate)
