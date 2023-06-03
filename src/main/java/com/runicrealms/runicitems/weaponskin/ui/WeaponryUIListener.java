@@ -60,7 +60,8 @@ public class WeaponryUIListener implements Listener {
             if (skin == null) return;
             if (skin.material() != player.getInventory().getItemInMainHand().getType()) {
                 player.closeInventory();
-                player.sendMessage(ColorUtil.format("&7You must be holding a weapon for class type &e" + skin.classType().getName() + "&c to equip the &e" + skin.name() + "&c skin."));
+                player.sendMessage(ColorUtil.format("&cYou must be holding a weapon for class type &e" + skin.classType().getName() + "&c to equip the &e" + skin.name() + "&c skin."));
+                return;
             }
             if (event.getClick() == ClickType.LEFT) {
                 if (!RunicItems.getWeaponSkinAPI().canActivateSkin(player, skin)) return;
