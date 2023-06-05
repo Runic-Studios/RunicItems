@@ -3,7 +3,7 @@ package com.runicrealms.runicitems.command;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CatchUnknown;
 import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.Conditions;
+import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Private;
 import com.runicrealms.plugin.common.util.ColorUtil;
@@ -15,8 +15,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 @CommandAlias("weaponry")
-@Conditions("is-op")
 @Private
+@CommandPermission("runic.default")
 public class WeaponryCommand extends BaseCommand {
 
     @Default

@@ -122,8 +122,10 @@ public class WeaponAppearancesUI implements InventoryHolder {
         lore.add(ColorUtil.format("&7" + skin.classType().getName()));
         lore.add("");
         if (!RunicItems.getWeaponSkinAPI().canActivateSkin(player, skin)) {
-            lore.add(ColorUtil.format("&l&4You do not have permission to use this skin!"));
-            lore.add(ColorUtil.format("&cPurchase a rank from our store for access to certain skins."));
+            lore.add(ColorUtil.format("&l&4You do not have permission"));
+            lore.add(ColorUtil.format("&l&4to use this skin!"));
+            lore.add(ColorUtil.format("&cPurchase a rank from our store"));
+            lore.add(ColorUtil.format("&c for access to certain skins."));
         } else {
             lore.add(ColorUtil.format("&2Left click to enable skin"));
             lore.add(ColorUtil.format("&cRight click to disable skin"));
