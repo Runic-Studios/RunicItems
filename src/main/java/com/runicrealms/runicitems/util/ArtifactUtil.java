@@ -16,22 +16,22 @@ public class ArtifactUtil {
      * @param triggerType the type of trigger to be fired
      * @return a wrapper that contains the artifact reference and a boolean to prevent needing to get the artifact again later
      */
-    public static ArtifactAndBooleanWrapper checkForArtifactTrigger(ItemStack itemStack, RunicArtifactAbilityTrigger triggerType) {
+    public static ArtifactWithTrigger checkForArtifactTrigger(ItemStack itemStack, RunicArtifactAbilityTrigger triggerType) {
         RunicItem runicItem = RunicItemsAPI.getRunicItemFromItemStack(itemStack);
-        if (runicItem == null) return new ArtifactAndBooleanWrapper(null, false);
-        if (!(runicItem instanceof RunicItemArtifact)) return new ArtifactAndBooleanWrapper(null, false);
-        RunicItemArtifact artifact = (RunicItemArtifact) runicItem;
+        if (runicItem == null) return new ArtifactWithTrigger(null, false);
+        if (!(runicItem instanceof RunicItemArtifact artifact)) return new ArtifactWithTrigger(null, false);
+        if (artifact.getAbility() == null) return new ArtifactWithTrigger(artifact, false);
         RunicArtifactAbilityTrigger abilityTrigger = artifact.getAbility().getTrigger();
-        if (abilityTrigger != triggerType) return new ArtifactAndBooleanWrapper(artifact, false);
-        return new ArtifactAndBooleanWrapper(artifact, true);
+        if (abilityTrigger != triggerType) return new ArtifactWithTrigger(artifact, false);
+        return new ArtifactWithTrigger(artifact, true);
     }
 
-    public static class ArtifactAndBooleanWrapper {
+    public static class ArtifactWithTrigger {
 
         private final RunicItemArtifact runicItemArtifact;
         private final boolean trigger;
 
-        ArtifactAndBooleanWrapper(@Nullable RunicItemArtifact runicItemArtifact, boolean trigger) {
+        ArtifactWithTrigger(@Nullable RunicItemArtifact runicItemArtifact, boolean trigger) {
             this.runicItemArtifact = runicItemArtifact;
             this.trigger = trigger;
         }
