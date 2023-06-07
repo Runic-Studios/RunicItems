@@ -4,6 +4,7 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CatchUnknown;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
+import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Conditions;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
@@ -32,14 +33,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
+import java.util.HashSet;
 
 @CommandAlias("ri|runicitems|runicitem")
+@CommandPermission("runic.op")
 public class RunicItemCommand extends BaseCommand {
 
     public static final String PREFIX = "&5[RunicItems] &6» &r";
 
     public RunicItemCommand() {
-        RunicItems.getCommandManager().getCommandCompletions().registerAsyncCompletion("item-ids", context -> TemplateManager.getTemplates().keySet());
+        RunicItems.getCommandManager().getCommandCompletions().registerAsyncCompletion("item-ids", context -> {
+            if (!context.getSender().isOp()) return new HashSet<>();
+            return TemplateManager.getTemplates().keySet();
+        });
     }
 
     private static boolean isInt(String number) {

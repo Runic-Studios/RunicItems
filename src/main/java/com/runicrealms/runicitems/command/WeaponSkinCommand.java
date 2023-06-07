@@ -4,6 +4,7 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CatchUnknown;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
+import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Conditions;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 @CommandAlias("weaponskin")
 @Conditions("is-op")
+@CommandPermission("runic.op")
 public class WeaponSkinCommand extends BaseCommand {
 
     @Default
