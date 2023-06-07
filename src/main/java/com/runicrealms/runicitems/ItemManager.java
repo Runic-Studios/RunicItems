@@ -226,7 +226,7 @@ public class ItemManager implements InventoryAPI, Listener {
 
                     slotsReceivingNewIds.add(i);
 
-                    event.getPlayer().getInventory().addItem(itemToAdd);
+                    RunicItemsAPI.addItem(event.getPlayer().getInventory(), itemToAdd);
 
                 }
 
@@ -245,7 +245,7 @@ public class ItemManager implements InventoryAPI, Listener {
 
         if (amountLeft > 0) {
             droppedItem.setAmount(amountLeft);
-            overflow = event.getPlayer().getInventory().addItem(droppedItem);
+            overflow = RunicItemsAPI.addItem(event.getPlayer().getInventory(), droppedItem);
         }
 
         boolean pickedUp = true;
