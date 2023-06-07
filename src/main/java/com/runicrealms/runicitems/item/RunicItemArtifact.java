@@ -19,7 +19,6 @@ import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -79,16 +78,8 @@ public class RunicItemArtifact extends RunicItemWeapon {
             stats.put(stat.first, stat.second);
         }
         WeaponSkin skin = null;
-        if (item instanceof Damageable) {
-            Damageable meta = (Damageable) item.getItemMeta();
-            if (meta.hasDamage() && meta.getDamage() != template.getDisplayableItem().getDamage()) {
-                for (WeaponSkin target : RunicItems.getWeaponSkinAPI().getMaterialSkins(item.getType())) {
-                    if (target.damage() == meta.getDamage()) {
-                        skin = target;
-                        break;
-                    }
-                }
-            }
+        if (nbtItem.hasNBTData() && nbtItem.hasKey("weapon-skin")) {
+            skin = RunicItems.getWeaponSkinAPI().getWeaponSkin(nbtItem.getString("weapon-skin"));
         }
         return new RunicItemArtifact(template, item.getAmount(), nbtItem.getInteger("id"), stats, skin);
     }
