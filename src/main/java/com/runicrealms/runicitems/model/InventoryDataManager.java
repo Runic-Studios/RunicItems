@@ -119,7 +119,7 @@ public class InventoryDataManager implements DataAPI, Listener {
         if (contents != null) { // Inventory exists for this character
             event.getPlayer().getInventory().setContents(contents);
         }
-        Bukkit.getLogger().severe("INVENTORY IS SET HERE 1");
+//        Bukkit.getLogger().severe("INVENTORY IS SET HERE 1");
         inventoryDataMap.remove(event.getPlayer().getUniqueId());
     }
 
