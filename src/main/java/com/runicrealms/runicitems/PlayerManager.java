@@ -2,6 +2,7 @@ package com.runicrealms.runicitems;
 
 import com.runicrealms.plugin.common.event.ArmorEquipEvent;
 import com.runicrealms.plugin.common.util.ArmorType;
+import com.runicrealms.plugin.rdb.event.CharacterHasQuitEvent;
 import com.runicrealms.plugin.rdb.event.CharacterLoadedEvent;
 import com.runicrealms.runicitems.player.PlayerStatHolder;
 import org.bukkit.Bukkit;
@@ -10,7 +11,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +64,7 @@ public class PlayerManager implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     // Fire after other character load events so checking stats functions properly
-    public void onPlayerQuit(PlayerQuitEvent event) {
+    public void onPlayerQuit(CharacterHasQuitEvent event) {
         cachedPlayerStats.remove(event.getPlayer().getUniqueId());
     }
 
