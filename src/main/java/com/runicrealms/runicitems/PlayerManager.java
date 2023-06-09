@@ -51,6 +51,7 @@ public class PlayerManager implements Listener {
      */
     @EventHandler(priority = EventPriority.LOW)
     public void onCharacterLoad(CharacterLoadedEvent event) {
+        Bukkit.getLogger().severe("LOADING STATS 2");
         cachedPlayerStats.put(event.getPlayer().getUniqueId(), new PlayerStatHolder(event.getPlayer()));
     }
 

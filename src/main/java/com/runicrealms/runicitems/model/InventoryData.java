@@ -186,6 +186,7 @@ public class InventoryData implements SessionDataMongo, SessionDataNested {
 
     @Override
     public void writeToJedis(Jedis jedis, int... ignored) {
+        Bukkit.getLogger().severe("WRITING ITEMS DATA");
         String database = RunicDatabase.getAPI().getDataAPI().getMongoDatabase().getName();
         // Remove all sub-keys to prevent duplication of items
         for (int slot : this.contentsMap.keySet()) {
