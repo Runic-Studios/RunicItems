@@ -1,12 +1,15 @@
 package com.runicrealms.runicitems.weaponskin;
 
 import com.runicrealms.plugin.common.CharacterClass;
+import com.runicrealms.plugin.common.DonorRank;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public record WeaponSkin(
         String id,
@@ -15,7 +18,7 @@ public record WeaponSkin(
         int damage,
         CharacterClass classType,
         @Nullable String achievementID,
-        @Nullable String rank,
+        @Nullable List<DonorRank> rank,
         String permission
 ) {
 

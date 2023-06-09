@@ -23,6 +23,7 @@ dependencies {
     compileOnly(commonLibs.mongodbdrivercore)
     compileOnly(commonLibs.mongodbdriversync)
     compileOnly(commonLibs.jedis)
+    compileOnly(commonLibs.luckperms)
     compileOnly(project(":Projects:Database"))
     compileOnly(project(":Projects:Common"))
 }

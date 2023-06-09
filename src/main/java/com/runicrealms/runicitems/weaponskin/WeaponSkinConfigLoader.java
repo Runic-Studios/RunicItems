@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.weaponskin;
 
 import com.runicrealms.plugin.common.CharacterClass;
+import com.runicrealms.plugin.common.DonorRank;
 import com.runicrealms.plugin.common.RunicCommon;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -27,12 +28,22 @@ public class WeaponSkinConfigLoader {
                 String name = section.getString("name");
                 CharacterClass classType = CharacterClass.getFromName(section.getString("class"));
                 String achievement = null;
-                String rank = null;
+                List<DonorRank> ranks = null;
                 String permission = null;
                 if (section.contains("achievement")) achievement = section.getString("achievement");
-                if (section.contains("rank")) rank = section.getString("rank");
+                if (section.contains("rank")) {
+                    for (String rankString : section.getStringList("rank")) {
+                        DonorRank rank = DonorRank.getFromIdentifier(rankString);
+                        if (rank == null) {
+                            Bukkit.getLogger().log(Level.WARNING, "WARNING: Could not find rank " + rankString + " for weapon skin " + name);
+                            continue;
+                        }
+                        if (ranks == null) ranks = new ArrayList<>();
+                        ranks.add(rank);
+                    }
+                }
                 if (section.contains("permission")) permission = section.getString("permission");
-                skins.add(new WeaponSkin(id, name, material, damage, classType, achievement, rank, permission));
+                skins.add(new WeaponSkin(id, name, material, damage, classType, achievement, ranks, permission));
             } catch (Exception exception) {
                 Bukkit.getLogger().log(Level.INFO, "ERROR loading weapon skin named " + id);
                 exception.printStackTrace();

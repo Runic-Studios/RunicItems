@@ -1,12 +1,19 @@
 package com.runicrealms.runicitems.weaponskin;
 
+import com.runicrealms.plugin.common.DonorRank;
 import com.runicrealms.plugin.common.RunicCommon;
 import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.RunicItemsAPI;
 import com.runicrealms.runicitems.api.WeaponSkinAPI;
 import de.tr7zw.nbtapi.NBTItem;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.node.Node;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -20,13 +27,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class WeaponSkinManager implements WeaponSkinAPI {
+public class WeaponSkinManager implements WeaponSkinAPI, Listener {
 
     private final List<WeaponSkin> weaponSkins = WeaponSkinConfigLoader.loadFromConfig(new File(RunicItems.getInstance().getDataFolder(), "weapon-skins.yml"));
     private final Map<Material, Set<WeaponSkin>> materialWeaponSkins = new HashMap<>();
     private final Map<String, WeaponSkin> idWeaponSkins = new HashMap<>();
 
     public WeaponSkinManager() {
+        Bukkit.getPluginManager().registerEvents(this, RunicItems.getInstance());
         RunicItems.getCommandManager().getCommandCompletions().registerCompletion("weaponskins", (context) ->
                 weaponSkins.stream()
                         .map(WeaponSkin::id)
@@ -43,7 +51,18 @@ public class WeaponSkinManager implements WeaponSkinAPI {
 
     @Override
     public boolean canActivateSkin(Player player, WeaponSkin skin) {
-        if (skin.hasRank() && !player.hasPermission("runic.rank." + skin.rank())) return false;
+//        if (skin.hasRank() && !player.hasPermission("runic.rank." + skin.rank())) return false;
+        if (skin.hasRank()) {
+            DonorRank playersRank = DonorRank.getDonorRank(player);
+            boolean hasRank = false;
+            for (DonorRank rank : skin.rank()) {
+                if (playersRank.getIdentifier().equalsIgnoreCase(rank.getIdentifier())) {
+                    hasRank = true;
+                    break;
+                }
+            }
+            if (!hasRank) return false;
+        }
         if (skin.hasAchievementID() && !RunicCommon.getAchievementsAPI().hasAchievement(player, skin.achievementID()))
             return false;
         return !skin.hasPermission() || player.hasPermission(skin.permission());
@@ -119,6 +138,15 @@ public class WeaponSkinManager implements WeaponSkinAPI {
         NBTItem nbtItem = new NBTItem(item);
         nbtItem.removeKey("weapon-skin");
         return nbtItem.getItem();
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onWeaponSkinObtainHandler(WeaponSkinObtainEvent event) {
+        if (event.isCancelled()) return;
+        LuckPermsProvider.get().getUserManager().loadUser(event.getPlayer().getUniqueId()).thenAcceptAsync(user -> {
+            user.data().add(Node.builder(event.getPermission()).build());
+            LuckPermsProvider.get().getUserManager().saveUser(user);
+        });
     }
 
 }
