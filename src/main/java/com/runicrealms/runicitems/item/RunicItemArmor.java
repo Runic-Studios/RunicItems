@@ -272,7 +272,7 @@ public class RunicItemArmor extends RunicItem {
                 new ItemLoreSection(new String[]{healthString}),
                 new ItemLoreSection(lore),
                 new ItemLoreSection(new String[]{
-                        rarity.getDisplay(),
+                        rarity.getDisplay() + " " + getArmorName(),
                         ChatColor.GRAY + runicClass.getDisplay()
                 }),
         };
@@ -348,6 +348,15 @@ public class RunicItemArmor extends RunicItem {
 
     public LinkedHashMap<Stat, RunicItemStat> getStats() {
         return this.stats;
+    }
+
+    private String getArmorName() {
+        String materialName = this.displayableItem.getMaterial().name();
+        if (materialName.contains("HELMET")) return "Helmet";
+        if (materialName.contains("CHESTPLATE")) return "Chestplate";
+        if (materialName.contains("LEGGINGS")) return "Leggings";
+        if (materialName.contains("BOOST")) return "Boost";
+        return "";
     }
 
 }
