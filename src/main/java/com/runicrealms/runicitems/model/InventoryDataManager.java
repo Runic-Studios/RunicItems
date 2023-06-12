@@ -3,6 +3,7 @@ package com.runicrealms.runicitems.model;
 import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainAbortAction;
 import com.runicrealms.plugin.rdb.RunicDatabase;
+import com.runicrealms.plugin.rdb.api.WriteCallback;
 import com.runicrealms.plugin.rdb.event.CharacterDeleteEvent;
 import com.runicrealms.plugin.rdb.event.CharacterLoadedEvent;
 import com.runicrealms.plugin.rdb.event.CharacterQuitEvent;
@@ -11,6 +12,7 @@ import com.runicrealms.plugin.rdb.event.MongoSaveEvent;
 import com.runicrealms.plugin.rdb.model.CharacterField;
 import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.api.DataAPI;
+import com.runicrealms.runicitems.api.ItemWriteOperation;
 import com.runicrealms.runicitems.item.RunicItem;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
@@ -26,13 +28,11 @@ import org.springframework.data.mongodb.core.query.Update;
 import redis.clients.jedis.Jedis;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class InventoryDataManager implements DataAPI, Listener {
+public class InventoryDataManager implements DataAPI, ItemWriteOperation, Listener {
     public static final TaskChainAbortAction<Player, String, ?> CONSOLE_LOG = new TaskChainAbortAction<>() {
         public void onAbort(TaskChain<?> chain, Player player, String message) {
             Bukkit.getLogger().log(Level.SEVERE, message);
@@ -51,35 +51,24 @@ public class InventoryDataManager implements DataAPI, Listener {
 
     @Override
     public InventoryData loadInventoryData(UUID uuid, int slotToLoad) {
-        // Step 1: Check if inventory data is cached in redis
-        try (Jedis jedis = RunicDatabase.getAPI().getRedisAPI().getNewJedisResource()) {
-            Set<String> redisInventoryList = RunicDatabase.getAPI().getRedisAPI().getRedisDataSet(uuid, "itemData", jedis);
-            boolean dataInRedis = RunicDatabase.getAPI().getRedisAPI().determineIfDataInRedis(redisInventoryList, slotToLoad);
-            if (dataInRedis) {
-                return new InventoryData(uuid, jedis, slotToLoad);
-            }
-            // Step 2: Check the mongo database
-            Query query = new Query();
-            query.addCriteria(Criteria.where(CharacterField.PLAYER_UUID.getField()).is(uuid));
-            MongoTemplate mongoTemplate = RunicDatabase.getAPI().getDataAPI().getMongoTemplate();
-            List<InventoryData> results = mongoTemplate.find(query, InventoryData.class);
-            if (results.size() > 0) {
-                InventoryData result = results.get(0);
-                result.writeToJedis(jedis);
-                return result;
-            }
-            // Step 3: If no data is found, we create some data and save it to the collection
-            InventoryData newData = new InventoryData
-                    (
-                            new ObjectId(),
-                            uuid,
-                            slotToLoad,
-                            new RunicItem[41]
-                    );
-            newData.addDocumentToMongo();
-            newData.writeToJedis(jedis);
-            return newData;
+        // Step 1: Check the mongo database
+        Query query = new Query();
+        query.addCriteria(Criteria.where(CharacterField.PLAYER_UUID.getField()).is(uuid));
+        MongoTemplate mongoTemplate = RunicDatabase.getAPI().getDataAPI().getMongoTemplate();
+        InventoryData result = mongoTemplate.findOne(query, InventoryData.class);
+        if (result != null) {
+            return result;
         }
+        // Step 2: If no data is found, we create some data and save it to the collection
+        InventoryData newData = new InventoryData
+                (
+                        new ObjectId(),
+                        uuid,
+                        slotToLoad,
+                        new RunicItem[41]
+                );
+        newData.addDocumentToMongo();
+        return newData;
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -116,7 +105,8 @@ public class InventoryDataManager implements DataAPI, Listener {
         if (contents != null) { // Inventory exists for this character
             event.getPlayer().getInventory().setContents(contents);
         }
-//        Bukkit.getLogger().severe("INVENTORY IS SET HERE 1");
+        Bukkit.getLogger().warning("INVENTORY REMOVED FROM MEMORY");
+        // todo: remove on quit?
         inventoryDataMap.remove(event.getPlayer().getUniqueId());
     }
 
@@ -178,23 +168,16 @@ public class InventoryDataManager implements DataAPI, Listener {
 
     private void saveInventory(Player player, int slot) {
         UUID uuid = player.getUniqueId();
-        TaskChain<?> chain = RunicItems.newChain();
-        chain
-                .asyncFirst(() -> loadInventoryData(uuid, slot))
-                .abortIfNull(CONSOLE_LOG, player, "RunicItems failed to save on quit!")
-                .sync(inventoryData -> {
-                    // Sync current inventory to object from Redis/Mongo (ensure they match)
-                    inventoryData.getContentsMap().put(slot,
-                            InventoryData.getRunicItemContents(player.getInventory().getContents()));
-                    return inventoryData;
-                    // todo: prevent them from logging in during this time
-                })
-                .asyncLast(inventoryData -> {
-                    try (Jedis jedis = RunicDatabase.getAPI().getRedisAPI().getNewJedisResource()) {
-                        inventoryData.writeToJedis(jedis);
-                    }
-                })
-                .execute();
+        updateInventoryData
+                (
+                        uuid,
+                        slot,
+                        InventoryData.getRunicItemContents(player.getInventory().getContents()),
+                        () -> {
+                            // todo: prevent them from logging in during this time!!!!!!!
+                        }
+
+                );
     }
 
     /**
@@ -211,4 +194,25 @@ public class InventoryDataManager implements DataAPI, Listener {
         }, 0, REDIS_TASK_PERIOD * 20L);
     }
 
+    @Override
+    public void updateInventoryData(UUID uuid, int slot, RunicItem[] newValue, WriteCallback callback) {
+        MongoTemplate mongoTemplate = RunicDatabase.getAPI().getDataAPI().getMongoTemplate();
+        TaskChain<?> chain = RunicItems.newChain();
+        chain
+                .asyncFirst(() -> {
+                    // Define a query to find the InventoryData for this player
+                    Query query = new Query();
+                    query.addCriteria(Criteria.where(CharacterField.PLAYER_UUID.getField()).is(uuid));
+
+                    // Define an update to set the specific field
+                    Update update = new Update();
+                    update.set("contentsMap." + slot, newValue);
+
+                    // Execute the update operation
+                    return mongoTemplate.updateFirst(query, update, InventoryData.class);
+                })
+                .abortIfNull(CONSOLE_LOG, null, "RunicItems failed to write to contentsMap!")
+                .syncLast(updateResult -> callback.onWriteComplete())
+                .execute();
+    }
 }
