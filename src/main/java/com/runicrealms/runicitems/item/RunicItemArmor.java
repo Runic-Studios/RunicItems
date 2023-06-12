@@ -355,7 +355,7 @@ public class RunicItemArmor extends RunicItem {
         if (materialName.contains("HELMET")) return "Helmet";
         if (materialName.contains("CHESTPLATE")) return "Chestplate";
         if (materialName.contains("LEGGINGS")) return "Leggings";
-        if (materialName.contains("BOOST")) return "Boost";
+        if (materialName.contains("BOOTS")) return "Boots";
         return "";
     }
 
