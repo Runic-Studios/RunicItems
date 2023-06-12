@@ -11,12 +11,12 @@ import java.util.UUID;
 public interface ItemWriteOperation {
 
     /**
-     * ?
+     * Updates a single field of the mapped 'InventoryData' document object
      *
-     * @param uuid
-     * @param slot
-     * @param newValue
-     * @param callback
+     * @param uuid     of the player
+     * @param slot     of the character
+     * @param newValue the new value for the field
+     * @param callback a function to execute on main thread when write operation is complete
      */
     void updateInventoryData(UUID uuid, int slot, RunicItem[] newValue, WriteCallback callback);
 

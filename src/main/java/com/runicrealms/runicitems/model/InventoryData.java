@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.util.HashMap;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 @Document(collection = "items")
 public class InventoryData implements SessionDataMongo {
     @Id

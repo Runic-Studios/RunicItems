@@ -105,8 +105,6 @@ public class InventoryDataManager implements DataAPI, ItemWriteOperation, Listen
         if (contents != null) { // Inventory exists for this character
             event.getPlayer().getInventory().setContents(contents);
         }
-        Bukkit.getLogger().warning("INVENTORY REMOVED FROM MEMORY");
-        // todo: remove on quit?
         inventoryDataMap.remove(event.getPlayer().getUniqueId());
     }
 
@@ -168,13 +166,14 @@ public class InventoryDataManager implements DataAPI, ItemWriteOperation, Listen
 
     private void saveInventory(Player player, int slot) {
         UUID uuid = player.getUniqueId();
+        RunicDatabase.getAPI().getDataAPI().preventLogin(uuid);
         updateInventoryData
                 (
                         uuid,
                         slot,
                         InventoryData.getRunicItemContents(player.getInventory().getContents()),
                         () -> {
-                            // todo: prevent them from logging in during this time!!!!!!!
+                            // todo: remove items from the list of plugins to save
                         }
 
                 );
