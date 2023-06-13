@@ -4,7 +4,6 @@ import com.runicrealms.plugin.rdb.RunicDatabase;
 import com.runicrealms.runicitems.api.AntiDupeInventoryHandler;
 import com.runicrealms.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
-import net.dv8tion.jda.api.entities.TextChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -29,7 +28,7 @@ public class DupeManager implements Listener {
     public static final String TEXT_CHANNEL_ID = "813580198133628928";
     public static final Color EMBED_COLOR = new Color(204, 35, 184);
 
-    private static TextChannel channel;
+//    private static TextChannel channel;
 
     private static long nextId = Long.MIN_VALUE;
 
@@ -39,9 +38,9 @@ public class DupeManager implements Listener {
         antiDupeInventoryHandlers.add(handler);
     }
 
-    public static void setupJda() {
-        channel = RunicItems.getJda().getTextChannelById(TEXT_CHANNEL_ID);
-    }
+//    public static void setupJda() {
+//        channel = RunicItems.getJda().getTextChannelById(TEXT_CHANNEL_ID);
+//    }
 
     public static void checkMissingDupeNBT(ItemStack item) {
         NBTItem nbtItem = new NBTItem(item, true);
