@@ -183,10 +183,11 @@ public class InventoryDataManager implements DataAPI, ItemWriteOperation, Listen
      * Periodic task to save player items
      */
     private void startInventorySaveTask() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(RunicItems.getInstance(), () -> {
+        Bukkit.getScheduler().runTaskTimer(RunicItems.getInstance(), () -> {
             for (UUID uuid : RunicDatabase.getAPI().getCharacterAPI().getLoadedCharacters()) {
                 Player player = Bukkit.getPlayer(uuid);
-                if (player == null) continue; // Player not online
+                if (player == null) continue;
+                if (!player.isOnline()) continue;
                 int slot = RunicDatabase.getAPI().getCharacterAPI().getCharacterSlot(uuid);
                 saveInventory(player, slot);
             }
@@ -196,6 +197,7 @@ public class InventoryDataManager implements DataAPI, ItemWriteOperation, Listen
     @Override
     public void updateInventoryData(UUID uuid, int slot, RunicItem[] newValue, WriteCallback callback) {
         MongoTemplate mongoTemplate = RunicDatabase.getAPI().getDataAPI().getMongoTemplate();
+
         TaskChain<?> chain = RunicItems.newChain();
         chain
                 .asyncFirst(() -> {
