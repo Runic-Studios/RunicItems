@@ -4,6 +4,7 @@ import com.runicrealms.plugin.common.event.ArmorEquipEvent;
 import com.runicrealms.plugin.common.util.ArmorType;
 import com.runicrealms.plugin.rdb.event.CharacterHasQuitEvent;
 import com.runicrealms.plugin.rdb.event.CharacterLoadedEvent;
+import com.runicrealms.runicitems.item.event.RunicStatUpdateEvent;
 import com.runicrealms.runicitems.player.PlayerStatHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -12,19 +13,19 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerManager implements Listener {
-    private static final Map<UUID, PlayerStatHolder> cachedPlayerStats = new HashMap<>();
+    private static final Map<UUID, PlayerStatHolder> cachedPlayerStats = new ConcurrentHashMap<>();
 
     public static Map<UUID, PlayerStatHolder> getCachedPlayerStats() {
         return cachedPlayerStats;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    // Fire before other armor equip events so checking stats functions properly
+    @EventHandler(priority = EventPriority.HIGHEST)
+    // Fire after other armor equip events to allow them to cancel it
     public void onArmorEquipEvent(ArmorEquipEvent event) {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
@@ -43,6 +44,8 @@ public class PlayerManager implements Listener {
                 case OFFHAND:
                     cachedPlayerStats.get(uuid).updateOffhand();
             }
+            RunicStatUpdateEvent statUpdateEvent = new RunicStatUpdateEvent(event.getPlayer(), cachedPlayerStats.get(uuid));
+            Bukkit.getPluginManager().callEvent(statUpdateEvent);
         });
     }
 
@@ -51,7 +54,6 @@ public class PlayerManager implements Listener {
      */
     @EventHandler(priority = EventPriority.LOW)
     public void onCharacterLoad(CharacterLoadedEvent event) {
-//        Bukkit.getLogger().severe("LOADING STATS 2");
         cachedPlayerStats.put(event.getPlayer().getUniqueId(), new PlayerStatHolder(event.getPlayer()));
     }
 

@@ -8,6 +8,7 @@ import com.runicrealms.runicitems.item.RunicItemArmor;
 import com.runicrealms.runicitems.item.RunicItemArtifact;
 import com.runicrealms.runicitems.item.RunicItemOffhand;
 import com.runicrealms.runicitems.item.RunicItemWeapon;
+import com.runicrealms.runicitems.item.event.RunicStatUpdateEvent;
 import com.runicrealms.runicitems.item.stats.RunicArtifactAbility;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -120,6 +121,7 @@ public class PlayerStatHolder {
     }
 
     public void updateItems() {
+        if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Cannot run update stats on main thread!");
         updateHelmet();
         updateChestplate();
         updateLeggings();
@@ -127,6 +129,7 @@ public class PlayerStatHolder {
         updateOffhand();
         updateWeapon();
         updateTotalStats();
+        Bukkit.getPluginManager().callEvent(new RunicStatUpdateEvent(this.player, this));
     }
 
     public void updateItems(ArmorType... armorTypes) {
