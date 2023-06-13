@@ -20,15 +20,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import redis.clients.jedis.Jedis;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -39,10 +36,6 @@ public class InventoryDataManager implements DataAPI, ItemWriteOperation, Listen
         }
     };
     private static final int REDIS_TASK_PERIOD = 30; // Seconds
-    /*
-    Only used to load data during CharacterLoadEvent. Not used during session
-     */
-    private final Map<UUID, InventoryData> inventoryDataMap = new HashMap<>();
 
     public InventoryDataManager() {
         Bukkit.getPluginManager().registerEvents(this, RunicItems.getInstance());
@@ -100,12 +93,12 @@ public class InventoryDataManager implements DataAPI, ItemWriteOperation, Listen
      */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onCharacterLoad(CharacterLoadedEvent event) {
-        InventoryData inventoryData = inventoryDataMap.get(event.getPlayer().getUniqueId());
-        ItemStack[] contents = inventoryData.generateItemStackContents(event.getCharacterSelectEvent().getSlot());
-        if (contents != null) { // Inventory exists for this character
-            event.getPlayer().getInventory().setContents(contents);
+        // Check if the inventory payload exists
+        if (event.getCharacterSelectEvent().getInventoryContents() != null) {
+            event.getPlayer().getInventory().setContents(event.getCharacterSelectEvent().getInventoryContents());
+        } else {
+            Bukkit.getLogger().severe("ERROR: INVENTORY PAYLOAD NULL FOR PLAYER " + event.getPlayer().getName());
         }
-        inventoryDataMap.remove(event.getPlayer().getUniqueId());
     }
 
     /**
@@ -138,7 +131,8 @@ public class InventoryDataManager implements DataAPI, ItemWriteOperation, Listen
                 .asyncFirst(() -> loadInventoryData(uuid, slot))
                 .abortIfNull(CONSOLE_LOG, player, "RunicItems failed to load on select!")
                 .syncLast(inventoryData -> {
-                    inventoryDataMap.put(event.getPlayer().getUniqueId(), inventoryData);
+                    // Set the inventory payload
+                    event.setInventoryContents(inventoryData.generateItemStackContents(event.getSlot()));
                     event.getPluginsToLoadData().remove("inventory");
                     // Calculate elapsed time
                     long endTime = System.nanoTime();
@@ -183,10 +177,11 @@ public class InventoryDataManager implements DataAPI, ItemWriteOperation, Listen
      * Periodic task to save player items
      */
     private void startInventorySaveTask() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(RunicItems.getInstance(), () -> {
+        Bukkit.getScheduler().runTaskTimer(RunicItems.getInstance(), () -> {
             for (UUID uuid : RunicDatabase.getAPI().getCharacterAPI().getLoadedCharacters()) {
                 Player player = Bukkit.getPlayer(uuid);
-                if (player == null) continue; // Player not online
+                if (player == null) continue;
+                if (!player.isOnline()) continue;
                 int slot = RunicDatabase.getAPI().getCharacterAPI().getCharacterSlot(uuid);
                 saveInventory(player, slot);
             }
@@ -196,6 +191,7 @@ public class InventoryDataManager implements DataAPI, ItemWriteOperation, Listen
     @Override
     public void updateInventoryData(UUID uuid, int slot, RunicItem[] newValue, WriteCallback callback) {
         MongoTemplate mongoTemplate = RunicDatabase.getAPI().getDataAPI().getMongoTemplate();
+
         TaskChain<?> chain = RunicItems.newChain();
         chain
                 .asyncFirst(() -> {
