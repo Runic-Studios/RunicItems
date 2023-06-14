@@ -18,13 +18,15 @@ public class ItemUtils {
      * @param itemStack item to remove
      * @param amount    amount of item to remove
      */
-    public static void takeItem(Player player, ItemStack itemStack, int amount) {
+    public static int takeItem(Player player, ItemStack itemStack, int amount) {
         int to_take = amount;
+        int total_taken = 0;
         for (ItemStack player_item : player.getInventory().getContents()) {
             if (player_item != null) {
                 if (RunicItemsAPI.isRunicItemSimilar(itemStack, player_item)) {
                     int take_next = Math.min(to_take, player_item.getAmount());
                     remove(player, player_item, take_next);
+                    total_taken += take_next;
                     to_take -= take_next;
                     if (to_take <= 0) { //Reached amount. Can stop!
                         break;
@@ -32,7 +34,24 @@ public class ItemUtils {
                 }
             }
         }
+        return total_taken;
     }
+
+//    public static void takeItem(Player player, ItemStack itemStack, int amount) {
+//        int to_take = amount;
+//        for (ItemStack player_item : player.getInventory().getContents()) {
+//            if (player_item != null) {
+//                if (RunicItemsAPI.isRunicItemSimilar(itemStack, player_item)) {
+//                    int take_next = Math.min(to_take, player_item.getAmount());
+//                    remove(player, player_item, take_next);
+//                    to_take -= take_next;
+//                    if (to_take <= 0) { //Reached amount. Can stop!
+//                        break;
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     /**
      * Removes items from a player's inventory based on material, typically for profession stations
