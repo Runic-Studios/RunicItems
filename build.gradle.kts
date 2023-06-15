@@ -16,7 +16,6 @@ dependencies {
     compileOnly(commonLibs.protocollib)
     compileOnly(commonLibs.jda)
     compileOnly(commonLibs.nbtapi)
-    compileOnly(commonLibs.craftbukkit)
     compileOnly(commonLibs.taskchain)
     compileOnly(commonLibs.mythicmobs)
     compileOnly(commonLibs.springdatamongodb)

@@ -29,12 +29,10 @@ import com.runicrealms.runicitems.item.template.RunicItemWeaponTemplate;
 import com.runicrealms.runicitems.item.util.ClickTrigger;
 import com.runicrealms.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
-import net.minecraft.server.v1_16_R3.PacketPlayOutCollect;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -267,8 +265,14 @@ public class ItemManager implements InventoryAPI, Listener {
         }
 
         if (pickedUp) {
-            PacketPlayOutCollect packet = new PacketPlayOutCollect(event.getItem().getEntityId(), event.getPlayer().getEntityId(), pickupItemCount);
-            ((CraftPlayer) event.getPlayer()).getHandle().playerConnection.sendPacket(packet);
+            PacketContainer pickupItemPacket = new PacketContainer(PacketType.Play.Client.PICK_ITEM);
+
+            pickupItemPacket.getIntegers().write(0, event.getItem().getEntityId());
+            pickupItemPacket.getIntegers().write(1, event.getPlayer().getEntityId());
+            pickupItemPacket.getIntegers().write(2, pickupItemCount);
+
+            ProtocolLibrary.getProtocolManager().sendServerPacket(event.getPlayer(), pickupItemPacket);
+
             event.getPlayer().updateInventory();
             event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_ITEM_PICKUP, 1, 1);
         }

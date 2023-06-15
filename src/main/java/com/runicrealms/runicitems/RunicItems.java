@@ -5,6 +5,8 @@ import co.aikar.commands.PaperCommandManager;
 import co.aikar.taskchain.BukkitTaskChainFactory;
 import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import com.runicrealms.plugin.rdb.event.DatabaseInitializeEvent;
 import com.runicrealms.runicitems.api.DataAPI;
 import com.runicrealms.runicitems.api.InventoryAPI;
