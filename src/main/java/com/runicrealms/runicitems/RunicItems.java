@@ -28,10 +28,6 @@ import com.runicrealms.runicitems.model.InventoryDataManager;
 import com.runicrealms.runicitems.model.MongoTask;
 import com.runicrealms.runicitems.weaponskin.WeaponSkinManager;
 import com.runicrealms.runicitems.weaponskin.ui.WeaponAppearancesUIListener;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.entities.Activity;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -44,7 +40,7 @@ public class RunicItems extends JavaPlugin implements Listener {
     private static DataAPI dataAPI;
     private static WeaponSkinAPI weaponSkinAPI;
     private static MongoTask mongoTask;
-    private static JDA jda;
+    //    private static JDA jda;
     private static InventoryAPI INVENTORY_API;
 
     private static boolean databaseLoadingEnabled = true;
@@ -78,9 +74,9 @@ public class RunicItems extends JavaPlugin implements Listener {
         return weaponSkinAPI;
     }
 
-    public static JDA getJda() {
-        return jda;
-    }
+//    public static JDA getJda() {
+//        return jda;
+//    }
 
     public static boolean isDatabaseLoadingEnabled() {
         return databaseLoadingEnabled;
@@ -134,15 +130,15 @@ public class RunicItems extends JavaPlugin implements Listener {
         commandManager.registerCommand(new WeaponryCommand());
 
         // Start JDA
-        try {
-            JDABuilder builder = JDABuilder.createDefault("ODEzNTc2Nzg4MjI2ODY3MjIx.YDRUbQ.qm2ri55Jj62J0R06MBElc_rm_1M");
-            builder.setStatus(OnlineStatus.ONLINE);
-            builder.setActivity(Activity.watching("over Runic Realms"));
-            builder.addEventListeners(new RunicItemsJDAListener());
-            jda = builder.build();
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
+//        try {
+//            JDABuilder builder = JDABuilder.createDefault("ODEzNTc2Nzg4MjI2ODY3MjIx.YDRUbQ.qm2ri55Jj62J0R06MBElc_rm_1M");
+//            builder.setStatus(OnlineStatus.ONLINE);
+//            builder.setActivity(Activity.watching("over Runic Realms"));
+//            builder.addEventListeners(new RunicItemsJDAListener());
+//            jda = builder.build();
+//        } catch (Exception exception) {
+//            exception.printStackTrace();
+//        }
     }
 
     @EventHandler

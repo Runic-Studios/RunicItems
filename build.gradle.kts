@@ -14,7 +14,6 @@ dependencies {
     compileOnly(commonLibs.acf)
     compileOnly(commonLibs.paper)
     compileOnly(commonLibs.protocollib)
-    compileOnly(commonLibs.jda)
     compileOnly(commonLibs.nbtapi)
     compileOnly(commonLibs.taskchain)
     compileOnly(commonLibs.mythicmobs)
