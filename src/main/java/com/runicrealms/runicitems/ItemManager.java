@@ -265,7 +265,7 @@ public class ItemManager implements InventoryAPI, Listener {
         }
 
         if (pickedUp) {
-            PacketContainer pickupItemPacket = new PacketContainer(PacketType.Play.Client.PICK_ITEM);
+            PacketContainer pickupItemPacket = new PacketContainer(PacketType.Play.Server.COLLECT);
 
             pickupItemPacket.getIntegers().write(0, event.getItem().getEntityId());
             pickupItemPacket.getIntegers().write(1, event.getPlayer().getEntityId());
