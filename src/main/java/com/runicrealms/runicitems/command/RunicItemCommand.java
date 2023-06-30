@@ -11,7 +11,6 @@ import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
 import com.runicrealms.plugin.rdb.RunicDatabase;
 import com.runicrealms.runicitems.DupeManager;
-import com.runicrealms.runicitems.ItemManager;
 import com.runicrealms.runicitems.LootManager;
 import com.runicrealms.runicitems.RunicItems;
 import com.runicrealms.runicitems.RunicItemsAPI;
@@ -95,34 +94,9 @@ public class RunicItemCommand extends BaseCommand {
                 return;
             }
         }
-        int amountRemoved = 0;
-        ItemStack[] contents = target.getInventory().getContents();
-        for (int i = 0; i < contents.length; i++) {
-            if (contents[i] != null && contents[i].getType() != Material.AIR) {
-                if (amount == -1 || amountRemoved < amount) {
-                    RunicItem item = ItemManager.getRunicItemFromItemStack(contents[i]);
-                    if (item == null) {
-                        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dError removing items!"));
-                        return;
-                    }
-                    boolean removeItem = false;
-                    if (template == null) {
-                        removeItem = true;
-                    } else if (item.getTemplateId().equalsIgnoreCase(template.getId())) {
-                        removeItem = true;
-                    }
-                    if (removeItem) {
-                        if (contents[i].getAmount() <= amount - amountRemoved || amount == -1) {
-                            amountRemoved += contents[i].getAmount();
-                            target.getInventory().setItem(i, new ItemStack(Material.AIR));
-                        } else {
-                            amountRemoved += amount - amountRemoved;
-                            target.getInventory().getItem(i).setAmount(target.getInventory().getItem(i).getAmount() - (amount - amountRemoved));
-                        }
-                    }
-                }
-            }
-        }
+
+        RunicItems.getInventoryAPI().clearInventory(target.getInventory(), amount, template, sender);
+
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&dCleared items from player's inventory!"));
     }
 

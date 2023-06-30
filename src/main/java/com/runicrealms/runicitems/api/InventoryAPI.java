@@ -1,11 +1,18 @@
 package com.runicrealms.runicitems.api;
 
+import com.runicrealms.runicitems.ItemManager;
+import com.runicrealms.runicitems.item.RunicItem;
+import com.runicrealms.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.runicitems.util.NBTUtil;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Provides methods for handling inventories and click events using our custom items system
@@ -69,4 +76,55 @@ public interface InventoryAPI {
         player.updateInventory();
     }
 
+    /**
+     * A method used to clear an inventory of all items that match the provided template
+     *
+     * @param inventory the inventory to wipe
+     * @param amount    the amount to remove
+     * @param template  the template
+     * @param sender    the user who initiated the clear inventory
+     */
+    default void clearInventory(@NotNull Inventory inventory, int amount, @Nullable RunicItemTemplate template, @Nullable CommandSender sender) {
+        int amountRemoved = 0;
+        ItemStack[] contents = inventory.getContents();
+        for (int i = 0; i < contents.length; i++) {
+            if (contents[i] != null && contents[i].getType() != Material.AIR) {
+                if (amount == -1 || amountRemoved < amount) {
+                    RunicItem item = ItemManager.getRunicItemFromItemStack(contents[i]);
+                    if (item == null) {
+                        if (sender != null) {
+                            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&dError removing items!"));
+                        }
+                        return;
+                    }
+                    boolean removeItem = false;
+                    if (template == null) {
+                        removeItem = true;
+                    } else if (item.getTemplateId().equalsIgnoreCase(template.getId())) {
+                        removeItem = true;
+                    }
+                    if (removeItem) {
+                        if (contents[i].getAmount() <= amount - amountRemoved || amount == -1) {
+                            amountRemoved += contents[i].getAmount();
+                            inventory.setItem(i, new ItemStack(Material.AIR));
+                        } else {
+                            amountRemoved += amount - amountRemoved;
+                            inventory.getItem(i).setAmount(inventory.getItem(i).getAmount() - (amount - amountRemoved));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * A method used to wipe all copies of a given item template from an inventory
+     *
+     * @param inventory the inventory to wipe
+     * @param template  the template
+     * @param sender    the user who initiated the clear inventory
+     */
+    default void clearInventory(@NotNull Inventory inventory, @Nullable RunicItemTemplate template, @Nullable CommandSender sender) {
+        this.clearInventory(inventory, -1, template, sender);
+    }
 }
