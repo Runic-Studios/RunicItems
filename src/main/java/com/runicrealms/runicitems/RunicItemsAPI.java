@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -310,6 +311,16 @@ public class RunicItemsAPI {
      */
     public static boolean isTemplate(String templateId) {
         return TemplateManager.getTemplateFromId(templateId) != null;
+    }
+
+    /**
+     * Gets a RunicItemTemplate from its given ID.
+     *
+     * @param templateId Template ID
+     * @return RunicItemTemplate if found, null if not
+     */
+    public static @Nullable RunicItemTemplate getTemplate(String templateId) {
+        return TemplateManager.getTemplateFromId(templateId);
     }
 
 }
