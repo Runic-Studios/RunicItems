@@ -23,46 +23,73 @@ import com.runicrealms.runicitems.item.util.RunicItemClass;
 import com.runicrealms.runicitems.util.StatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 
 public class TemplateLoader {
 
+    private static void addConfigs(File file, Collection<ConfigurationSection> existingConfigs) {
+        try {
+            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+            if (config.isConfigurationSection("items")) {
+                for (String key : config.getConfigurationSection("items").getKeys(false)) {
+                    existingConfigs.add(config.getConfigurationSection("items." + key));
+                }
+            } else {
+                existingConfigs.add(config);
+            }
+        } catch (Exception exception) {
+            Bukkit.getLogger().log(Level.SEVERE, "[RunicItems] WARNING: failed to load items file " + file.getName());
+        }
+    }
+
     public static void loadTemplates() {
-        File itemsFolder = new File(RunicItems.getInstance().getDataFolder(), "items");
-        File scriptFolder = new File(RunicItems.getInstance().getDataFolder(), "script");
         Map<String, RunicItemTemplate> templates = new HashMap<>();
-        Map<File, File> templateFiles = new HashMap<>();
-        for (File file : itemsFolder.listFiles()) templateFiles.put(file, itemsFolder);
-        for (File file : scriptFolder.listFiles()) templateFiles.put(file, scriptFolder);
-        for (File file : templateFiles.keySet()) {
+        Set<ConfigurationSection> itemSections = new HashSet<>();
+
+        for (File file : Objects.requireNonNull(new File(RunicItems.getInstance().getDataFolder(), "items").listFiles())) {
+            addConfigs(file, itemSections);
+        }
+
+        File scriptFile = new File(RunicItems.getInstance().getDataFolder(), "script-items.yml");
+        if (scriptFile.exists()) {
+            addConfigs(scriptFile, itemSections);
+        } else {
+            for (File file : Objects.requireNonNull(new File(RunicItems.getInstance().getDataFolder(), "script").listFiles())) {
+                addConfigs(file, itemSections);
+            }
+        }
+        for (ConfigurationSection section : itemSections) {
             // Bukkit.getLogger().log(Level.INFO, "[RunicItems] Loading template " + file.getName()); // for debugging
-            FileConfiguration itemConfig;
-            itemConfig = ConfigUtil.getYamlConfigFile(file.getName(), templateFiles.get(file));
-            RunicItemTemplate template;
             try {
-                template = loadTemplate(itemConfig);
+                RunicItemTemplate template = loadTemplate(section);
                 if (template == null) {
-                    Bukkit.getLogger().log(Level.INFO, "[RunicItems] WARNING: failed to load template " + file.getName());
+                    Bukkit.getLogger().log(Level.SEVERE, "[RunicItems] WARNING: failed to load template " + section.getName());
                     continue;
                 }
                 templates.put(template.getId(), template);
             } catch (Exception exception) {
-                Bukkit.getLogger().log(Level.INFO, "Error loading template: " + file.getName());
+                Bukkit.getLogger().log(Level.SEVERE, "[RunicItems] Error loading template: " + section.getName());
                 exception.printStackTrace();
             }
         }
         TemplateManager.setTemplates(templates);
     }
 
-    public static RunicItemTemplate loadTemplate(FileConfiguration itemConfig) {
+    public static RunicItemTemplate loadTemplate(ConfigurationSection itemConfig) {
         String id = itemConfig.getString("id");
         List<RunicItemTag> tags = new ArrayList<RunicItemTag>();
         if (itemConfig.contains("tags")) {
@@ -132,11 +159,11 @@ public class TemplateLoader {
         return null;
     }
 
-    private static RunicItemStatRange loadDamage(FileConfiguration itemConfig) {
+    private static RunicItemStatRange loadDamage(ConfigurationSection itemConfig) {
         return new RunicItemStatRange(itemConfig.getInt("damage.min"), itemConfig.getInt("damage.max"));
     }
 
-    private static LinkedHashMap<Stat, RunicItemStatRange> loadStats(FileConfiguration itemConfig) {
+    private static LinkedHashMap<Stat, RunicItemStatRange> loadStats(ConfigurationSection itemConfig) {
         if (itemConfig.contains("stats")) {
             Map<Stat, RunicItemStatRange> stats = new HashMap<>();
             for (String key : itemConfig.getConfigurationSection("stats").getKeys(false)) {
@@ -152,7 +179,7 @@ public class TemplateLoader {
         return new LinkedHashMap<>();
     }
 
-    private static Map<ClickTrigger, String> loadTriggers(FileConfiguration itemConfig) {
+    private static Map<ClickTrigger, String> loadTriggers(ConfigurationSection itemConfig) {
         Map<ClickTrigger, String> triggers = new HashMap<>();
         if (itemConfig.contains("triggers")) {
             for (String key : itemConfig.getConfigurationSection("triggers").getKeys(false)) {
