@@ -41,7 +41,7 @@ public enum Stat {
     Combat multipliers
      */
     // Dexterity
-    private static final double ABILITY_HASTE = 0.0025; // .25%
+    private static final double ABILITY_HASTE = 0.004; // .4%
     // Intelligence
     private static final double MANA_REGEN_MULT = 0.01; // 1%
     private static final double MAGIC_DMG_MULT = 0.01; // 1%
@@ -49,18 +49,18 @@ public enum Stat {
     private static final double PHYSICAL_DMG_MULT = 0.0075; // 0.75%
     // Wisdom
     private static final double MAX_MANA_MULT = 0.01; // 1%
-    private static final double SPELL_HEALING_MULT = 0.006; // .6%
-    private static final double SPELL_SHIELDING_MULT = 0.006; // .6%
-    private static final double EXP_MULT = .0025; // 0.25%
+    private static final double SPELL_HEALING_MULT = 0.012; // 1.2%
+    private static final double SPELL_SHIELDING_MULT = 0.012; // 1.2%
+//    private static final double EXP_MULT = .0025; // 0.25%
 
     // Vitality
-    private static final double DAMAGE_REDUCTION_MULT = 0.004; // 0.4%
+    private static final double DAMAGE_REDUCTION_MULT = 0.003; // 0.3%
     private static final double HEALTH_REGEN_MULT = 0.01; // 1%
 
     /*
     Capped values
      */
-    private static final double DAMAGE_REDUCTION_CAP = 40; // %
+    private static final double DAMAGE_REDUCTION_CAP = 30; // 30%
 
     /*
     Enum fields
@@ -87,10 +87,6 @@ public enum Stat {
 
     public static double getAbilityHaste() {
         return ABILITY_HASTE;
-    }
-
-    public static double getExpMult() {
-        return EXP_MULT;
     }
 
     public static double getMagicDmgMult() {
