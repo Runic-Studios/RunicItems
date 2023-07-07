@@ -79,12 +79,13 @@ public interface InventoryAPI {
     /**
      * A method used to clear an inventory of all items that match the provided template
      *
-     * @param inventory the inventory to wipe
-     * @param amount    the amount to remove
-     * @param template  the template
-     * @param sender    the user who initiated the clear inventory
+     * @param inventory        the inventory to wipe
+     * @param amount           the amount to remove
+     * @param template         the template
+     * @param sender           the user who initiated the clear inventory
+     * @param ignoreItemStacks if an invalid item is found, if the wipe should be stopped
      */
-    default void clearInventory(@NotNull Inventory inventory, int amount, @Nullable RunicItemTemplate template, @Nullable CommandSender sender) {
+    default void clearInventory(@NotNull Inventory inventory, int amount, @Nullable RunicItemTemplate template, @Nullable CommandSender sender, boolean ignoreItemStacks) {
         int amountRemoved = 0;
         ItemStack[] contents = inventory.getContents();
         for (int i = 0; i < contents.length; i++) {
@@ -92,6 +93,9 @@ public interface InventoryAPI {
                 if (amount == -1 || amountRemoved < amount) {
                     RunicItem item = ItemManager.getRunicItemFromItemStack(contents[i]);
                     if (item == null) {
+                        if (ignoreItemStacks) {
+                            continue;
+                        }
                         if (sender != null) {
                             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&dError removing items!"));
                         }
@@ -118,6 +122,30 @@ public interface InventoryAPI {
     }
 
     /**
+     * A method used to clear an inventory of all items that match the provided template
+     *
+     * @param inventory the inventory to wipe
+     * @param amount    the amount to remove
+     * @param template  the template
+     * @param sender    the user who initiated the clear inventory
+     */
+    default void clearInventory(@NotNull Inventory inventory, int amount, @Nullable RunicItemTemplate template, @Nullable CommandSender sender) {
+        this.clearInventory(inventory, amount, template, sender, false);
+    }
+
+    /**
+     * A method used to wipe all copies of a given item template from an inventory
+     *
+     * @param inventory        the inventory to wipe
+     * @param template         the template
+     * @param sender           the user who initiated the clear inventory
+     * @param ignoreItemStacks if an invalid item is found, if the wipe should be stopped
+     */
+    default void clearInventory(@NotNull Inventory inventory, @Nullable RunicItemTemplate template, @Nullable CommandSender sender, boolean ignoreItemStacks) {
+        this.clearInventory(inventory, -1, template, sender, ignoreItemStacks);
+    }
+
+    /**
      * A method used to wipe all copies of a given item template from an inventory
      *
      * @param inventory the inventory to wipe
@@ -125,6 +153,6 @@ public interface InventoryAPI {
      * @param sender    the user who initiated the clear inventory
      */
     default void clearInventory(@NotNull Inventory inventory, @Nullable RunicItemTemplate template, @Nullable CommandSender sender) {
-        this.clearInventory(inventory, -1, template, sender);
+        this.clearInventory(inventory, -1, template, sender, false);
     }
 }
