@@ -30,6 +30,7 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -45,19 +46,6 @@ public class RunicItemCommand extends BaseCommand {
             if (!context.getSender().isOp()) return new HashSet<>();
             return TemplateManager.getTemplates().keySet();
         });
-    }
-
-    private static boolean isInt(String number) {
-        try {
-            Integer.parseInt(number);
-        } catch (Exception exception) {
-            return false;
-        }
-        return true;
-    }
-
-    private static boolean isBoolean(String bool) {
-        return ("true".equalsIgnoreCase(bool) || "false".equalsIgnoreCase(bool));
     }
 
     @Subcommand("clear|c")
@@ -459,4 +447,78 @@ public class RunicItemCommand extends BaseCommand {
         }
     }
 
+    @Subcommand("get-random")
+    @Conditions("is-player|is-op")
+    private void onGetRandom(@NotNull Player player, @NotNull String[] args) {
+        /*
+        String[] rawRange = levelRange != null ? levelRange.split("-") : null;
+        if (rawRange != null && (rawRange.length != 2 || !isInt(rawRange[0]) || !isInt(rawRange[1]))) {
+            player.sendMessage(ColorUtil.format(PREFIX + "&cInvalid range syntax: lower-higher"));
+        }
+
+        Pair<Integer, Integer> range = levelRange != null && (rawRange.length != 2 || !isInt(rawRange[0]) || !isInt(rawRange[1])) ? new Pair<>(Integer.parseInt(rawRange[0]), Integer.parseInt(rawRange[1])) : null;
+
+        Set<RunicItemRarity> rarities = null;
+
+        for (String rawRarity : rarity != null ? rarity.split("-") : new String[0]) {
+            RunicItemRarity parsed = RunicItemRarity.getFromIdentifier(rawRarity);
+
+            if (parsed == null) {
+                player.sendMessage(ColorUtil.format(PREFIX + "&cInvalid rarity of " + rawRarity + " entered!"));
+                continue;
+            }
+
+            if (rarities == null) {
+                rarities = new HashSet<>();
+            }
+
+            rarities.add(parsed);
+        }
+
+        RunicItemClass clazz = RunicItemClass.getFromIdentifier(playerClass);
+
+        if (clazz == null && playerClass != null) {
+            player.sendMessage(ColorUtil.format(PREFIX + "&cInvalid class of " + playerClass + " entered!"));
+            //syntax error
+        }
+
+        Set<LootManager.ItemType> types = null;
+
+        for (String rawType : items != null ? items.split("-") : new String[0]) {
+            LootManager.ItemType parsed = LootManager.ItemType.getItemType(rawType);
+
+            if (parsed == null) {
+                player.sendMessage(ColorUtil.format(PREFIX + "&cInvalid item type of " + rawType + " entered!"));
+                continue;
+            }
+
+            if (types == null) {
+                types = new HashSet<>();
+            }
+
+            types.add(parsed);
+        }
+
+        //iterating and picking item is async, slight delay and item is given on main thread after async task is complete
+        LootManager.getItem(range, rarities, clazz, types, lqm)
+                .thenAccept(template -> {
+                    RunicItem item = template.generateItem(1, DupeManager.getNextItemId(), null, null);
+                    RunicItemsAPI.addItem(player.getInventory(), item.generateItem());
+                });
+
+         */
+    }
+
+    private static boolean isInt(String number) {
+        try {
+            Integer.parseInt(number);
+        } catch (Exception exception) {
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean isBoolean(String bool) {
+        return ("true".equalsIgnoreCase(bool) || "false".equalsIgnoreCase(bool));
+    }
 }

@@ -1,6 +1,7 @@
 package com.runicrealms.runicitems.item.util;
 
 import com.runicrealms.plugin.common.CharacterClass;
+import org.jetbrains.annotations.Nullable;
 
 public enum RunicItemClass {
 
@@ -19,7 +20,7 @@ public enum RunicItemClass {
         this.identifier = identifier;
     }
 
-    public static RunicItemClass getFromIdentifier(String identifier) {
+    public static RunicItemClass getFromIdentifier(@Nullable String identifier) {
         for (RunicItemClass itemClass : RunicItemClass.values()) {
             if (itemClass.getIdentifier().equalsIgnoreCase(identifier)) {
                 return itemClass;
