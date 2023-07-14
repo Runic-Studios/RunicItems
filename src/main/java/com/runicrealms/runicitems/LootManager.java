@@ -12,10 +12,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -68,26 +70,25 @@ public class LootManager {
      * @return a future/promise for an item that meets the following conditions, or null if none meet the conditions
      */
     @NotNull
-    public static CompletableFuture<RunicRarityLevelItemTemplate> getItem(@Nullable Pair<Integer, Integer> range, @Nullable Set<RunicItemRarity> rarities, @Nullable RunicItemClass playerClass, @Nullable Set<ItemType> itemTypes, @Nullable Float lqm) {
-        return CompletableFuture.supplyAsync(() -> {
-            int level = ThreadLocalRandom.current().nextInt(range != null && range.first < range.second ? range.second + 1 - range.first : 60 + 1);
+    public static CompletableFuture<Optional<RunicRarityLevelItemTemplate>> getItem(@Nullable Pair<Integer, Integer> range, @Nullable Set<RunicItemRarity> rarities, @Nullable RunicItemClass playerClass, @Nullable Set<ItemType> itemTypes, @Nullable Float lqm) {
+        Set<RunicItemRarity> rarity = rarities != null && !rarities.isEmpty() ? rarities : Collections.singleton(LootManager.rollRarity());
 
-            RunicItemRarity rarity = rarities == null || rarities.isEmpty() || rarities.stream().allMatch(r -> r == RunicItemRarity.COMMON || r == RunicItemRarity.UNCOMMON || r == RunicItemRarity.RARE || r == RunicItemRarity.EPIC) ? rollRarity() : rollRarity(rarities);
-
-            return Stream.concat(itemTypes != null && !itemTypes.isEmpty() && (itemTypes.contains(ItemType.HELMET) || itemTypes.contains(ItemType.CHESTPLATE) || itemTypes.contains(ItemType.LEGGINGS) || itemTypes.contains(ItemType.BOOTS)) ? armorItems.get(level).get(rarity).stream() : Stream.empty(),
-                            itemTypes != null && !itemTypes.isEmpty() && itemTypes.contains(ItemType.WEAPON) ? weaponItems.get(level).get(rarity).stream() : Stream.empty())
-                    .filter(template -> {
-                        if (playerClass == null || playerClass == RunicItemClass.ANY) {
-                            return true;
-                        }
-
-                        if (template instanceof RunicItemWeaponTemplate weaponTemplate && weaponTemplate.getRunicClass() != playerClass) {
-                            return false;
-                        }
-
-                        return !(template instanceof RunicItemArmorTemplate armorTemplate) || (armorTemplate.getRunicClass() == playerClass && (itemTypes == null || itemTypes.contains(ItemType.getItemType(armorTemplate))));
-                    }).findAny().orElse(null); //lgm stuff not implemented
-        }, executor -> Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), executor));
+        return CompletableFuture.supplyAsync(() ->
+                                TemplateManager.getTemplates().entrySet()
+                                        .stream()
+                                        .filter(entry -> entry.getValue() instanceof RunicRarityLevelItemTemplate && entry.getKey().startsWith("script"))
+                                        .map(entry -> (RunicRarityLevelItemTemplate) entry.getValue())
+                                        .filter(template -> (range == null || range.first > range.second) || (range.first <= template.getLevel() && range.second >= template.getLevel()))
+                                        .filter(template -> rarity.contains(template.getRarity()))
+                                        .filter(template -> playerClass == null || playerClass == RunicItemClass.ANY || getItemClass(template) == playerClass)
+                                        .filter(template -> itemTypes == null || itemTypes.contains(ItemType.getItemType(template)))
+                                        .min((one, two) -> ThreadLocalRandom.current().nextInt(-1, 1 + 1)) //return one of the elements at random
+                        , executor -> Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), executor))
+                .whenComplete((value, e) -> {
+                    if (e != null) {
+                        e.printStackTrace();
+                    }
+                });
     }
 
     @NotNull
@@ -184,9 +185,11 @@ public class LootManager {
             }
         }
 
+        //if the players luck was so bad that they didn't even win a common, give them a common
         return RunicItemRarity.COMMON;
     }
 
+    @NotNull
     public static RunicItemRarity rollRarity() {
         return RARITY_DROP_TABLE_WEIGHTED.get(random.nextInt(RARITY_DROP_TABLE_WEIGHTED.size()));
     }
@@ -237,7 +240,7 @@ public class LootManager {
                 return WEAPON;
             }
 
-            if (!(item instanceof RunicItemArmorTemplate armorTemplate)) {
+            if (!(item instanceof RunicItemArmorTemplate)) {
                 throw new IllegalStateException("item " + item.getDisplayableItem().getDisplayName() + " not armor or weapon");
             }
 
@@ -249,6 +252,19 @@ public class LootManager {
 
             throw new IllegalStateException("item " + item.getDisplayableItem().getDisplayName() + " is a type of armor that is not implemented in com.runicrealms.runicitems.LootManager.ItemType");
         }
+    }
+
+    @Nullable
+    private static RunicItemClass getItemClass(@NotNull RunicRarityLevelItemTemplate template) {
+        if (template instanceof RunicItemArmorTemplate armorTemplate) {
+            return armorTemplate.getRunicClass();
+        }
+
+        if (template instanceof RunicItemWeaponTemplate weaponTemplate) {
+            return weaponTemplate.getRunicClass();
+        }
+
+        return null;
     }
 
     private enum RarityItemType {

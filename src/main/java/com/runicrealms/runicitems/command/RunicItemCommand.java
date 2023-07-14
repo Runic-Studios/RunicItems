@@ -37,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +57,10 @@ public class RunicItemCommand extends BaseCommand {
             if (!context.getSender().isOp()) return new HashSet<>();
             return TemplateManager.getTemplates().keySet();
         });
+
+        RunicItems.getCommandManager().getCommandCompletions().registerAsyncCompletion("flag-parameter", context -> Collections.emptyList());
+
+        RunicItems.getCommandManager().getCommandCompletions().registerAsyncCompletion("value-parameter", context -> Collections.emptyList());
     }
 
     @Subcommand("clear|c")
@@ -459,7 +464,7 @@ public class RunicItemCommand extends BaseCommand {
 
     @Subcommand("get-random")
     @Conditions("is-player|is-op")
-    @CommandCompletion("@flag-parameter")
+    @CommandCompletion("@flag-parameter @value-parameter @flag-parameter @value-parameter @flag-parameter @value-parameter @flag-parameter @value-parameter @flag-parameter @value-parameter @nothing")
     private void onGetRandom(@NotNull Player player, @NotNull String[] args) {
         Map<GetRandomFlag, String> parameters = new HashMap<>();
 
@@ -490,18 +495,18 @@ public class RunicItemCommand extends BaseCommand {
         }
 
         String rawRange = parameters.get(GetRandomFlag.RANGE);
-        String[] parsedRange = rawRange != null ? rawRange.split("-") : null;
-        if (parsedRange != null && (parsedRange.length != 2 || !isInt(parsedRange[0]) || !isInt(parsedRange[1]))) {
+        String[] parsedRange = rawRange != null ? rawRange.split(",") : null;
+        if (parsedRange != null && (parsedRange.length != 2 || !isInt(parsedRange[0].trim()) || !isInt(parsedRange[1].trim()))) {
             player.sendMessage(ColorUtil.format(PREFIX + "&cInvalid range syntax: lower-higher"));
         }
 
-        Pair<Integer, Integer> range = parsedRange != null && (parsedRange.length != 2 || !isInt(parsedRange[0]) || !isInt(parsedRange[1])) ? new Pair<>(Integer.parseInt(parsedRange[0]), Integer.parseInt(parsedRange[1])) : null;
+        Pair<Integer, Integer> range = parsedRange != null && parsedRange.length == 2 && isInt(parsedRange[0].trim()) && isInt(parsedRange[1].trim()) ? new Pair<>(Integer.parseInt(parsedRange[0].trim()), Integer.parseInt(parsedRange[1].trim())) : null;
 
         Set<RunicItemRarity> rarities = null;
 
         String rarity = parameters.get(GetRandomFlag.RARITY);
-        for (String rawRarity : rarity != null ? rarity.split("-") : new String[0]) {
-            RunicItemRarity parsed = RunicItemRarity.getFromIdentifier(rawRarity);
+        for (String rawRarity : rarity != null ? rarity.split(",") : new String[0]) {
+            RunicItemRarity parsed = RunicItemRarity.getFromIdentifier(rawRarity.trim());
 
             if (parsed == null) {
                 player.sendMessage(ColorUtil.format(PREFIX + "&cInvalid rarity of " + rawRarity + " entered!"));
@@ -516,28 +521,28 @@ public class RunicItemCommand extends BaseCommand {
         }
 
         String playerClass = parameters.get(GetRandomFlag.CLASS);
-        RunicItemClass clazz = RunicItemClass.getFromIdentifier(playerClass);
+        RunicItemClass clazz = RunicItemClass.getFromIdentifier(playerClass != null ? playerClass.trim() : null);
 
         if (clazz == null && playerClass != null) {
-            player.sendMessage(ColorUtil.format(PREFIX + "&cInvalid class of " + playerClass + " entered!"));
+            player.sendMessage(ColorUtil.format(PREFIX + "&cInvalid class of " + playerClass.trim() + " entered!"));
         }
 
-        String items = parameters.get(GetRandomFlag.ITEMS);
-        Set<LootManager.ItemType> types = null;
+        String types = parameters.get(GetRandomFlag.ITEMS);
+        Set<LootManager.ItemType> items = null;
 
-        for (String rawType : items != null ? items.split("-") : new String[0]) {
-            LootManager.ItemType parsed = LootManager.ItemType.getItemType(rawType);
+        for (String rawType : types != null ? types.split(",") : new String[0]) {
+            LootManager.ItemType parsed = LootManager.ItemType.getItemType(rawType.trim());
 
             if (parsed == null) {
-                player.sendMessage(ColorUtil.format(PREFIX + "&cInvalid item type of " + rawType + " entered!"));
+                player.sendMessage(ColorUtil.format(PREFIX + "&cInvalid item type of " + rawType.trim() + " entered!"));
                 continue;
             }
 
-            if (types == null) {
-                types = new HashSet<>();
+            if (items == null) {
+                items = new HashSet<>();
             }
 
-            types.add(parsed);
+            items.add(parsed);
         }
 
         Float lqm;
@@ -550,18 +555,18 @@ public class RunicItemCommand extends BaseCommand {
         Bukkit.broadcastMessage("range: " + range); //remove
         Bukkit.broadcastMessage("rarities: " + rarities); //remove
         Bukkit.broadcastMessage("class: " + clazz); //remove
-        Bukkit.broadcastMessage("types: " + types); //remove
+        Bukkit.broadcastMessage("items: " + items); //remove
         Bukkit.broadcastMessage("lqm: " + lqm); //remove
 
         //iterating and picking item is async, slight delay and item is given on main thread after async task is complete
-        LootManager.getItem(range, rarities, clazz, types, lqm)
+        LootManager.getItem(range, rarities, clazz, items, lqm)
                 .thenAccept(template -> {
-                    if (template == null) {
+                    if (template.isEmpty()) {
                         player.sendMessage(ColorUtil.format(PREFIX + "&cThere are no item templates that match your conditions!"));
                         return;
                     }
 
-                    RunicItem item = template.generateItem(1, DupeManager.getNextItemId(), null, null);
+                    RunicItem item = template.get().generateItem(1, DupeManager.getNextItemId(), null, null);
                     RunicItemsAPI.addItem(player.getInventory(), item.generateItem());
                 });
     }
@@ -570,9 +575,9 @@ public class RunicItemCommand extends BaseCommand {
      * An enum to keep track of parameters for the get-random subcommand
      */
     private enum GetRandomFlag {
-        RANGE("range", input -> Stream.of("10-20", "20-30", "30-40", "40-50", "50-60").filter(element -> element.startsWith(input)).toList()),
+        RANGE("range", input -> Stream.of("10,20", "20,30", "30,40", "40,50", "50,60, 60,60").filter(element -> element.startsWith(input)).toList()),
         RARITY("rarity", input -> Stream.of("common", "uncommon", "rare", "epic").filter(element -> element.startsWith(input)).toList()),
-        CLASS("class", input -> Stream.of("mage-rouge", "mage").filter(element -> element.startsWith(input)).toList()),
+        CLASS("class", input -> Stream.of("mage", "mage,rouge", "mage,rouge,warrior").filter(element -> element.startsWith(input)).toList()),
         ITEMS("items", input -> Stream.of("helmet", "chestplate", "leggings", "boots", "weapon").filter(element -> element.startsWith(input)).toList()),
         LQM("lqm", input -> Stream.of("1", "1.5", "0.5").filter(element -> element.startsWith(input)).toList());
 
