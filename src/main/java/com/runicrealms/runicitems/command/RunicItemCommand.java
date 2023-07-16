@@ -36,6 +36,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -58,9 +59,48 @@ public class RunicItemCommand extends BaseCommand {
             return TemplateManager.getTemplates().keySet();
         });
 
-        RunicItems.getCommandManager().getCommandCompletions().registerAsyncCompletion("flag-parameter", context -> Collections.emptyList());
+        RunicItems.getCommandManager().getCommandCompletions().registerAsyncCompletion("flag-parameter", context -> {
+            String[] args = context.getContextValue(String[].class);
+            List<String> list = new ArrayList<>();
 
-        RunicItems.getCommandManager().getCommandCompletions().registerAsyncCompletion("value-parameter", context -> Collections.emptyList());
+            for (GetRandomFlag flag : GetRandomFlag.values()) {
+                boolean contains = false;
+
+                for (String arg : args) {
+                    if (!arg.startsWith("-") || !flag.getName().equalsIgnoreCase(arg.substring(1))) {
+                        continue;
+                    }
+
+                    contains = true;
+                    break;
+                }
+
+                if (!contains) {
+                    list.add("-" + flag.getName());
+                }
+            }
+
+            return list;
+        });
+
+        RunicItems.getCommandManager().getCommandCompletions().registerAsyncCompletion("value-parameter", context -> {
+            int index = Integer.parseInt(context.getConfig());
+            String[] args = context.getContextValue(String[].class);
+
+            String rawFlag = args[index - 1];
+
+            if (!rawFlag.startsWith("-")) {
+                return Collections.emptyList();
+            }
+
+            GetRandomFlag flag = GetRandomFlag.getFlag(rawFlag.substring(1));
+
+            if (flag == null) {
+                return Collections.emptyList();
+            }
+
+            return flag.getComplete().apply(context.getInput());
+        });
     }
 
     @Subcommand("clear|c")
@@ -464,7 +504,7 @@ public class RunicItemCommand extends BaseCommand {
 
     @Subcommand("get-random")
     @Conditions("is-player|is-op")
-    @CommandCompletion("@flag-parameter @value-parameter @flag-parameter @value-parameter @flag-parameter @value-parameter @flag-parameter @value-parameter @flag-parameter @value-parameter @nothing")
+    @CommandCompletion("@flag-parameter:0 @value-parameter:1 @flag-parameter:2 @value-parameter:3 @flag-parameter:4 @value-parameter:5 @flag-parameter:6 @value-parameter:7 @flag-parameter:8 @value-parameter:9 @nothing")
     private void onGetRandom(@NotNull Player player, @NotNull String[] args) {
         Map<GetRandomFlag, String> parameters = new HashMap<>();
 
@@ -552,12 +592,6 @@ public class RunicItemCommand extends BaseCommand {
             lqm = null;
         }
 
-        Bukkit.broadcastMessage("range: " + range); //remove
-        Bukkit.broadcastMessage("rarities: " + rarities); //remove
-        Bukkit.broadcastMessage("class: " + clazz); //remove
-        Bukkit.broadcastMessage("items: " + items); //remove
-        Bukkit.broadcastMessage("lqm: " + lqm); //remove
-
         //iterating and picking item is async, slight delay and item is given on main thread after async task is complete
         LootManager.getItem(range, rarities, clazz, items, lqm)
                 .thenAccept(template -> {
@@ -575,10 +609,10 @@ public class RunicItemCommand extends BaseCommand {
      * An enum to keep track of parameters for the get-random subcommand
      */
     private enum GetRandomFlag {
-        RANGE("range", input -> Stream.of("10,20", "20,30", "30,40", "40,50", "50,60, 60,60").filter(element -> element.startsWith(input)).toList()),
-        RARITY("rarity", input -> Stream.of("common", "uncommon", "rare", "epic").filter(element -> element.startsWith(input)).toList()),
+        RANGE("range", input -> Stream.of("10,20", "20,30", "30,40", "40,50", "50,60", "60,60").filter(element -> element.startsWith(input)).toList()),
+        RARITY("rarity", input -> Stream.of("common", "uncommon", "rare", "epic", "common,uncommon").filter(element -> element.startsWith(input)).toList()),
         CLASS("class", input -> Stream.of("mage", "mage,rouge", "mage,rouge,warrior").filter(element -> element.startsWith(input)).toList()),
-        ITEMS("items", input -> Stream.of("helmet", "chestplate", "leggings", "boots", "weapon").filter(element -> element.startsWith(input)).toList()),
+        ITEMS("items", input -> Stream.of("helmet", "chestplate", "leggings", "boots", "weapon", "helmet,chestplate,leggings,boots").filter(element -> element.startsWith(input)).toList()),
         LQM("lqm", input -> Stream.of("1", "1.5", "0.5").filter(element -> element.startsWith(input)).toList());
 
         private final String name;
