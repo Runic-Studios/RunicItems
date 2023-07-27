@@ -1,7 +1,7 @@
 name: RunicItems
 description: Runic Realms Items Plugin, by Excel
 version: 1.0
-main: com.runicrealms.runicitems.RunicItems
+main: com.runicrealms.plugin.runicitems.RunicItems
 api-version: 1.16
 depend:
   - NBTAPI

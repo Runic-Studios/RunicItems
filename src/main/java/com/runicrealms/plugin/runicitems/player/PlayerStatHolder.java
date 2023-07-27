@@ -1,0 +1,257 @@
+package com.runicrealms.plugin.runicitems.player;
+
+import com.runicrealms.plugin.common.util.ArmorType;
+import com.runicrealms.plugin.runicitems.item.RunicItem;
+import com.runicrealms.plugin.runicitems.item.RunicItemArmor;
+import com.runicrealms.plugin.runicitems.item.RunicItemArtifact;
+import com.runicrealms.plugin.runicitems.item.RunicItemOffhand;
+import com.runicrealms.plugin.runicitems.item.RunicItemWeapon;
+import com.runicrealms.plugin.runicitems.item.event.RunicStatUpdateEvent;
+import com.runicrealms.plugin.runicitems.ItemManager;
+import com.runicrealms.plugin.runicitems.Stat;
+import com.runicrealms.plugin.runicitems.item.stats.RunicArtifactAbility;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+
+/**
+ * A simple container which caches the player's stats and updates their armor stats
+ */
+public class PlayerStatHolder {
+    private final Player player;
+    private RunicItemArmor helmet;
+    private RunicItemArmor chestplate;
+    private RunicItemArmor leggings;
+    private RunicItemArmor boots;
+    private RunicItemOffhand offhand;
+    private RunicItemWeapon weapon;
+
+    private AddedPlayerStats cachedStats;
+
+    public PlayerStatHolder(Player player) {
+        this.player = player;
+        this.updateHelmet();
+        this.updateChestplate();
+        this.updateLeggings();
+        this.updateBoots();
+        this.updateOffhand();
+        this.updateWeapon();
+        this.cachedStats = getTotalStats();
+    }
+
+    public RunicItemArmor getBoots() {
+        return this.boots;
+    }
+
+    public RunicItemArmor getChestplate() {
+        return this.chestplate;
+    }
+
+    public RunicItemArmor getHelmet() {
+        return this.helmet;
+    }
+
+    public RunicItemArmor getLeggings() {
+        return this.leggings;
+    }
+
+    public RunicItemOffhand getOffhand() {
+        return this.offhand;
+    }
+
+    public Player getPlayer() {
+        return this.player;
+    }
+
+    public AddedPlayerStats getTotalStats() {
+        return this.cachedStats;
+    }
+
+    public RunicItemWeapon getWeapon() {
+        return this.weapon;
+    }
+
+    private void updateBoots() {
+        if (this.player.getInventory().getBoots() != null && this.player.getInventory().getBoots().getType() != Material.AIR) {
+            try {
+                this.boots = (RunicItemArmor) ItemManager.getRunicItemFromItemStack(this.player.getInventory().getBoots());
+            } catch (Exception exception) {
+                Bukkit.getLogger().log(Level.INFO, "[RunicItems] Error loading player " + this.player.getName() + " boots!");
+                exception.printStackTrace();
+                this.boots = null;
+            }
+        } else {
+            this.boots = null;
+        }
+        this.updateTotalStats();
+    }
+
+    private void updateChestplate() {
+        if (this.player.getInventory().getChestplate() != null && this.player.getInventory().getChestplate().getType() != Material.AIR) {
+            try {
+                this.chestplate = (RunicItemArmor) ItemManager.getRunicItemFromItemStack(this.player.getInventory().getChestplate());
+            } catch (Exception exception) {
+                Bukkit.getLogger().log(Level.INFO, "[RunicItems] Error loading player " + this.player.getName() + " chestplate!");
+                exception.printStackTrace();
+                this.chestplate = null;
+            }
+        } else {
+            this.chestplate = null;
+        }
+        this.updateTotalStats();
+    }
+
+    private void updateHelmet() {
+        if (this.player.getInventory().getHelmet() != null && this.player.getInventory().getHelmet().getType() != Material.AIR) {
+            try {
+                this.helmet = (RunicItemArmor) ItemManager.getRunicItemFromItemStack(this.player.getInventory().getHelmet());
+            } catch (Exception exception) {
+                Bukkit.getLogger().log(Level.INFO, "[RunicItems] Error loading player " + this.player.getName() + " helmet!");
+                exception.printStackTrace();
+                this.helmet = null;
+            }
+        } else {
+            this.helmet = null;
+        }
+        this.updateTotalStats();
+    }
+
+    public void updateItems() {
+        if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Cannot run update stats on main thread!");
+        updateHelmet();
+        updateChestplate();
+        updateLeggings();
+        updateBoots();
+        updateOffhand();
+        updateWeapon();
+        updateTotalStats();
+        Bukkit.getPluginManager().callEvent(new RunicStatUpdateEvent(this.player, this));
+    }
+
+    public void updateItems(ArmorType... armorTypes) {
+        for (ArmorType armorType : armorTypes) {
+            switch (armorType) {
+                case HELMET:
+                    updateHelmet();
+                case CHESTPLATE:
+                    updateChestplate();
+                case LEGGINGS:
+                    updateLeggings();
+                case BOOTS:
+                    updateBoots();
+            }
+        }
+        updateTotalStats();
+    }
+
+    private void updateLeggings() {
+        if (this.player.getInventory().getLeggings() != null && this.player.getInventory().getLeggings().getType() != Material.AIR) {
+            try {
+                this.leggings = (RunicItemArmor) ItemManager.getRunicItemFromItemStack(this.player.getInventory().getLeggings());
+            } catch (Exception exception) {
+                Bukkit.getLogger().log(Level.INFO, "[RunicItems] Error loading player " + this.player.getName() + " leggings!");
+                exception.printStackTrace();
+                this.leggings = null;
+            }
+        } else {
+            this.leggings = null;
+        }
+        this.updateTotalStats();
+    }
+
+    public void updateOffhand() {
+        if (this.player.getInventory().getItemInOffHand().getType() != Material.AIR) {
+            try {
+                RunicItem item = ItemManager.getRunicItemFromItemStack(this.player.getInventory().getItemInOffHand());
+                if (item instanceof RunicItemOffhand) {
+                    this.offhand = (RunicItemOffhand) item;
+                } else {
+                    this.offhand = null;
+                }
+            } catch (Exception exception) {
+                Bukkit.getLogger().log(Level.INFO, "[RunicItems] Error loading player " + this.player.getName() + " offhand!");
+                exception.printStackTrace();
+                this.offhand = null;
+            }
+        } else {
+            this.offhand = null;
+        }
+        this.updateTotalStats();
+    }
+
+    public void updateTotalStats() {
+        Map<Stat, Integer> stats = new HashMap<>();
+        RunicArtifactAbility ability = null;
+        int health = 0;
+        if (this.helmet != null) {
+            AddedArmorStats addedStats = this.helmet.calculateAddedStats();
+            addedStats.getStats().forEach((stat, value) -> {
+                if (!stats.containsKey(stat)) stats.put(stat, 0);
+                stats.put(stat, stats.get(stat) + value);
+            });
+            health += addedStats.getHealth();
+        }
+        if (this.chestplate != null) {
+            AddedArmorStats addedStats = this.chestplate.calculateAddedStats();
+            addedStats.getStats().forEach((stat, value) -> {
+                if (!stats.containsKey(stat)) stats.put(stat, 0);
+                stats.put(stat, stats.get(stat) + value);
+            });
+            health += addedStats.getHealth();
+        }
+        if (this.leggings != null) {
+            AddedArmorStats addedStats = this.leggings.calculateAddedStats();
+            addedStats.getStats().forEach((stat, value) -> {
+                if (!stats.containsKey(stat)) stats.put(stat, 0);
+                stats.put(stat, stats.get(stat) + value);
+            });
+            health += addedStats.getHealth();
+        }
+        if (this.boots != null) {
+            AddedArmorStats addedStats = this.boots.calculateAddedStats();
+            addedStats.getStats().forEach((stat, value) -> {
+                if (!stats.containsKey(stat)) stats.put(stat, 0);
+                stats.put(stat, stats.get(stat) + value);
+            });
+            health += addedStats.getHealth();
+        }
+        if (this.offhand != null) {
+            this.offhand.getStats().forEach((stat, roll) -> {
+                if (!stats.containsKey(stat)) stats.put(stat, 0);
+                stats.put(stat, stats.get(stat) + roll.getValue());
+            });
+        }
+        if (this.weapon != null) {
+            this.weapon.getStats().forEach((stat, roll) -> {
+                if (!stats.containsKey(stat)) stats.put(stat, 0);
+                stats.put(stat, stats.get(stat) + roll.getValue());
+            });
+            ability = this.weapon instanceof RunicItemArtifact ? ((RunicItemArtifact) this.weapon).getAbility() : null;
+        }
+        this.cachedStats = new AddedPlayerStats(stats, health, ability);
+    }
+
+    public void updateWeapon() {
+        if (this.player.getInventory().getItemInMainHand().getType() != Material.AIR) {
+            try {
+                RunicItem item = ItemManager.getRunicItemFromItemStack(this.player.getInventory().getItemInMainHand());
+                if (item instanceof RunicItemWeapon) {
+                    this.weapon = (RunicItemWeapon) item;
+                } else {
+                    this.weapon = null;
+                }
+            } catch (Exception exception) {
+                Bukkit.getLogger().log(Level.INFO, "[RunicItems] Error loading player " + this.player.getName() + "weapon!");
+                exception.printStackTrace();
+                this.weapon = null;
+            }
+        } else {
+            this.weapon = null;
+        }
+        this.updateTotalStats();
+    }
+}
