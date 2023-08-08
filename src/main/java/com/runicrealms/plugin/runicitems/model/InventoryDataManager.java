@@ -10,10 +10,10 @@ import com.runicrealms.plugin.rdb.event.CharacterQuitEvent;
 import com.runicrealms.plugin.rdb.event.CharacterSelectEvent;
 import com.runicrealms.plugin.rdb.event.MongoSaveEvent;
 import com.runicrealms.plugin.rdb.model.CharacterField;
-import com.runicrealms.plugin.runicitems.item.RunicItem;
 import com.runicrealms.plugin.runicitems.RunicItems;
 import com.runicrealms.plugin.runicitems.api.DataAPI;
 import com.runicrealms.plugin.runicitems.api.ItemWriteOperation;
+import com.runicrealms.plugin.runicitems.item.RunicItem;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -26,6 +26,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import redis.clients.jedis.Jedis;
 
+import java.sql.Timestamp;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -108,6 +109,12 @@ public class InventoryDataManager implements DataAPI, ItemWriteOperation, Listen
      */
     @EventHandler(priority = EventPriority.LOW) // fires early
     public void onCharacterQuit(CharacterQuitEvent event) {
+        if (!event.hasLoadedPlayerData()) {
+            RunicItems.getInstance().getLogger().log(Level.SEVERE, "inventory save aborted on " + event.getPlayer().getName() + " at " + new Timestamp(System.currentTimeMillis()) + " because there was no core player data in memory!");
+            Thread.dumpStack();
+            return;
+        }
+
         Player player = event.getPlayer();
         int slot = event.getSlot();
         saveInventory(player, slot);
