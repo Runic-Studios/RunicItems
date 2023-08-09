@@ -2,6 +2,7 @@ package com.runicrealms.plugin.runicitems.model;
 
 import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainAbortAction;
+import com.runicrealms.plugin.common.util.ColorUtil;
 import com.runicrealms.plugin.rdb.RunicDatabase;
 import com.runicrealms.plugin.rdb.api.WriteCallback;
 import com.runicrealms.plugin.rdb.event.CharacterDeleteEvent;
@@ -110,7 +111,9 @@ public class InventoryDataManager implements DataAPI, ItemWriteOperation, Listen
     @EventHandler(priority = EventPriority.LOW) // fires early
     public void onCharacterQuit(CharacterQuitEvent event) {
         if (!event.hasLoadedPlayerData()) {
-            RunicItems.getInstance().getLogger().log(Level.SEVERE, "inventory save aborted on " + event.getPlayer().getName() + " at " + new Timestamp(System.currentTimeMillis()) + " because there was no core player data in memory!");
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            RunicItems.getInstance().getLogger().log(Level.SEVERE, "inventory save aborted on " + event.getPlayer().getName() + " at " + timestamp + " because there was no core player data in memory!");
+            Bukkit.broadcastMessage(ColorUtil.format("&cPlease take a screenshot of this and report to admins that inventory save was aborted for " + event.getPlayer().getName() + " at " + timestamp));
             Thread.dumpStack();
             return;
         }
