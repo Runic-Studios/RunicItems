@@ -1,17 +1,20 @@
 package com.runicrealms.plugin.runicitems.item;
 
 import com.runicrealms.plugin.common.util.Pair;
-import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
-import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
-import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
 import com.runicrealms.plugin.runicitems.Stat;
 import com.runicrealms.plugin.runicitems.TemplateManager;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerk;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerkManager;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerkType;
 import com.runicrealms.plugin.runicitems.item.stats.GemBonus;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemArmorTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
+import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
+import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
+import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
 import com.runicrealms.plugin.runicitems.player.AddedArmorStats;
 import com.runicrealms.plugin.runicitems.util.StatUtil;
 import de.tr7zw.nbtapi.NBTItem;
@@ -41,26 +44,28 @@ public class RunicItemArmor extends RunicItem {
     private final LinkedHashMap<Stat, RunicItemStat> stats;
     private final List<GemBonus> gemBonuses;
     private final int maxGemSlots;
+    private final List<ItemPerk> itemPerks;
     private final RunicItemClass runicClass;
 
     public RunicItemArmor(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
-                          int health, LinkedHashMap<Stat, RunicItemStat> stats, List<GemBonus> gemBonuses, int maxGemSlots,
+                          int health, LinkedHashMap<Stat, RunicItemStat> stats, List<GemBonus> gemBonuses, int maxGemSlots, List<ItemPerk> itemPerks,
                           int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(templateId, displayableItem, tags, data, count, id);
         this.rarity = rarity;
         this.level = level;
         this.health = health;
         this.gemBonuses = gemBonuses;
+        this.itemPerks = itemPerks;
         this.stats = stats;
         this.maxGemSlots = maxGemSlots;
         this.runicClass = runicClass;
     }
 
 
-    public RunicItemArmor(RunicItemArmorTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats, List<GemBonus> gemBonuses) {
+    public RunicItemArmor(RunicItemArmorTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats, List<GemBonus> gemBonuses, List<ItemPerk> itemPerks) {
         this(
                 template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id,
-                template.getHealth(), stats, gemBonuses, template.getMaxGemSlots(),
+                template.getHealth(), stats, gemBonuses, template.getMaxGemSlots(), itemPerks,
                 template.getLevel(), template.getRarity(), template.getRunicClass()
         );
     }
@@ -78,31 +83,24 @@ public class RunicItemArmor extends RunicItem {
                 amountOfStats++;
             }
         }
+
         List<Pair<Stat, RunicItemStat>> statsList = new ArrayList<>(amountOfStats);
+        Map<Integer, LinkedHashMap<Stat, Integer>> gemStats = new HashMap<>();
+        Map<Integer, Integer> gemHealth = new HashMap<>();
+        Map<Integer, Stat> gemMainStat = new HashMap<>();
+        Map<Integer, Integer> gemTier = new HashMap<>();
+        List<ItemPerk> perks = new LinkedList<>();
+
         for (int i = 0; i < amountOfStats; i++) {
             statsList.add(null);
         }
         for (String key : keys) {
             String[] split = key.split("-");
-            if (split[0].equals("stat")) {
+            if (split[0].equals("stat") && split.length >= 3) {
                 Stat statType = Stat.getFromIdentifier(split[2]);
                 RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), nbtItem.getDouble(key));
                 statsList.set(Integer.parseInt(split[1]), new Pair<>(statType, stat));
-            }
-        }
-        LinkedHashMap<Stat, RunicItemStat> stats = new LinkedHashMap<>();
-        for (Pair<Stat, RunicItemStat> stat : statsList) {
-            stats.put(stat.first, stat.second);
-        }
-
-        Map<Integer, LinkedHashMap<Stat, Integer>> gemStats = new HashMap<>();
-        Map<Integer, Integer> gemHealth = new HashMap<>();
-        Map<Integer, Stat> gemMainStat = new HashMap<>();
-        Map<Integer, Integer> gemTier = new HashMap<>();
-
-        for (String key : keys) {
-            String[] split = key.split("-");
-            if (split[0].equals("gem")) {
+            } else if (split[0].equals("gem") && split.length >= 3) {
 
                 int gemNumber = Integer.parseInt(split[1]);
                 if (!gemStats.containsKey(gemNumber))
@@ -118,7 +116,18 @@ public class RunicItemArmor extends RunicItem {
                 } else {
                     gemStats.get(gemNumber).put(Stat.getFromIdentifier(split[2]), nbtItem.getInteger(key));
                 }
+            } else if (split[0].equalsIgnoreCase("perks") && split.length >= 2) {
+                for (ItemPerkType type : ItemPerkManager.getItemPerks()) {
+                    if (type.getIdentifier().equalsIgnoreCase(split[1])) {
+                        perks.add(new ItemPerk(type, nbtItem.getInteger(key)));
+                        break;
+                    }
+                }
             }
+        }
+        LinkedHashMap<Stat, RunicItemStat> stats = new LinkedHashMap<>();
+        for (Pair<Stat, RunicItemStat> stat : statsList) {
+            stats.put(stat.first, stat.second);
         }
 
         List<GemBonus> gemBonuses = new ArrayList<>();
@@ -131,7 +140,7 @@ public class RunicItemArmor extends RunicItem {
                             gemTier.get(gemNumber)));
         }
 
-        return new RunicItemArmor(template, item.getAmount(), nbtItem.getInteger("id"), stats, gemBonuses);
+        return new RunicItemArmor(template, item.getAmount(), nbtItem.getInteger("id"), stats, gemBonuses, perks);
     }
 
     @Override
@@ -150,6 +159,9 @@ public class RunicItemArmor extends RunicItem {
             jedisDataMap.put("gems." + count + ".tier", String.valueOf(gemBonus.getTier()));
             jedisDataMap.put("gems." + count + ".main", gemBonus.getMainStat().getIdentifier());
             count++;
+        }
+        for (ItemPerk perk : this.itemPerks) {
+            jedisDataMap.put("perks." + perk.getType().getIdentifier(), String.valueOf(perk.getStacks()));
         }
         return jedisDataMap;
     }
@@ -178,12 +190,15 @@ public class RunicItemArmor extends RunicItem {
             nbtItem.setInteger("gem-" + count + "-tier", gemBonus.getTier());
             count++;
         }
+        for (ItemPerk perk : this.itemPerks) {
+            nbtItem.setInteger("perks-" + perk.getType().getIdentifier(), perk.getStacks());
+        }
         return item;
     }
 
     @Override
     protected ItemLoreSection[] generateLore() {
-        List<String> lore = new LinkedList<>();
+        List<String> statLore = new LinkedList<>();
 
         Map<Stat, Integer> gemOnlyStats = new HashMap<>();
         for (GemBonus gemBonus : gemBonuses) {
@@ -197,7 +212,7 @@ public class RunicItemArmor extends RunicItem {
         for (Stat stat : Stat.values()) {
             if (stats.get(stat) != null && stats.get(stat).getValue() == 0) continue;
             if (isMenuDisplay && stats.containsKey(stat)) {
-                lore.add(stat.getChatColor() + "+" + stats.get(stat).getRange().getMin() +
+                statLore.add(stat.getChatColor() + "+" + stats.get(stat).getRange().getMin() +
                         "-" + stats.get(stat).getRange().getMax() + stat.getIcon());
             } else if (stats.containsKey(stat)) {
                 int value = stats.get(stat).getValue();
@@ -208,12 +223,12 @@ public class RunicItemArmor extends RunicItem {
                     }
                 }
                 if (finalValue == value) {
-                    lore.add(stat.getChatColor()
+                    statLore.add(stat.getChatColor()
                             + (value < 0 ? "-" : "+")
                             + value
                             + stat.getIcon());
                 } else {
-                    lore.add("" + ChatColor.GRAY + ChatColor.STRIKETHROUGH
+                    statLore.add("" + ChatColor.GRAY + ChatColor.STRIKETHROUGH
                             + (value < 0 ? "-" : "+")
                             + value + (stat.getIcon().length() == 1 ? stat.getIcon() : "") + ChatColor.RESET + " "
                             + stat.getChatColor()
@@ -225,7 +240,7 @@ public class RunicItemArmor extends RunicItem {
 
             } else if (gemOnlyStats.containsKey(stat)) {
                 int value = gemOnlyStats.get(stat);
-                lore.add("" + ChatColor.GRAY + ChatColor.STRIKETHROUGH
+                statLore.add("" + ChatColor.GRAY + ChatColor.STRIKETHROUGH
                         + "+0" + (stat.getIcon().length() == 1 ? stat.getIcon() : "") + ChatColor.RESET + " "
                         + stat.getChatColor()
                         + (value < 0 ? "-" : "+")
@@ -260,6 +275,12 @@ public class RunicItemArmor extends RunicItem {
             gemTextBuilder.append(Stat.EMPTY_GEM_ICON).append(" ");
         }
         gemTextBuilder.append(ChatColor.WHITE).append("]");
+
+        List<String> perkLore = new LinkedList<>(); // TODO: make this nicer
+        for (ItemPerk perk : this.itemPerks) {
+            perkLore.add("[" + perk.getStacks() + "x] " + perk.getType().getIdentifier() + " placeholder");
+        }
+
         String levelString = level > 0 ? String.valueOf(level) : "None";
         return new ItemLoreSection[]{
                 (maxGemSlots > 0
@@ -270,7 +291,8 @@ public class RunicItemArmor extends RunicItem {
                         ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + levelString,
                 })),
                 new ItemLoreSection(new String[]{healthString}),
-                new ItemLoreSection(lore),
+                new ItemLoreSection(statLore),
+                new ItemLoreSection(perkLore),
                 new ItemLoreSection(new String[]{
                         rarity.getDisplay() + " " + getArmorName(),
                         ChatColor.GRAY + runicClass.getDisplay()
@@ -302,6 +324,13 @@ public class RunicItemArmor extends RunicItem {
         }
         if (!gemStatsMap.isEmpty()) {
             document.put("gems", gemStatsMap);
+        }
+        Map<String, Integer> perksMap = new HashMap<>();
+        for (ItemPerk perk : this.itemPerks) {
+            perksMap.put(perk.getType().getIdentifier(), perk.getStacks());
+        }
+        if (!perksMap.isEmpty()) {
+            document.put("perks", perksMap);
         }
         return document;
     }

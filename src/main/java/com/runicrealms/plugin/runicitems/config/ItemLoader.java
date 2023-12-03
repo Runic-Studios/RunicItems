@@ -1,5 +1,8 @@
 package com.runicrealms.plugin.runicitems.config;
 
+import com.runicrealms.plugin.runicitems.RunicItems;
+import com.runicrealms.plugin.runicitems.Stat;
+import com.runicrealms.plugin.runicitems.TemplateManager;
 import com.runicrealms.plugin.runicitems.item.RunicItem;
 import com.runicrealms.plugin.runicitems.item.RunicItemArmor;
 import com.runicrealms.plugin.runicitems.item.RunicItemArtifact;
@@ -9,10 +12,9 @@ import com.runicrealms.plugin.runicitems.item.RunicItemGem;
 import com.runicrealms.plugin.runicitems.item.RunicItemGeneric;
 import com.runicrealms.plugin.runicitems.item.RunicItemOffhand;
 import com.runicrealms.plugin.runicitems.item.RunicItemWeapon;
-import com.runicrealms.plugin.runicitems.weaponskin.WeaponSkin;
-import com.runicrealms.plugin.runicitems.RunicItems;
-import com.runicrealms.plugin.runicitems.Stat;
-import com.runicrealms.plugin.runicitems.TemplateManager;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerk;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerkManager;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerkType;
 import com.runicrealms.plugin.runicitems.item.stats.GemBonus;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStatRange;
@@ -26,12 +28,14 @@ import com.runicrealms.plugin.runicitems.item.template.RunicItemOffhandTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemWeaponTemplate;
 import com.runicrealms.plugin.runicitems.util.StatUtil;
+import com.runicrealms.plugin.runicitems.weaponskin.WeaponSkin;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,7 +68,7 @@ public class ItemLoader {
                 if (document.containsKey("gems")) {
                     loadGems(document, gemBonuses);
                 }
-                return new RunicItemArmor(armorTemplate, count, id, loadStats(document, armorTemplate.getStats()), gemBonuses);
+                return new RunicItemArmor(armorTemplate, count, id, loadStats(document, armorTemplate.getStats()), gemBonuses, loadItemPerks(document));
             } else if (template instanceof RunicItemArtifactTemplate artifactTemplate) {
                 return new RunicItemArtifact(artifactTemplate, count, id, loadStats(document, artifactTemplate.getStats()), skin);
             } else if (template instanceof RunicItemBookTemplate bookTemplate) {
@@ -113,7 +117,7 @@ public class ItemLoader {
             }
             if (template instanceof RunicItemArmorTemplate armorTemplate) {
                 List<GemBonus> gemBonuses = getGemBonuses(itemDataMap);
-                return new RunicItemArmor(armorTemplate, count, id, loadStats(itemDataMap, armorTemplate.getStats()), gemBonuses);
+                return new RunicItemArmor(armorTemplate, count, id, loadStats(itemDataMap, armorTemplate.getStats()), gemBonuses, loadItemPerks(itemDataMap));
             } else if (template instanceof RunicItemArtifactTemplate artifactTemplate) {
                 return new RunicItemArtifact(artifactTemplate, count, id, loadStats(itemDataMap, artifactTemplate.getStats()), skin);
             } else if (template instanceof RunicItemBookTemplate bookTemplate) {
@@ -165,6 +169,28 @@ public class ItemLoader {
             }
         }
         return StatUtil.sortStatMap(stats);
+    }
+
+    /**
+     * Load the item perks of an item from a mongo document
+     *
+     * @param document of the runic item to load
+     * @return a list of all the item perks
+     */
+    @SuppressWarnings("unchecked")
+    private static List<ItemPerk> loadItemPerks(Document document) {
+        if (!document.containsKey("perks")) return new LinkedList<>();
+        List<ItemPerk> perks = new LinkedList<>();
+        Map<String, Integer> documentPerkMap = (Map<String, Integer>) document.get("perks");
+        for (String perkIdentifier : documentPerkMap.keySet()) {
+            for (ItemPerkType type : ItemPerkManager.getItemPerks()) {
+                if (type.getIdentifier().equalsIgnoreCase(perkIdentifier)) {
+                    perks.add(new ItemPerk(type, documentPerkMap.get(perkIdentifier)));
+                    break;
+                }
+            }
+        }
+        return perks;
     }
 
     /**
@@ -251,6 +277,16 @@ public class ItemLoader {
             }
         }
         return StatUtil.sortStatMap(stats);
+    }
+
+    private static List<ItemPerk> loadItemPerks(Map<String, String> itemDataMap) {
+        List<ItemPerk> perks = new LinkedList<>();
+        for (ItemPerkType type : ItemPerkManager.getItemPerks()) {
+            if (itemDataMap.containsKey("perks:" + type.getIdentifier())) {
+                perks.add(new ItemPerk(type, Integer.parseInt(itemDataMap.get("perks:" + type.getIdentifier()))));
+            }
+        }
+        return perks;
     }
 
     /**

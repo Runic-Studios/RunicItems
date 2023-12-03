@@ -1,13 +1,13 @@
 package com.runicrealms.plugin.runicitems.item.template;
 
-import com.runicrealms.plugin.runicitems.item.RunicItemArmor;
-import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
-import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
 import com.runicrealms.plugin.runicitems.Stat;
+import com.runicrealms.plugin.runicitems.item.RunicItemArmor;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
+import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
+import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -45,7 +45,7 @@ public class RunicItemArmorTemplate extends RunicRarityLevelItemTemplate {
         if (data == null) data = this.data;
         return new RunicItemArmor(
                 this.id, displayableItem, tags, data, count, id,
-                this.health, rolledStats, new LinkedList<>(), this.maxGemSlots,
+                this.health, rolledStats, new LinkedList<>(), this.maxGemSlots, new LinkedList<>(),
                 this.level, this.rarity, this.runicClass
         );
     }
