@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 public class AddedArmorStats {
 
     private final LinkedHashMap<Stat, Integer> stats;
-    private int health;
+    private final int health;
 
     public AddedArmorStats(LinkedHashMap<Stat, Integer> stats, int health) {
         this.stats = stats;

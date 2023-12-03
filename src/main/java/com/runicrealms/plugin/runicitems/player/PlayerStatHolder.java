@@ -1,14 +1,16 @@
 package com.runicrealms.plugin.runicitems.player;
 
 import com.runicrealms.plugin.common.util.ArmorType;
+import com.runicrealms.plugin.runicitems.ItemManager;
+import com.runicrealms.plugin.runicitems.Stat;
 import com.runicrealms.plugin.runicitems.item.RunicItem;
 import com.runicrealms.plugin.runicitems.item.RunicItemArmor;
 import com.runicrealms.plugin.runicitems.item.RunicItemArtifact;
 import com.runicrealms.plugin.runicitems.item.RunicItemOffhand;
 import com.runicrealms.plugin.runicitems.item.RunicItemWeapon;
 import com.runicrealms.plugin.runicitems.item.event.RunicStatUpdateEvent;
-import com.runicrealms.plugin.runicitems.ItemManager;
-import com.runicrealms.plugin.runicitems.Stat;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerk;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerkType;
 import com.runicrealms.plugin.runicitems.item.stats.RunicArtifactAbility;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -17,6 +19,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 /**
  * A simple container which caches the player's stats and updates their armor stats
@@ -185,6 +188,7 @@ public class PlayerStatHolder {
 
     public void updateTotalStats() {
         Map<Stat, Integer> stats = new HashMap<>();
+        Map<ItemPerkType, Integer> perks = new HashMap<>();
         RunicArtifactAbility ability = null;
         int health = 0;
         if (this.helmet != null) {
@@ -192,6 +196,11 @@ public class PlayerStatHolder {
             addedStats.getStats().forEach((stat, value) -> {
                 if (!stats.containsKey(stat)) stats.put(stat, 0);
                 stats.put(stat, stats.get(stat) + value);
+            });
+            this.helmet.getItemPerks().forEach((itemPerk) -> {
+                Integer existing = perks.get(itemPerk.getType());
+                if (existing == null) existing = 0;
+                perks.put(itemPerk.getType(), existing + itemPerk.getStacks());
             });
             health += addedStats.getHealth();
         }
@@ -201,6 +210,11 @@ public class PlayerStatHolder {
                 if (!stats.containsKey(stat)) stats.put(stat, 0);
                 stats.put(stat, stats.get(stat) + value);
             });
+            this.chestplate.getItemPerks().forEach((itemPerk) -> {
+                Integer existing = perks.get(itemPerk.getType());
+                if (existing == null) existing = 0;
+                perks.put(itemPerk.getType(), existing + itemPerk.getStacks());
+            });
             health += addedStats.getHealth();
         }
         if (this.leggings != null) {
@@ -209,6 +223,11 @@ public class PlayerStatHolder {
                 if (!stats.containsKey(stat)) stats.put(stat, 0);
                 stats.put(stat, stats.get(stat) + value);
             });
+            this.leggings.getItemPerks().forEach((itemPerk) -> {
+                Integer existing = perks.get(itemPerk.getType());
+                if (existing == null) existing = 0;
+                perks.put(itemPerk.getType(), existing + itemPerk.getStacks());
+            });
             health += addedStats.getHealth();
         }
         if (this.boots != null) {
@@ -216,6 +235,11 @@ public class PlayerStatHolder {
             addedStats.getStats().forEach((stat, value) -> {
                 if (!stats.containsKey(stat)) stats.put(stat, 0);
                 stats.put(stat, stats.get(stat) + value);
+            });
+            this.boots.getItemPerks().forEach((itemPerk) -> {
+                Integer existing = perks.get(itemPerk.getType());
+                if (existing == null) existing = 0;
+                perks.put(itemPerk.getType(), existing + itemPerk.getStacks());
             });
             health += addedStats.getHealth();
         }
@@ -232,7 +256,15 @@ public class PlayerStatHolder {
             });
             ability = this.weapon instanceof RunicItemArtifact ? ((RunicItemArtifact) this.weapon).getAbility() : null;
         }
-        this.cachedStats = new AddedPlayerStats(stats, health, ability);
+        ;
+        this.cachedStats = new AddedPlayerStats(
+                stats,
+                perks.entrySet()
+                        .stream()
+                        .map((entry) -> new ItemPerk(entry.getKey(), entry.getValue()))
+                        .collect(Collectors.toUnmodifiableSet()),
+                health,
+                ability);
     }
 
     public void updateWeapon() {

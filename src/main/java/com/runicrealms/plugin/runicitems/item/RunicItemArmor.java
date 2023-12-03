@@ -379,6 +379,10 @@ public class RunicItemArmor extends RunicItem {
         return this.stats;
     }
 
+    public List<ItemPerk> getItemPerks() {
+        return this.itemPerks;
+    }
+
     private String getArmorName() {
         String materialName = this.displayableItem.getMaterial().name();
         if (materialName.contains("HELMET")) return "Helmet";
