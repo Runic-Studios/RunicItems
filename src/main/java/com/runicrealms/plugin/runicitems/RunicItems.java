@@ -17,6 +17,7 @@ import com.runicrealms.plugin.runicitems.config.ConfigUtil;
 import com.runicrealms.plugin.runicitems.config.TemplateLoader;
 import com.runicrealms.plugin.runicitems.converter.RunicItemReadConverter;
 import com.runicrealms.plugin.runicitems.converter.RunicItemWriteConverter;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerkManager;
 import com.runicrealms.plugin.runicitems.listeners.GoldPouchListener;
 import com.runicrealms.plugin.runicitems.listeners.ItemSpawnListener;
 import com.runicrealms.plugin.runicitems.listeners.MoveToInventoryListener;
@@ -126,6 +127,8 @@ public class RunicItems extends JavaPlugin implements Listener {
         commandManager.registerCommand(new RunicItemCommand());
         commandManager.registerCommand(new WeaponSkinCommand());
         commandManager.registerCommand(new WeaponryCommand());
+
+        ItemPerkManager.initializeItemPerks();
 
         // Start JDA
 //        try {

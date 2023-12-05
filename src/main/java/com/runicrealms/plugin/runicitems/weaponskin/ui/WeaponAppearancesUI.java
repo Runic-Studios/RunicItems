@@ -7,7 +7,6 @@ import com.runicrealms.plugin.common.util.GUIUtil;
 import com.runicrealms.plugin.common.util.Pair;
 import com.runicrealms.plugin.runicitems.RunicItems;
 import com.runicrealms.plugin.runicitems.RunicItemsAPI;
-import com.runicrealms.plugin.runicitems.item.template.RunicItemArtifactTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemWeaponTemplate;
 import com.runicrealms.plugin.runicitems.weaponskin.WeaponSkin;
@@ -69,9 +68,7 @@ public class WeaponAppearancesUI implements InventoryHolder {
     private static int getDefaultPageNumber(Player player) {
         CharacterClass characterClass;
         RunicItemTemplate template = RunicItemsAPI.getItemStackTemplate(player.getInventory().getItemInMainHand());
-        if (template instanceof RunicItemArtifactTemplate) {
-            characterClass = ((RunicItemArtifactTemplate) template).getRunicClass().toCharacterClass();
-        } else if (template instanceof RunicItemWeaponTemplate) {
+        if (template instanceof RunicItemWeaponTemplate) {
             characterClass = ((RunicItemWeaponTemplate) template).getRunicClass().toCharacterClass();
         } else {
             throw new IllegalStateException("Could not find character class for item player is holding");

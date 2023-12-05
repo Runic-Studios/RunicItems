@@ -5,7 +5,6 @@ import com.runicrealms.plugin.runicitems.Stat;
 import com.runicrealms.plugin.runicitems.TemplateManager;
 import com.runicrealms.plugin.runicitems.item.RunicItem;
 import com.runicrealms.plugin.runicitems.item.RunicItemArmor;
-import com.runicrealms.plugin.runicitems.item.RunicItemArtifact;
 import com.runicrealms.plugin.runicitems.item.RunicItemBook;
 import com.runicrealms.plugin.runicitems.item.RunicItemDynamic;
 import com.runicrealms.plugin.runicitems.item.RunicItemGem;
@@ -19,7 +18,6 @@ import com.runicrealms.plugin.runicitems.item.stats.GemBonus;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemArmorTemplate;
-import com.runicrealms.plugin.runicitems.item.template.RunicItemArtifactTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemBookTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemDynamicTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemGemTemplate;
@@ -35,7 +33,7 @@ import org.bukkit.Bukkit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,7 +56,7 @@ public class ItemLoader {
             int count = document.getInteger("count");
             RunicItemTemplate template = TemplateManager.getTemplateFromId(templateId);
             WeaponSkin skin = null;
-            if (template instanceof RunicItemWeaponTemplate || template instanceof RunicItemArtifactTemplate) {
+            if (template instanceof RunicItemWeaponTemplate) {
                 if (document.containsKey("weapon-skin")) {
                     skin = RunicItems.getWeaponSkinAPI().getWeaponSkin(document.getString("weapon-skin"));
                 }
@@ -69,8 +67,6 @@ public class ItemLoader {
                     loadGems(document, gemBonuses);
                 }
                 return new RunicItemArmor(armorTemplate, count, id, loadStats(document, armorTemplate.getStats()), gemBonuses, loadItemPerks(document));
-            } else if (template instanceof RunicItemArtifactTemplate artifactTemplate) {
-                return new RunicItemArtifact(artifactTemplate, count, id, loadStats(document, artifactTemplate.getStats()), skin);
             } else if (template instanceof RunicItemBookTemplate bookTemplate) {
                 return new RunicItemBook(bookTemplate, count, id);
             } else if (template instanceof RunicItemDynamicTemplate) {
@@ -110,7 +106,7 @@ public class ItemLoader {
             int count = Integer.parseInt(itemDataMap.get("count"));
             RunicItemTemplate template = TemplateManager.getTemplateFromId(templateId);
             WeaponSkin skin = null;
-            if (template instanceof RunicItemWeaponTemplate || template instanceof RunicItemArtifactTemplate) {
+            if (template instanceof RunicItemWeaponTemplate) {
                 if (itemDataMap.containsKey("weapon-skin")) {
                     skin = RunicItems.getWeaponSkinAPI().getWeaponSkin(itemDataMap.get("weapon-skin"));
                 }
@@ -118,8 +114,6 @@ public class ItemLoader {
             if (template instanceof RunicItemArmorTemplate armorTemplate) {
                 List<GemBonus> gemBonuses = getGemBonuses(itemDataMap);
                 return new RunicItemArmor(armorTemplate, count, id, loadStats(itemDataMap, armorTemplate.getStats()), gemBonuses, loadItemPerks(itemDataMap));
-            } else if (template instanceof RunicItemArtifactTemplate artifactTemplate) {
-                return new RunicItemArtifact(artifactTemplate, count, id, loadStats(itemDataMap, artifactTemplate.getStats()), skin);
             } else if (template instanceof RunicItemBookTemplate bookTemplate) {
                 return new RunicItemBook(bookTemplate, count, id);
             } else if (template instanceof RunicItemDynamicTemplate) {
@@ -178,9 +172,9 @@ public class ItemLoader {
      * @return a list of all the item perks
      */
     @SuppressWarnings("unchecked")
-    private static List<ItemPerk> loadItemPerks(Document document) {
-        if (!document.containsKey("perks")) return new LinkedList<>();
-        List<ItemPerk> perks = new LinkedList<>();
+    private static LinkedHashSet<ItemPerk> loadItemPerks(Document document) {
+        if (!document.containsKey("perks")) return new LinkedHashSet<>();
+        LinkedHashSet<ItemPerk> perks = new LinkedHashSet<>();
         Map<String, Integer> documentPerkMap = (Map<String, Integer>) document.get("perks");
         for (String perkIdentifier : documentPerkMap.keySet()) {
             for (ItemPerkType type : ItemPerkManager.getItemPerks()) {
@@ -279,8 +273,8 @@ public class ItemLoader {
         return StatUtil.sortStatMap(stats);
     }
 
-    private static List<ItemPerk> loadItemPerks(Map<String, String> itemDataMap) {
-        List<ItemPerk> perks = new LinkedList<>();
+    private static LinkedHashSet<ItemPerk> loadItemPerks(Map<String, String> itemDataMap) {
+        LinkedHashSet<ItemPerk> perks = new LinkedHashSet<>();
         for (ItemPerkType type : ItemPerkManager.getItemPerks()) {
             if (itemDataMap.containsKey("perks:" + type.getIdentifier())) {
                 perks.add(new ItemPerk(type, Integer.parseInt(itemDataMap.get("perks:" + type.getIdentifier()))));

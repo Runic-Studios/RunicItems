@@ -9,7 +9,6 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.runicrealms.plugin.runicitems.api.InventoryAPI;
 import com.runicrealms.plugin.runicitems.item.RunicItem;
 import com.runicrealms.plugin.runicitems.item.RunicItemArmor;
-import com.runicrealms.plugin.runicitems.item.RunicItemArtifact;
 import com.runicrealms.plugin.runicitems.item.RunicItemBook;
 import com.runicrealms.plugin.runicitems.item.RunicItemDynamic;
 import com.runicrealms.plugin.runicitems.item.RunicItemGem;
@@ -17,10 +16,7 @@ import com.runicrealms.plugin.runicitems.item.RunicItemGeneric;
 import com.runicrealms.plugin.runicitems.item.RunicItemOffhand;
 import com.runicrealms.plugin.runicitems.item.RunicItemWeapon;
 import com.runicrealms.plugin.runicitems.item.event.RunicItemGenericTriggerEvent;
-import com.runicrealms.plugin.runicitems.item.util.ClickTrigger;
-import com.runicrealms.plugin.runicitems.util.NBTUtil;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemArmorTemplate;
-import com.runicrealms.plugin.runicitems.item.template.RunicItemArtifactTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemBookTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemDynamicTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemGemTemplate;
@@ -28,6 +24,8 @@ import com.runicrealms.plugin.runicitems.item.template.RunicItemGenericTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemOffhandTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemWeaponTemplate;
+import com.runicrealms.plugin.runicitems.item.util.ClickTrigger;
+import com.runicrealms.plugin.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -99,8 +97,6 @@ public class ItemManager implements InventoryAPI, Listener {
         if (template == null) return null;
         if (template instanceof RunicItemArmorTemplate) {
             return RunicItemArmor.getFromItemStack(itemStack);
-        } else if (template instanceof RunicItemArtifactTemplate) {
-            return RunicItemArtifact.getFromItemStack(itemStack);
         } else if (template instanceof RunicItemBookTemplate) {
             return RunicItemBook.getFromItemStack(itemStack);
         } else if (template instanceof RunicItemDynamicTemplate) {
@@ -290,7 +286,7 @@ public class ItemManager implements InventoryAPI, Listener {
             PlayerInventory inventory = event.getPlayer().getInventory();
             if (event.getHand() == null) return;
             ItemStack itemStack = inventory.getItem(event.getHand());
-            if (itemStack == null || itemStack.getType() == Material.AIR) return;
+            if (itemStack.getType() == Material.AIR) return;
             RunicItem item = getRunicItemFromItemStack(itemStack);
             if (!(item instanceof RunicItemGeneric generic)) return;
             ClickTrigger clickTrigger = ClickTrigger.getFromInteractAction(event.getAction(), event.getPlayer());

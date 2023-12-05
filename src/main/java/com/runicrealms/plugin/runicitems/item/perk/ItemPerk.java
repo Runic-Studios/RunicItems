@@ -1,5 +1,7 @@
 package com.runicrealms.plugin.runicitems.item.perk;
 
+import java.util.Objects;
+
 public class ItemPerk {
 
     private final ItemPerkType type;
@@ -18,4 +20,16 @@ public class ItemPerk {
         return this.stacks;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ItemPerk itemPerk)) return false;
+        return stacks == itemPerk.stacks && Objects.equals(type, itemPerk.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, stacks);
+    }
+    
 }

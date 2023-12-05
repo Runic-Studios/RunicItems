@@ -7,10 +7,9 @@ import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Private;
 import com.runicrealms.plugin.common.util.ColorUtil;
-import com.runicrealms.plugin.runicitems.weaponskin.ui.WeaponAppearancesUI;
 import com.runicrealms.plugin.runicitems.RunicItemsAPI;
-import com.runicrealms.plugin.runicitems.item.template.RunicItemArtifactTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemWeaponTemplate;
+import com.runicrealms.plugin.runicitems.weaponskin.ui.WeaponAppearancesUI;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -23,8 +22,7 @@ public class WeaponryCommand extends BaseCommand {
     @CatchUnknown
     public void onCommand(Player player) {
         if (player.getInventory().getItemInMainHand().getType() == Material.AIR
-                || (!(RunicItemsAPI.getItemStackTemplate(player.getInventory().getItemInMainHand()) instanceof RunicItemWeaponTemplate)
-                && !(RunicItemsAPI.getItemStackTemplate(player.getInventory().getItemInMainHand()) instanceof RunicItemArtifactTemplate))) {
+                || (!(RunicItemsAPI.getItemStackTemplate(player.getInventory().getItemInMainHand()) instanceof RunicItemWeaponTemplate))) {
             player.sendMessage(ColorUtil.format("&cYou must be holding a weapon to modify your weapon appearances!"));
             return;
         }

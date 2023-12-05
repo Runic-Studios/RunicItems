@@ -1,18 +1,13 @@
 package com.runicrealms.plugin.runicitems.config;
 
-import com.runicrealms.plugin.runicitems.item.RunicItemDynamic;
-import com.runicrealms.plugin.runicitems.item.util.ClickTrigger;
-import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
-import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
-import com.runicrealms.plugin.runicitems.AbilityManager;
 import com.runicrealms.plugin.runicitems.RunicItems;
 import com.runicrealms.plugin.runicitems.Stat;
 import com.runicrealms.plugin.runicitems.TemplateManager;
+import com.runicrealms.plugin.runicitems.item.RunicItemDynamic;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemArmorTemplate;
-import com.runicrealms.plugin.runicitems.item.template.RunicItemArtifactTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemBookTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemDynamicTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemGemTemplate;
@@ -20,6 +15,9 @@ import com.runicrealms.plugin.runicitems.item.template.RunicItemGenericTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemOffhandTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemWeaponTemplate;
+import com.runicrealms.plugin.runicitems.item.util.ClickTrigger;
+import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
+import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
 import com.runicrealms.plugin.runicitems.util.StatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -112,12 +110,6 @@ public class TemplateLoader {
             return new RunicItemArmorTemplate(
                     id, displayableItem, tags, data,
                     itemConfig.getInt("health"), loadStats(itemConfig), itemConfig.getInt("max-gem-slots"),
-                    itemConfig.getInt("level"), RunicItemRarity.getFromIdentifier(itemConfig.getString("rarity")), RunicItemClass.getFromIdentifier(itemConfig.getString("class"))
-            );
-        } else if (itemConfig.getString("type").equalsIgnoreCase("artifact")) {
-            return new RunicItemArtifactTemplate(
-                    id, displayableItem, tags, data,
-                    AbilityManager.getAbilityFromId(itemConfig.getString("ability")), loadDamage(itemConfig), loadStats(itemConfig),
                     itemConfig.getInt("level"), RunicItemRarity.getFromIdentifier(itemConfig.getString("rarity")), RunicItemClass.getFromIdentifier(itemConfig.getString("class"))
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase(RunicItemDynamic.getDynamicFieldString())) {

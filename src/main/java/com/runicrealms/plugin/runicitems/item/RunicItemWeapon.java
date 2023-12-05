@@ -1,10 +1,6 @@
 package com.runicrealms.plugin.runicitems.item;
 
 import com.runicrealms.plugin.common.util.Pair;
-import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
-import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
-import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
-import com.runicrealms.plugin.runicitems.weaponskin.WeaponSkin;
 import com.runicrealms.plugin.runicitems.RunicItems;
 import com.runicrealms.plugin.runicitems.Stat;
 import com.runicrealms.plugin.runicitems.TemplateManager;
@@ -14,6 +10,11 @@ import com.runicrealms.plugin.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemWeaponTemplate;
+import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
+import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
+import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
+import com.runicrealms.plugin.runicitems.player.AddedStats;
+import com.runicrealms.plugin.runicitems.weaponskin.WeaponSkin;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -34,7 +35,8 @@ import java.util.Set;
 
 @Document(collection = "items")
 @TypeAlias("weapon")
-public class RunicItemWeapon extends RunicItem {
+public class RunicItemWeapon extends RunicItem implements AddedStatsHolder {
+
     protected int level;
     protected RunicItemRarity rarity;
     protected RunicItemClass runicClass;
@@ -224,4 +226,12 @@ public class RunicItemWeapon extends RunicItem {
         return this.damageRange;
     }
 
+    @Override
+    public AddedStats getAddedStats() {
+        Map<Stat, Integer> addedStats = new HashMap<>();
+        for (Stat stat : stats.keySet()) {
+            addedStats.put(stat, stats.get(stat).getValue());
+        }
+        return new AddedStats(addedStats, null, 0);
+    }
 }

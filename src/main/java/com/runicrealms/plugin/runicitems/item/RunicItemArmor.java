@@ -15,7 +15,7 @@ import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
 import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
-import com.runicrealms.plugin.runicitems.player.AddedArmorStats;
+import com.runicrealms.plugin.runicitems.player.AddedStats;
 import com.runicrealms.plugin.runicitems.util.StatUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bson.Document;
@@ -29,12 +29,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class RunicItemArmor extends RunicItem {
+public class RunicItemArmor extends RunicItem implements AddedStatsHolder {
 
     private static final AttributeModifier attributeModifier = new AttributeModifier("generic.armor", 0, AttributeModifier.Operation.ADD_NUMBER);
 
@@ -44,11 +45,11 @@ public class RunicItemArmor extends RunicItem {
     private final LinkedHashMap<Stat, RunicItemStat> stats;
     private final List<GemBonus> gemBonuses;
     private final int maxGemSlots;
-    private final List<ItemPerk> itemPerks;
+    private final LinkedHashSet<ItemPerk> itemPerks;
     private final RunicItemClass runicClass;
 
     public RunicItemArmor(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
-                          int health, LinkedHashMap<Stat, RunicItemStat> stats, List<GemBonus> gemBonuses, int maxGemSlots, List<ItemPerk> itemPerks,
+                          int health, LinkedHashMap<Stat, RunicItemStat> stats, List<GemBonus> gemBonuses, int maxGemSlots, LinkedHashSet<ItemPerk> itemPerks,
                           int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(templateId, displayableItem, tags, data, count, id);
         this.rarity = rarity;
@@ -62,7 +63,7 @@ public class RunicItemArmor extends RunicItem {
     }
 
 
-    public RunicItemArmor(RunicItemArmorTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats, List<GemBonus> gemBonuses, List<ItemPerk> itemPerks) {
+    public RunicItemArmor(RunicItemArmorTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats, List<GemBonus> gemBonuses, LinkedHashSet<ItemPerk> itemPerks) {
         this(
                 template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id,
                 template.getHealth(), stats, gemBonuses, template.getMaxGemSlots(), itemPerks,
@@ -89,7 +90,7 @@ public class RunicItemArmor extends RunicItem {
         Map<Integer, Integer> gemHealth = new HashMap<>();
         Map<Integer, Stat> gemMainStat = new HashMap<>();
         Map<Integer, Integer> gemTier = new HashMap<>();
-        List<ItemPerk> perks = new LinkedList<>();
+        LinkedHashSet<ItemPerk> perks = new LinkedHashSet<>();
 
         for (int i = 0; i < amountOfStats; i++) {
             statsList.add(null);
@@ -335,7 +336,8 @@ public class RunicItemArmor extends RunicItem {
         return document;
     }
 
-    public AddedArmorStats calculateAddedStats() {
+    @Override
+    public AddedStats getAddedStats() {
         LinkedHashMap<Stat, Integer> calculatedStats = new LinkedHashMap<>();
         int health = this.health;
         for (Stat stat : this.stats.keySet()) {
@@ -348,7 +350,7 @@ public class RunicItemArmor extends RunicItem {
             }
             health += gemBonus.getHealth();
         }
-        return new AddedArmorStats(calculatedStats, health);
+        return new AddedStats(calculatedStats, this.itemPerks, health);
     }
 
     public List<GemBonus> getGems() {
@@ -379,7 +381,7 @@ public class RunicItemArmor extends RunicItem {
         return this.stats;
     }
 
-    public List<ItemPerk> getItemPerks() {
+    public LinkedHashSet<ItemPerk> getItemPerks() {
         return this.itemPerks;
     }
 

@@ -3,7 +3,6 @@ package com.runicrealms.plugin.runicitems.converter;
 import com.runicrealms.plugin.rdb.RunicDatabase;
 import com.runicrealms.plugin.runicitems.item.RunicItem;
 import com.runicrealms.plugin.runicitems.item.RunicItemArmor;
-import com.runicrealms.plugin.runicitems.item.RunicItemArtifact;
 import com.runicrealms.plugin.runicitems.item.RunicItemBook;
 import com.runicrealms.plugin.runicitems.item.RunicItemDynamic;
 import com.runicrealms.plugin.runicitems.item.RunicItemGem;
@@ -26,8 +25,6 @@ public class RunicItemWriteConverter implements Converter<RunicItem, Document> {
     public Document convert(@NotNull RunicItem source) {
         Document document = new Document();
         if (source instanceof RunicItemArmor) {
-            return source.writeToDocument(source, document);
-        } else if (source instanceof RunicItemArtifact) {
             return source.writeToDocument(source, document);
         } else if (source instanceof RunicItemBook) {
             return source.writeToDocument(source, document);

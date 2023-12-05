@@ -12,19 +12,18 @@ import co.aikar.commands.annotation.Syntax;
 import com.runicrealms.plugin.common.util.ColorUtil;
 import com.runicrealms.plugin.common.util.Pair;
 import com.runicrealms.plugin.rdb.RunicDatabase;
-import com.runicrealms.plugin.runicitems.item.RunicItem;
-import com.runicrealms.plugin.runicitems.item.RunicItemDynamic;
-import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
 import com.runicrealms.plugin.runicitems.DupeManager;
 import com.runicrealms.plugin.runicitems.LootManager;
 import com.runicrealms.plugin.runicitems.RunicItems;
 import com.runicrealms.plugin.runicitems.RunicItemsAPI;
 import com.runicrealms.plugin.runicitems.TemplateManager;
+import com.runicrealms.plugin.runicitems.item.RunicItem;
+import com.runicrealms.plugin.runicitems.item.RunicItemDynamic;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemArmorTemplate;
-import com.runicrealms.plugin.runicitems.item.template.RunicItemArtifactTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemWeaponTemplate;
+import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -101,6 +100,19 @@ public class RunicItemCommand extends BaseCommand {
 
             return flag.getComplete().apply(context.getInput());
         });
+    }
+
+    private static boolean isInt(String number) {
+        try {
+            Integer.parseInt(number);
+        } catch (Exception exception) {
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean isBoolean(String bool) {
+        return ("true".equalsIgnoreCase(bool) || "false".equalsIgnoreCase(bool));
     }
 
     @Subcommand("clear|c")
@@ -487,8 +499,6 @@ public class RunicItemCommand extends BaseCommand {
             RunicItemClass itemClass = null;
             if (template instanceof RunicItemArmorTemplate) {
                 itemClass = ((RunicItemArmorTemplate) template).getRunicClass();
-            } else if (template instanceof RunicItemArtifactTemplate) {
-                itemClass = ((RunicItemArtifactTemplate) template).getRunicClass();
             } else if (template instanceof RunicItemWeaponTemplate) {
                 itemClass = ((RunicItemWeaponTemplate) template).getRunicClass();
             }
@@ -623,6 +633,15 @@ public class RunicItemCommand extends BaseCommand {
             this.complete = complete;
         }
 
+        @Nullable
+        public static GetRandomFlag getFlag(@NotNull String value) {
+            try {
+                return GetRandomFlag.valueOf(value.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
+
         @NotNull
         public String getName() {
             return this.name;
@@ -632,27 +651,5 @@ public class RunicItemCommand extends BaseCommand {
         public Function<String, List<String>> getComplete() {
             return this.complete;
         }
-
-        @Nullable
-        public static GetRandomFlag getFlag(@NotNull String value) {
-            try {
-                return GetRandomFlag.valueOf(value.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                return null;
-            }
-        }
-    }
-
-    private static boolean isInt(String number) {
-        try {
-            Integer.parseInt(number);
-        } catch (Exception exception) {
-            return false;
-        }
-        return true;
-    }
-
-    private static boolean isBoolean(String bool) {
-        return ("true".equalsIgnoreCase(bool) || "false".equalsIgnoreCase(bool));
     }
 }

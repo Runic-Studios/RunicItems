@@ -1,8 +1,6 @@
 package com.runicrealms.plugin.runicitems.item;
 
 import com.runicrealms.plugin.common.util.Pair;
-import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
-import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.plugin.runicitems.Stat;
 import com.runicrealms.plugin.runicitems.TemplateManager;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemRarity;
@@ -10,6 +8,9 @@ import com.runicrealms.plugin.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemOffhandTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
+import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
+import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
+import com.runicrealms.plugin.runicitems.player.AddedStats;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class RunicItemOffhand extends RunicItem {
+public class RunicItemOffhand extends RunicItem implements AddedStatsHolder {
 
     private final LinkedHashMap<Stat, RunicItemStat> stats;
     private final int level;
@@ -148,4 +149,12 @@ public class RunicItemOffhand extends RunicItem {
         return this.stats;
     }
 
+    @Override
+    public AddedStats getAddedStats() {
+        Map<Stat, Integer> addedStats = new HashMap<>();
+        for (Stat stat : stats.keySet()) {
+            addedStats.put(stat, stats.get(stat).getValue());
+        }
+        return new AddedStats(addedStats, null, 0);
+    }
 }

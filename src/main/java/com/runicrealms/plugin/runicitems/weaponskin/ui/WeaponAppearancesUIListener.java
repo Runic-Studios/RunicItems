@@ -3,7 +3,6 @@ package com.runicrealms.plugin.runicitems.weaponskin.ui;
 import com.runicrealms.plugin.common.util.ColorUtil;
 import com.runicrealms.plugin.runicitems.RunicItems;
 import com.runicrealms.plugin.runicitems.RunicItemsAPI;
-import com.runicrealms.plugin.runicitems.item.template.RunicItemArtifactTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemWeaponTemplate;
 import com.runicrealms.plugin.runicitems.weaponskin.WeaponSkin;
 import de.tr7zw.nbtapi.NBTItem;
@@ -46,8 +45,7 @@ public class WeaponAppearancesUIListener implements Listener {
             player.openInventory(new WeaponAppearancesUI(player, weaponAppearancesUI.getPageNumber() + 1).getInventory());
         } else if (event.getSlot() >= 9) {
             if (player.getInventory().getItemInMainHand().getType() == Material.AIR
-                    || (!(RunicItemsAPI.getItemStackTemplate(player.getInventory().getItemInMainHand()) instanceof RunicItemWeaponTemplate)
-                    && !(RunicItemsAPI.getItemStackTemplate(player.getInventory().getItemInMainHand()) instanceof RunicItemArtifactTemplate))) {
+                    || (!(RunicItemsAPI.getItemStackTemplate(player.getInventory().getItemInMainHand()) instanceof RunicItemWeaponTemplate))) {
                 player.closeInventory();
                 player.sendMessage(ColorUtil.format("&cYou must be holding a weapon while activating a weapon skin!"));
                 return;

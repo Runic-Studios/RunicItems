@@ -2,12 +2,12 @@ package com.runicrealms.plugin.runicitems;
 
 import com.runicrealms.plugin.runicitems.api.AntiDupeInventoryHandler;
 import com.runicrealms.plugin.runicitems.item.RunicItem;
-import com.runicrealms.plugin.runicitems.player.AddedPlayerStats;
-import com.runicrealms.plugin.runicitems.player.PlayerStatHolder;
-import com.runicrealms.plugin.runicitems.util.NBTUtil;
 import com.runicrealms.plugin.runicitems.item.stats.RunicArtifactAbility;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
+import com.runicrealms.plugin.runicitems.player.AddedStats;
+import com.runicrealms.plugin.runicitems.player.PlayerStatHolder;
+import com.runicrealms.plugin.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -110,7 +110,7 @@ public class RunicItemsAPI {
      * @param uuid - UUID of player to check
      * @return AddedPlayerStats
      */
-    public static AddedPlayerStats getAddedPlayerStats(UUID uuid) {
+    public static AddedStats getAddedPlayerStats(UUID uuid) {
         return PlayerManager.getCachedPlayerStats().get(uuid).getTotalStats();
     }
 
