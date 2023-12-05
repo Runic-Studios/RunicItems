@@ -9,8 +9,8 @@ import java.util.Set;
 
 public class AddedPlayerStats {
 
+    private final Set<ItemPerk> itemPerks;
     private Map<Stat, Integer> addedStats;
-    private Set<ItemPerk> itemPerks;
     private int addedHealth;
     private RunicArtifactAbility ability;
 
@@ -47,6 +47,14 @@ public class AddedPlayerStats {
 
     public boolean hasAbility() {
         return this.ability != null;
+    }
+
+    public Set<ItemPerk> getItemPerks() {
+        return this.itemPerks;
+    }
+
+    public boolean hasItemPerks() {
+        return this.itemPerks.size() > 0;
     }
 
 }
