@@ -49,7 +49,7 @@ public class PlayerStatHolder {
         this.updateBoots();
         this.updateOffhand();
         this.updateWeapon();
-        this.cachedStats = getTotalStats();
+        this.cachedStats = new AddedStats(new HashMap<>(), null, 0);
     }
 
     public RunicItemArmor getBoots() {
