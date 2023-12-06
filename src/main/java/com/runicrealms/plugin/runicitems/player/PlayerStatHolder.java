@@ -42,6 +42,7 @@ public class PlayerStatHolder {
     private AddedStats cachedStats;
 
     public PlayerStatHolder(Player player) {
+        this.cachedStats = new AddedStats(new HashMap<>(), null, 0);
         this.player = player;
         this.updateHelmet();
         this.updateChestplate();
@@ -49,7 +50,6 @@ public class PlayerStatHolder {
         this.updateBoots();
         this.updateOffhand();
         this.updateWeapon();
-        this.cachedStats = new AddedStats(new HashMap<>(), null, 0);
     }
 
     public RunicItemArmor getBoots() {
