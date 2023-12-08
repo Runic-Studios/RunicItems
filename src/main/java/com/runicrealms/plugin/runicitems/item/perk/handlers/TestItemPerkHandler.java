@@ -1,16 +1,16 @@
 package com.runicrealms.plugin.runicitems.item.perk.handlers;
 
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerkHandler;
 import org.bukkit.Bukkit;
-import org.bukkit.event.Listener;
 
-public class TestItemPerkHandler extends ItemPerkHandler implements Listener {
+public class TestItemPerkHandler extends ItemPerkHandler {
 
     public TestItemPerkHandler() {
-        super("test-speed", 5);
+        super("test-speed");
     }
 
     @Override
-    protected void onChange(int stacks) {
+    public void onChange(int stacks) {
         Bukkit.broadcastMessage("CHANGE TEST-SPEED, stacks: " + stacks);
     }
 }

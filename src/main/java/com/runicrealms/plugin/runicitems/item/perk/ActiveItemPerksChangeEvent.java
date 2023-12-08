@@ -19,6 +19,7 @@ public class ActiveItemPerksChangeEvent extends Event {
     private final Set<ItemPerk> newItemPerks;
 
     public ActiveItemPerksChangeEvent(Player player, Set<ItemPerk> oldItemPerks, Set<ItemPerk> newItemPerks) {
+        super(true);
         this.player = player;
         this.oldItemPerks = oldItemPerks;
         this.newItemPerks = newItemPerks;

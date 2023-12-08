@@ -3,6 +3,7 @@ package com.runicrealms.plugin.runicitems.player;
 import com.google.common.collect.Sets;
 import com.runicrealms.plugin.common.util.ArmorType;
 import com.runicrealms.plugin.runicitems.ItemManager;
+import com.runicrealms.plugin.runicitems.RunicItems;
 import com.runicrealms.plugin.runicitems.item.RunicItem;
 import com.runicrealms.plugin.runicitems.item.RunicItemArmor;
 import com.runicrealms.plugin.runicitems.item.RunicItemOffhand;
@@ -225,7 +226,12 @@ public class PlayerStatHolder {
         Set<ItemPerk> newPerks = this.cachedStats.getItemPerks();
         if (newPerks == null) newPerks = EMPTY_SET;
         if (!Sets.intersection(oldPerks, newPerks).equals(Sets.union(oldPerks, newPerks))) {
-            Bukkit.getPluginManager().callEvent(new ActiveItemPerksChangeEvent(this.player, oldPerks, newPerks));
+            ActiveItemPerksChangeEvent event = new ActiveItemPerksChangeEvent(this.player, oldPerks, newPerks);
+            if (!Bukkit.isPrimaryThread()) {
+                Bukkit.getPluginManager().callEvent(event);
+            } else {
+                Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> Bukkit.getPluginManager().callEvent(event));
+            }
         }
     }
 

@@ -1,7 +1,6 @@
 package com.runicrealms.plugin.runicitems.item.perk;
 
-import com.runicrealms.plugin.runicitems.item.perk.handlers.ItemPerkHandler;
-import com.runicrealms.plugin.runicitems.item.perk.handlers.TestItemPerkHandler;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -9,6 +8,7 @@ import java.util.Set;
 public class ItemPerkManager {
 
     private static final Set<ItemPerkType> itemPerks = new HashSet<>();
+    private static ItemPerkHandlerManager handlerManager;
 
     public static Set<ItemPerkType> getItemPerks() {
         return itemPerks;
@@ -19,7 +19,21 @@ public class ItemPerkManager {
     }
 
     public static void initializeItemPerks() {
-        new TestItemPerkHandler();
+        handlerManager = new ItemPerkHandlerManager();
+    }
+
+    public static boolean isValidItemPerkIdentifier(String identifier) {
+        for (ItemPerkType type : itemPerks) {
+            if (type.getIdentifier().equalsIgnoreCase(identifier)) return true;
+        }
+        return false;
+    }
+
+    public static @Nullable ItemPerkType getItemPerkFromIdentifier(String identifier) {
+        for (ItemPerkType type : itemPerks) {
+            if (type.getIdentifier().equalsIgnoreCase(identifier)) return type;
+        }
+        return null;
     }
 
 }

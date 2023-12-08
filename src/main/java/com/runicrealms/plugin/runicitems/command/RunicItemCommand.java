@@ -18,7 +18,11 @@ import com.runicrealms.plugin.runicitems.RunicItems;
 import com.runicrealms.plugin.runicitems.RunicItemsAPI;
 import com.runicrealms.plugin.runicitems.TemplateManager;
 import com.runicrealms.plugin.runicitems.item.RunicItem;
+import com.runicrealms.plugin.runicitems.item.RunicItemArmor;
 import com.runicrealms.plugin.runicitems.item.RunicItemDynamic;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerk;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerkManager;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerkType;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemArmorTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
@@ -40,10 +44,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @CommandAlias("ri|runicitems|runicitem")
@@ -99,6 +106,16 @@ public class RunicItemCommand extends BaseCommand {
             }
 
             return flag.getComplete().apply(context.getInput());
+        });
+
+        final AtomicReference<Set<String>> cachedPerkIDs = new AtomicReference<>();
+
+        RunicItems.getCommandManager().getCommandCompletions().registerAsyncCompletion("perk-ids", context -> {
+            if (!context.getSender().isOp()) return new HashSet<>();
+            if (cachedPerkIDs.get() == null) {
+                cachedPerkIDs.set(ItemPerkManager.getItemPerks().stream().map(ItemPerkType::getIdentifier).collect(Collectors.toUnmodifiableSet()));
+            }
+            return cachedPerkIDs.get();
         });
     }
 
@@ -510,6 +527,59 @@ public class RunicItemCommand extends BaseCommand {
                     target.getLocation());
             return;
         }
+    }
+
+    @Subcommand("add-perk")
+    @Conditions("is-player|is-op")
+    @CommandCompletion("@perk-ids")
+    private void onAddPerk(@NotNull Player player, @NotNull String[] args) {
+        if (args.length == 0) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&dYou must specify a perk to add!"));
+            return;
+        }
+
+        ItemPerkType type = ItemPerkManager.getItemPerkFromIdentifier(args[0]);
+        if (type == null) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&d" + args[0] + " is not a valid perk type!"));
+            return;
+        }
+
+        ItemStack heldItem = player.getInventory().getItemInMainHand();
+        if (heldItem.getType() == Material.AIR) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&dYou must be holding an item to add a perk to it!"));
+            return;
+        }
+
+        RunicItem item = RunicItemsAPI.getRunicItemFromItemStack(heldItem);
+        if (!(item instanceof RunicItemArmor armor)) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&dYou must be holding armor to add a perk to it."));
+            return;
+        }
+
+        // inefficient i know but i don't care it only runs on command and is async
+
+        LinkedHashSet<ItemPerk> perks = armor.getItemPerks();
+        LinkedHashSet<ItemPerk> newPerks = new LinkedHashSet<>();
+
+        boolean replaced = false;
+        for (ItemPerk perk : perks) {
+            if (perk.getType() != type) {
+                newPerks.add(perk);
+            } else {
+                newPerks.add(new ItemPerk(type, perk.getStacks() + 1));
+                replaced = true;
+            }
+        }
+        if (!replaced) {
+            newPerks.add(new ItemPerk(type, 1));
+        }
+
+        armor.getItemPerks().clear();
+        newPerks.forEach(perk -> armor.getItemPerks().add(perk));
+
+        player.getInventory().setItemInMainHand(armor.generateItem());
+
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&dAdded " + args[0] + " x1 to your held item."));
     }
 
     @Subcommand("get-random")

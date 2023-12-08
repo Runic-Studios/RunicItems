@@ -27,6 +27,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -34,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class RunicItemArmor extends RunicItem implements AddedStatsHolder {
 
@@ -118,8 +120,9 @@ public class RunicItemArmor extends RunicItem implements AddedStatsHolder {
                     gemStats.get(gemNumber).put(Stat.getFromIdentifier(split[2]), nbtItem.getInteger(key));
                 }
             } else if (split[0].equalsIgnoreCase("perks") && split.length >= 2) {
+                String identifier = Arrays.stream(split, 1, split.length).collect(Collectors.joining("-"));
                 for (ItemPerkType type : ItemPerkManager.getItemPerks()) {
-                    if (type.getIdentifier().equalsIgnoreCase(split[1])) {
+                    if (type.getIdentifier().equalsIgnoreCase(identifier)) {
                         perks.add(new ItemPerk(type, nbtItem.getInteger(key)));
                         break;
                     }
