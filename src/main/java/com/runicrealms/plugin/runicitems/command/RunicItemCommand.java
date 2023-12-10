@@ -17,8 +17,8 @@ import com.runicrealms.plugin.runicitems.LootManager;
 import com.runicrealms.plugin.runicitems.RunicItems;
 import com.runicrealms.plugin.runicitems.RunicItemsAPI;
 import com.runicrealms.plugin.runicitems.TemplateManager;
+import com.runicrealms.plugin.runicitems.item.ItemPerksHolder;
 import com.runicrealms.plugin.runicitems.item.RunicItem;
-import com.runicrealms.plugin.runicitems.item.RunicItemArmor;
 import com.runicrealms.plugin.runicitems.item.RunicItemDynamic;
 import com.runicrealms.plugin.runicitems.item.perk.ItemPerk;
 import com.runicrealms.plugin.runicitems.item.perk.ItemPerkManager;
@@ -529,57 +529,60 @@ public class RunicItemCommand extends BaseCommand {
         }
     }
 
-    @Subcommand("add-perk")
+    @Subcommand("set-perk")
     @Conditions("is-player|is-op")
     @CommandCompletion("@perk-ids")
-    private void onAddPerk(@NotNull Player player, @NotNull String[] args) {
-        if (args.length == 0) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&dYou must specify a perk to add!"));
+    private void onSetPerk(@NotNull Player player, @NotNull String[] args) {
+        if (args.length != 2) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dYou must specify a perk type and the amount of stacks!"));
             return;
         }
 
         ItemPerkType type = ItemPerkManager.getItemPerkFromIdentifier(args[0]);
         if (type == null) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&d" + args[0] + " is not a valid perk type!"));
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&d" + args[0] + " is not a valid perk type!"));
             return;
         }
 
         ItemStack heldItem = player.getInventory().getItemInMainHand();
         if (heldItem.getType() == Material.AIR) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&dYou must be holding an item to add a perk to it!"));
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dYou must be holding an item to add a perk to it!"));
             return;
         }
 
         RunicItem item = RunicItemsAPI.getRunicItemFromItemStack(heldItem);
-        if (!(item instanceof RunicItemArmor armor)) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&dYou must be holding armor to add a perk to it."));
+        if (!(item instanceof ItemPerksHolder perkHolder)) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dYou must be holding armor or a weapon to add a perk to it."));
             return;
         }
 
+        if (!isInt(args[1]) || Integer.parseInt(args[1]) < 0) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThe number of stacks must be an integer!"));
+            return;
+        }
+
+        int stacks = Integer.parseInt(args[1]);
+
         // inefficient i know but i don't care it only runs on command and is async
 
-        LinkedHashSet<ItemPerk> perks = armor.getItemPerks();
+        LinkedHashSet<ItemPerk> perks = perkHolder.getItemPerks();
         LinkedHashSet<ItemPerk> newPerks = new LinkedHashSet<>();
 
-        boolean replaced = false;
         for (ItemPerk perk : perks) {
             if (perk.getType() != type) {
                 newPerks.add(perk);
-            } else {
-                newPerks.add(new ItemPerk(type, perk.getStacks() + 1));
-                replaced = true;
             }
         }
-        if (!replaced) {
-            newPerks.add(new ItemPerk(type, 1));
+        if (stacks > 0) {
+            newPerks.add(new ItemPerk(type, stacks));
         }
 
-        armor.getItemPerks().clear();
-        newPerks.forEach(perk -> armor.getItemPerks().add(perk));
+        perkHolder.getItemPerks().clear();
+        newPerks.forEach(perk -> perkHolder.getItemPerks().add(perk));
 
-        player.getInventory().setItemInMainHand(armor.generateItem());
+        player.getInventory().setItemInMainHand(item.generateItem());
 
-        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&dAdded " + args[0] + " x1 to your held item."));
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dSet " + args[0] + " to " + stacks + "x on your held item."));
     }
 
     @Subcommand("get-random")

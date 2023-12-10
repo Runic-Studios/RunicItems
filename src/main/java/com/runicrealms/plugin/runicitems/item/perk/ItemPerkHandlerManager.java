@@ -49,12 +49,18 @@ public class ItemPerkHandlerManager implements Listener {
                 }
             }
         }
-        if (activated && !deactivated) {
-            event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.0F, 2.0F);
-        } else if (!activated && deactivated) {
-            event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 1.0F, 2.0F);
-        } else if (activated) { // both activated and deactivated
-            event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_SHULKER_BULLET_HURT, 1.0F, 2.0F);
+
+        if (event.shouldPlaySounds()) {
+            if (activated && !deactivated) {
+                event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.0F, 2.0F);
+            } else if (!activated && deactivated) {
+                event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 1.0F, 2.0F);
+            } else if (activated) { // both activated and deactivated
+                event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 1.0F, 2.0F);
+                Bukkit.getScheduler().runTaskLater(RunicItems.getInstance(), () -> {
+                    event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.0F, 2.0F);
+                }, 10);
+            }
         }
     }
 

@@ -16,6 +16,7 @@ import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
 import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
 import com.runicrealms.plugin.runicitems.player.AddedStats;
+import com.runicrealms.plugin.runicitems.util.LazyField;
 import com.runicrealms.plugin.runicitems.util.StatUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bson.Document;
@@ -37,7 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RunicItemArmor extends RunicItem implements AddedStatsHolder {
+public class RunicItemArmor extends RunicItem implements AddedStatsHolder, ItemPerksHolder {
 
     private static final AttributeModifier attributeModifier = new AttributeModifier("generic.armor", 0, AttributeModifier.Operation.ADD_NUMBER);
 
@@ -49,6 +50,7 @@ public class RunicItemArmor extends RunicItem implements AddedStatsHolder {
     private final int maxGemSlots;
     private final LinkedHashSet<ItemPerk> itemPerks;
     private final RunicItemClass runicClass;
+    private final LazyField<AddedStats> addedStats;
 
     public RunicItemArmor(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
                           int health, LinkedHashMap<Stat, RunicItemStat> stats, List<GemBonus> gemBonuses, int maxGemSlots, LinkedHashSet<ItemPerk> itemPerks,
@@ -62,6 +64,21 @@ public class RunicItemArmor extends RunicItem implements AddedStatsHolder {
         this.stats = stats;
         this.maxGemSlots = maxGemSlots;
         this.runicClass = runicClass;
+        this.addedStats = new LazyField<>(() -> {
+            LinkedHashMap<Stat, Integer> calculatedStats = new LinkedHashMap<>();
+            for (Stat stat : stats.keySet()) {
+                calculatedStats.put(stat, this.stats.get(stat).getValue());
+            }
+            int bonusHealth = this.health;
+            for (GemBonus gemBonus : this.gemBonuses) {
+                for (Stat stat : gemBonus.getStats().keySet()) {
+                    if (!calculatedStats.containsKey(stat)) calculatedStats.put(stat, 0);
+                    calculatedStats.put(stat, calculatedStats.get(stat) + gemBonus.getStats().get(stat));
+                }
+                bonusHealth += gemBonus.getHealth();
+            }
+            return new AddedStats(calculatedStats, this.itemPerks, bonusHealth);
+        });
     }
 
 
@@ -119,7 +136,7 @@ public class RunicItemArmor extends RunicItem implements AddedStatsHolder {
                 } else {
                     gemStats.get(gemNumber).put(Stat.getFromIdentifier(split[2]), nbtItem.getInteger(key));
                 }
-            } else if (split[0].equalsIgnoreCase("perks") && split.length >= 2) {
+            } else if (split[0].equals("perks") && split.length >= 2) {
                 String identifier = Arrays.stream(split, 1, split.length).collect(Collectors.joining("-"));
                 for (ItemPerkType type : ItemPerkManager.getItemPerks()) {
                     if (type.getIdentifier().equalsIgnoreCase(identifier)) {
@@ -341,19 +358,7 @@ public class RunicItemArmor extends RunicItem implements AddedStatsHolder {
 
     @Override
     public AddedStats getAddedStats() {
-        LinkedHashMap<Stat, Integer> calculatedStats = new LinkedHashMap<>();
-        int health = this.health;
-        for (Stat stat : this.stats.keySet()) {
-            calculatedStats.put(stat, this.stats.get(stat).getValue());
-        }
-        for (GemBonus gemBonus : this.gemBonuses) {
-            for (Stat stat : gemBonus.getStats().keySet()) {
-                if (!calculatedStats.containsKey(stat)) calculatedStats.put(stat, 0);
-                calculatedStats.put(stat, calculatedStats.get(stat) + gemBonus.getStats().get(stat));
-            }
-            health += gemBonus.getHealth();
-        }
-        return new AddedStats(calculatedStats, this.itemPerks, health);
+        return this.addedStats.get();
     }
 
     public List<GemBonus> getGems() {
@@ -384,8 +389,13 @@ public class RunicItemArmor extends RunicItem implements AddedStatsHolder {
         return this.stats;
     }
 
+    @Override
     public LinkedHashSet<ItemPerk> getItemPerks() {
         return this.itemPerks;
+    }
+
+    public boolean hasItemPerks() {
+        return this.itemPerks != null && this.itemPerks.size() > 0;
     }
 
     private String getArmorName() {

@@ -11,6 +11,7 @@ import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
 import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.plugin.runicitems.player.AddedStats;
+import com.runicrealms.plugin.runicitems.util.LazyField;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -31,6 +32,7 @@ public class RunicItemOffhand extends RunicItem implements AddedStatsHolder {
     private final LinkedHashMap<Stat, RunicItemStat> stats;
     private final int level;
     private final RunicItemRarity rarity;
+    private final LazyField<AddedStats> addedStats;
 
     public RunicItemOffhand(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
                             LinkedHashMap<Stat, RunicItemStat> stats,
@@ -39,6 +41,13 @@ public class RunicItemOffhand extends RunicItem implements AddedStatsHolder {
         this.stats = stats;
         this.level = level;
         this.rarity = rarity;
+        this.addedStats = new LazyField<>(() -> {
+            Map<Stat, Integer> addedStats = new HashMap<>();
+            for (Stat stat : stats.keySet()) {
+                addedStats.put(stat, stats.get(stat).getValue());
+            }
+            return new AddedStats(addedStats, null, 0);
+        });
     }
 
     public RunicItemOffhand(RunicItemOffhandTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats) {
@@ -151,10 +160,6 @@ public class RunicItemOffhand extends RunicItem implements AddedStatsHolder {
 
     @Override
     public AddedStats getAddedStats() {
-        Map<Stat, Integer> addedStats = new HashMap<>();
-        for (Stat stat : stats.keySet()) {
-            addedStats.put(stat, stats.get(stat).getValue());
-        }
-        return new AddedStats(addedStats, null, 0);
+        return this.addedStats.get();
     }
 }

@@ -34,6 +34,10 @@ public class AddedStats {
         return this.itemPerks;
     }
 
+    public void setItemPerks(@Nullable Set<ItemPerk> itemPerks) {
+        this.itemPerks = itemPerks;
+    }
+
     public boolean hasItemPerks() {
         return this.itemPerks != null && this.itemPerks.size() > 0;
     }

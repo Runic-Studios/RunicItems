@@ -4,6 +4,9 @@ import com.runicrealms.plugin.common.util.Pair;
 import com.runicrealms.plugin.runicitems.RunicItems;
 import com.runicrealms.plugin.runicitems.Stat;
 import com.runicrealms.plugin.runicitems.TemplateManager;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerk;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerkManager;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerkType;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStatRange;
@@ -14,6 +17,7 @@ import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
 import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
 import com.runicrealms.plugin.runicitems.player.AddedStats;
+import com.runicrealms.plugin.runicitems.util.LazyField;
 import com.runicrealms.plugin.runicitems.weaponskin.WeaponSkin;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
@@ -21,36 +25,29 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-@Document(collection = "items")
-@TypeAlias("weapon")
-public class RunicItemWeapon extends RunicItem implements AddedStatsHolder {
+public class RunicItemWeapon extends RunicItem implements AddedStatsHolder, ItemPerksHolder {
 
-    protected int level;
-    protected RunicItemRarity rarity;
-    protected RunicItemClass runicClass;
-    protected RunicItemStatRange damageRange;
-    protected LinkedHashMap<Stat, RunicItemStat> stats;
-    protected @Nullable WeaponSkin activeSkin;
+    private final int level;
+    private final RunicItemRarity rarity;
+    private final RunicItemClass runicClass;
+    private final RunicItemStatRange damageRange;
+    private final LinkedHashMap<Stat, RunicItemStat> stats;
+    private final @Nullable WeaponSkin activeSkin;
+    private final LinkedHashSet<ItemPerk> itemPerks;
+    private final LazyField<AddedStats> addedStats;
 
-    @SuppressWarnings("unused")
-    public RunicItemWeapon() {
-        super();
-        // Default constructor for Spring
-    }
-
-    @Autowired
     public RunicItemWeapon(
             String templateId,
             DisplayableItem displayableItem,
@@ -59,6 +56,7 @@ public class RunicItemWeapon extends RunicItem implements AddedStatsHolder {
             long id,
             RunicItemStatRange damageRange,
             LinkedHashMap<Stat, RunicItemStat> stats,
+            LinkedHashSet<ItemPerk> itemPerks,
             int level,
             RunicItemRarity rarity,
             RunicItemClass runicClass,
@@ -69,13 +67,21 @@ public class RunicItemWeapon extends RunicItem implements AddedStatsHolder {
         this.runicClass = runicClass;
         this.damageRange = damageRange;
         this.stats = stats;
+        this.itemPerks = itemPerks;
         this.activeSkin = activeSkin;
+        this.addedStats = new LazyField<>(() -> {
+            LinkedHashMap<Stat, Integer> calculatedStats = new LinkedHashMap<>();
+            for (Stat stat : stats.keySet()) {
+                calculatedStats.put(stat, this.stats.get(stat).getValue());
+            }
+            return new AddedStats(calculatedStats, this.itemPerks, 0);
+        });
     }
 
-    public RunicItemWeapon(RunicItemWeaponTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats, @Nullable WeaponSkin activeSkin) {
+    public RunicItemWeapon(RunicItemWeaponTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats, LinkedHashSet<ItemPerk> itemPerks, @Nullable WeaponSkin activeSkin) {
         this(
                 template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id,
-                template.getDamageRange(), stats,
+                template.getDamageRange(), stats, itemPerks,
                 template.getLevel(), template.getRarity(), template.getRunicClass(), activeSkin
         );
     }
@@ -98,12 +104,21 @@ public class RunicItemWeapon extends RunicItem implements AddedStatsHolder {
         for (int i = 0; i < amountOfStats; i++) {
             statsList.add(null);
         }
+        LinkedHashSet<ItemPerk> perks = new LinkedHashSet<>();
         for (String key : keys) {
             String[] split = key.split("-");
             if (split[0].equals("stat")) {
                 Stat statType = Stat.getFromIdentifier(split[2]);
                 RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), nbtItem.getFloat(key));
                 statsList.set(Integer.parseInt(split[1]), new Pair<>(statType, stat));
+            } else if (split[0].equals("perks") && split.length >= 2) {
+                String identifier = Arrays.stream(split, 1, split.length).collect(Collectors.joining("-"));
+                for (ItemPerkType type : ItemPerkManager.getItemPerks()) {
+                    if (type.getIdentifier().equalsIgnoreCase(identifier)) {
+                        perks.add(new ItemPerk(type, nbtItem.getInteger(key)));
+                        break;
+                    }
+                }
             }
         }
         LinkedHashMap<Stat, RunicItemStat> stats = new LinkedHashMap<>();
@@ -114,7 +129,7 @@ public class RunicItemWeapon extends RunicItem implements AddedStatsHolder {
         if (nbtItem.hasNBTData() && nbtItem.hasKey("weapon-skin")) {
             skin = RunicItems.getWeaponSkinAPI().getWeaponSkin(nbtItem.getString("weapon-skin"));
         }
-        return new RunicItemWeapon(template, item.getAmount(), nbtItem.getInteger("id"), stats, skin);
+        return new RunicItemWeapon(template, item.getAmount(), nbtItem.getInteger("id"), stats, perks, skin);
     }
 
     @Override
@@ -125,6 +140,9 @@ public class RunicItemWeapon extends RunicItem implements AddedStatsHolder {
         }
         if (this.activeSkin != null) {
             jedisDataMap.put("weapon-skin", this.activeSkin.id());
+        }
+        for (ItemPerk perk : this.itemPerks) {
+            jedisDataMap.put("perks." + perk.getType().getIdentifier(), String.valueOf(perk.getStacks()));
         }
         return jedisDataMap;
     }
@@ -146,24 +164,32 @@ public class RunicItemWeapon extends RunicItem implements AddedStatsHolder {
             item = nbtItem.getItem();
             this.activeSkin.apply(item);
         }
+        for (ItemPerk perk : this.itemPerks) {
+            nbtItem.setInteger("perks-" + perk.getType().getIdentifier(), perk.getStacks());
+        }
         return item;
     }
 
     @Override
     protected ItemLoreSection[] generateLore() {
-        List<String> lore = new LinkedList<>();
+        List<String> statLore = new LinkedList<>();
         for (Map.Entry<Stat, RunicItemStat> entry : stats.entrySet()) {
-            lore.add(
+            statLore.add(
                     entry.getKey().getChatColor()
                             + (entry.getValue().getValue() < 0 ? "-" : "+")
                             + entry.getValue().getValue()
                             + entry.getKey().getIcon()
             );
         }
+        List<String> perkLore = new LinkedList<>(); // TODO: make this nicer
+        for (ItemPerk perk : this.itemPerks) {
+            perkLore.add("[" + perk.getStacks() + "x] " + perk.getType().getIdentifier() + " placeholder");
+        }
         return new ItemLoreSection[]{
                 (level > 0 ? new ItemLoreSection(new String[]{ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level}) : new ItemLoreSection(new String[]{""})),
                 new ItemLoreSection(new String[]{ChatColor.RED + "" + damageRange.getMin() + "-" + damageRange.getMax() + " DMG"}),
-                new ItemLoreSection(lore),
+                new ItemLoreSection(statLore),
+                new ItemLoreSection(perkLore),
                 new ItemLoreSection(new String[]{rarity.getDisplay(), ChatColor.GRAY + runicClass.getDisplay()}),
         };
     }
@@ -179,6 +205,13 @@ public class RunicItemWeapon extends RunicItem implements AddedStatsHolder {
         if (this.activeSkin != null) {
             document.put("weapon-skin", this.activeSkin.id());
         }
+        Map<String, Integer> perksMap = new HashMap<>();
+        for (ItemPerk perk : this.itemPerks) {
+            perksMap.put(perk.getType().getIdentifier(), perk.getStacks());
+        }
+        if (!perksMap.isEmpty()) {
+            document.put("perks", perksMap);
+        }
         return document;
     }
 
@@ -186,40 +219,20 @@ public class RunicItemWeapon extends RunicItem implements AddedStatsHolder {
         return damageRange;
     }
 
-    public void setDamageRange(RunicItemStatRange damageRange) {
-        this.damageRange = damageRange;
-    }
-
     public int getLevel() {
         return this.level;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
     }
 
     public RunicItemRarity getRarity() {
         return this.rarity;
     }
 
-    public void setRarity(RunicItemRarity rarity) {
-        this.rarity = rarity;
-    }
-
     public RunicItemClass getRunicClass() {
         return this.runicClass;
     }
 
-    public void setRunicClass(RunicItemClass runicClass) {
-        this.runicClass = runicClass;
-    }
-
     public LinkedHashMap<Stat, RunicItemStat> getStats() {
         return stats;
-    }
-
-    public void setStats(LinkedHashMap<Stat, RunicItemStat> stats) {
-        this.stats = stats;
     }
 
     public RunicItemStatRange getWeaponDamage() {
@@ -227,11 +240,17 @@ public class RunicItemWeapon extends RunicItem implements AddedStatsHolder {
     }
 
     @Override
+    public LinkedHashSet<ItemPerk> getItemPerks() {
+        return this.itemPerks;
+    }
+
+    @Override
+    public boolean hasItemPerks() {
+        return this.itemPerks != null && this.itemPerks.size() > 0;
+    }
+
+    @Override
     public AddedStats getAddedStats() {
-        Map<Stat, Integer> addedStats = new HashMap<>();
-        for (Stat stat : stats.keySet()) {
-            addedStats.put(stat, stats.get(stat).getValue());
-        }
-        return new AddedStats(addedStats, null, 0);
+        return this.addedStats.get();
     }
 }

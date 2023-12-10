@@ -4,11 +4,11 @@ import com.runicrealms.plugin.common.event.ArmorEquipEvent;
 import com.runicrealms.plugin.common.util.ArmorType;
 import com.runicrealms.plugin.runicitems.item.RunicItemArmor;
 import com.runicrealms.plugin.runicitems.item.RunicItemGem;
+import com.runicrealms.plugin.runicitems.item.stats.GemBonus;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemArmorTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemGemTemplate;
 import com.runicrealms.plugin.runicitems.player.PlayerStatHolder;
 import com.runicrealms.plugin.runicitems.util.StatUtil;
-import com.runicrealms.plugin.runicitems.item.stats.GemBonus;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,14 +23,6 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 public class GemManager implements Listener {
-
-    private static Integer parseInt(String value) {
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException exception) {
-            return null;
-        }
-    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onGemApply(InventoryClickEvent event) {
@@ -88,7 +80,12 @@ public class GemManager implements Listener {
         if (event.getSlotType() == InventoryType.SlotType.ARMOR)
             Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
                 PlayerStatHolder holder = PlayerManager.getCachedPlayerStats().get(event.getWhoClicked().getUniqueId());
-                holder.updateItems(ArmorType.HELMET, ArmorType.CHESTPLATE, ArmorType.LEGGINGS, ArmorType.BOOTS);
+                holder.updateItems(false,
+                        PlayerStatHolder.StatHolderType.HELMET,
+                        PlayerStatHolder.StatHolderType.CHESTPLATE,
+                        PlayerStatHolder.StatHolderType.LEGGINGS,
+                        PlayerStatHolder.StatHolderType.BOOTS
+                );
             });
 
         event.setCancelled(true);

@@ -1,15 +1,16 @@
 package com.runicrealms.plugin.runicitems.item.template;
 
-import com.runicrealms.plugin.runicitems.item.RunicItemWeapon;
-import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
-import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
 import com.runicrealms.plugin.runicitems.Stat;
+import com.runicrealms.plugin.runicitems.item.RunicItemWeapon;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
+import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
+import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class RunicItemWeaponTemplate extends RunicRarityLevelItemTemplate {
         if (data == null) data = this.data;
         return new RunicItemWeapon(
                 this.id, this.displayableItem, tags, data, count, id,
-                this.damageRange, rolledStats,
+                this.damageRange, rolledStats, new LinkedHashSet<>(),
                 this.level, this.rarity, this.runicClass, null
         );
     }

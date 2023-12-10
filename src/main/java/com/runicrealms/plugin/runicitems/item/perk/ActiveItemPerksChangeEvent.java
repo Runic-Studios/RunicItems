@@ -17,12 +17,14 @@ public class ActiveItemPerksChangeEvent extends Event {
     private final Player player;
     private final Set<ItemPerk> oldItemPerks;
     private final Set<ItemPerk> newItemPerks;
+    private final boolean playSounds;
 
-    public ActiveItemPerksChangeEvent(Player player, Set<ItemPerk> oldItemPerks, Set<ItemPerk> newItemPerks) {
+    public ActiveItemPerksChangeEvent(Player player, Set<ItemPerk> oldItemPerks, Set<ItemPerk> newItemPerks, boolean playSounds) {
         super(true);
         this.player = player;
         this.oldItemPerks = oldItemPerks;
         this.newItemPerks = newItemPerks;
+        this.playSounds = playSounds;
     }
 
     public static HandlerList getHandlerList() {
@@ -45,6 +47,14 @@ public class ActiveItemPerksChangeEvent extends Event {
      */
     public Set<ItemPerk> getNewItemPerks() {
         return this.newItemPerks;
+    }
+
+    /**
+     * Should we play the beacon noises for this event?
+     * This is only false in the case of the player logging in
+     */
+    public boolean shouldPlaySounds() {
+        return this.playSounds;
     }
 
     @NotNull
