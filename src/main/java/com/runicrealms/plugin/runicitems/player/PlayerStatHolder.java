@@ -110,51 +110,55 @@ public class PlayerStatHolder {
 
         Boolean beaconNoise = null; // Null indicates default behavior, true indicates yes, false indicates no
 
-        if (this.weapon != null && !weaponSwitched && cooldownTask == null) {
-            this.cachedStats.combine(this.weapon.getAddedStats()); // Default behavior
-        } else if (this.weapon != null && weaponSwitched) {
+        if (this.weapon == null || canUseWeapon(this.player, this.weapon)) {
+            if (this.weapon != null && !weaponSwitched && cooldownTask == null) {
+                this.cachedStats.combine(this.weapon.getAddedStats()); // Default behavior
+            } else if (this.weapon != null && weaponSwitched) {
 
-            // Add just the stats no perks
-            AddedStats weaponStats = this.weapon.getAddedStats();
-            this.cachedStats.combine(new AddedStats(weaponStats.getAddedStats(), null, weaponStats.getAddedHealth()));
+                // Add just the stats no perks
+                AddedStats weaponStats = this.weapon.getAddedStats();
+                this.cachedStats.combine(new AddedStats(weaponStats.getAddedStats(), null, weaponStats.getAddedHealth()));
 
-            // Because this logic is very confusing, I will try to outline the thought process behind each statement
-            if (cooldownTask == null) { // if we are on cooldown we do nothing
-                if (this.recentWeapon != null && !this.recentWeapon.matchesItem(this.weapon)) {
-                    // We had a weapon equipped, and we just swapped to a different weapon
-                    // If the previous weapon had perks, activate cooldown, beacon deactivate, don't add any new perks.
-                    // Else apply perks normally.
-                    if (this.recentWeapon.hasItemPerks()) {
-                        Bukkit.broadcastMessage("cooldown initiated");
-                        // Both the old weapon and the new one have perks
-                        beaconNoise = true; // Play beacon deactivate
-                        cooldownTask = new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                Bukkit.broadcastMessage("cooldown over");
-                                cooldownTask = null;
-                                recentWeapon = null; // Reset our recent weapon, so we can get weapon perks like normal
-                                updateWeaponAndTotal(false);
-                            }
-                        }.runTaskLaterAsynchronously(RunicItems.getInstance(), WEAPON_PERKS_COOLDOWN_TICKS);
-                    } else if (this.weapon.hasItemPerks()) {
-                        // Only the new one has perks, the old one didn't
-                        // ... we should apply the perks normally
+                // Because this logic is very confusing, I will try to outline the thought process behind each statement
+                if (cooldownTask == null) { // if we are on cooldown we do nothing
+                    if (this.recentWeapon != null && !this.recentWeapon.matchesItem(this.weapon)) {
+                        // We had a weapon equipped, and we just swapped to a different weapon
+                        // If the previous weapon had perks, activate cooldown, beacon deactivate, don't add any new perks.
+                        // Else apply perks normally.
+                        if (this.recentWeapon.hasItemPerks()) {
+                            Bukkit.broadcastMessage("cooldown initiated");
+                            // Both the old weapon and the new one have perks
+                            beaconNoise = true; // Play beacon deactivate
+                            cooldownTask = new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    Bukkit.broadcastMessage("cooldown over");
+                                    cooldownTask = null;
+                                    recentWeapon = null; // Reset our recent weapon, so we can get weapon perks like normal
+                                    updateWeaponAndTotal(false);
+                                }
+                            }.runTaskLaterAsynchronously(RunicItems.getInstance(), WEAPON_PERKS_COOLDOWN_TICKS);
+                        } else if (this.weapon.hasItemPerks()) {
+                            // Only the new one has perks, the old one didn't
+                            // ... we should apply the perks normally
+                            this.cachedStats.combine(new AddedStats(EMPTY_STAT_MAP, weaponStats.getItemPerks(), 0));
+                        }
+                    } else {
+                        // Either we didn't have a previous weapon (cooldown ended/login) or we swapped back to our previous weapon
+                        // Does matter, just reapply stats as normal
                         this.cachedStats.combine(new AddedStats(EMPTY_STAT_MAP, weaponStats.getItemPerks(), 0));
-                    }
-                } else {
-                    // Either we didn't have a previous weapon (cooldown ended/login) or we swapped back to our previous weapon
-                    // Does matter, just reapply stats as normal
-                    this.cachedStats.combine(new AddedStats(EMPTY_STAT_MAP, weaponStats.getItemPerks(), 0));
-                    if (this.recentWeapon != null) {
-                        // This implies that we just equipped the same weapon as the last weapon (work through the logic)
-                        // Suppress beacon noises:
-                        beaconNoise = false;
+                        if (this.recentWeapon != null) {
+                            // This implies that we just equipped the same weapon as the last weapon (work through the logic)
+                            // Suppress beacon noises:
+                            beaconNoise = false;
+                        }
                     }
                 }
+            } else if (this.weapon == null && weaponSwitched && this.recentWeapon != null) {
+                beaconNoise = false; // We de-equipped a weapon, suppress noise because we didn't swap to a perks weapon
             }
-        } else if (this.weapon == null && weaponSwitched && this.recentWeapon != null) {
-            beaconNoise = false; // We de-equipped a weapon, suppress noise because we didn't swap to a perks weapon
+        } else if (weapon != null) { // We equipped a weapon but we can't use it
+            beaconNoise = false; // Suppress noise
         }
 
         Set<ItemPerk> perks = this.cachedStats.getItemPerks();
@@ -176,7 +180,7 @@ public class PlayerStatHolder {
         Set<ItemPerk> newPerks = this.cachedStats.getItemPerks();
         if (newPerks == null) newPerks = EMPTY_SET;
         if (!Sets.intersection(oldPerks, newPerks).equals(Sets.union(oldPerks, newPerks))) {
-            if (!weaponSwitched) beaconNoise = true; // We didn't switch weapons, disregard funky logic
+            if (!weaponSwitched) beaconNoise = null; // We didn't switch weapons, disregard funky logic
             boolean playSounds = beaconNoise == null ? !onLogin : !onLogin && beaconNoise;
             ActiveItemPerksChangeEvent event = new ActiveItemPerksChangeEvent(this.player, oldPerks, newPerks, playSounds);
             if (!Bukkit.isPrimaryThread()) {
