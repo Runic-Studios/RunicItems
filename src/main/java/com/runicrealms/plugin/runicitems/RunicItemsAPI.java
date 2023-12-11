@@ -3,6 +3,7 @@ package com.runicrealms.plugin.runicitems;
 import com.runicrealms.plugin.runicitems.api.AntiDupeInventoryHandler;
 import com.runicrealms.plugin.runicitems.dynamic.DynamicItemHandler;
 import com.runicrealms.plugin.runicitems.item.RunicItem;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerkManager;
 import com.runicrealms.plugin.runicitems.item.stats.RunicArtifactAbility;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
@@ -329,6 +330,13 @@ public class RunicItemsAPI {
      */
     public static DynamicItemHandler getDynamicItemHandler() {
         return RunicItems.getDynamicItemHandler();
+    }
+
+    /**
+     * Gets the ItemPerkManager for RunicItems
+     */
+    public static ItemPerkManager getItemPerkManager() {
+        return RunicItems.getItemPerkManager();
     }
 
 }

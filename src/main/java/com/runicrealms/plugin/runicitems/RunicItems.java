@@ -40,6 +40,7 @@ public class RunicItems extends JavaPlugin implements Listener {
     private static DataAPI dataAPI;
     private static WeaponSkinAPI weaponSkinAPI;
     private static DynamicItemHandler dynamicItemHandler;
+    private static ItemPerkManager itemPerkManager;
     private static MongoTask mongoTask;
     //    private static JDA jda;
     private static InventoryAPI INVENTORY_API;
@@ -77,6 +78,10 @@ public class RunicItems extends JavaPlugin implements Listener {
 
     public static DynamicItemHandler getDynamicItemHandler() {
         return dynamicItemHandler;
+    }
+
+    public static ItemPerkManager getItemPerkManager() {
+        return itemPerkManager;
     }
 
 //    public static JDA getJda() {
@@ -134,8 +139,7 @@ public class RunicItems extends JavaPlugin implements Listener {
         commandManager.registerCommand(new WeaponSkinCommand());
         commandManager.registerCommand(new WeaponryCommand());
 
-        ItemPerkManager.initializeItemPerks();
-
+        itemPerkManager = new ItemPerkManager();
         dynamicItemHandler = new DynamicItemHandler();
 
         // Start JDA

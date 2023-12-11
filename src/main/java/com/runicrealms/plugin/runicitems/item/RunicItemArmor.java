@@ -1,10 +1,11 @@
 package com.runicrealms.plugin.runicitems.item;
 
 import com.runicrealms.plugin.common.util.Pair;
+import com.runicrealms.plugin.runicitems.RunicItemsAPI;
 import com.runicrealms.plugin.runicitems.Stat;
 import com.runicrealms.plugin.runicitems.TemplateManager;
 import com.runicrealms.plugin.runicitems.item.perk.ItemPerk;
-import com.runicrealms.plugin.runicitems.item.perk.ItemPerkManager;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerkHandler;
 import com.runicrealms.plugin.runicitems.item.perk.ItemPerkType;
 import com.runicrealms.plugin.runicitems.item.stats.GemBonus;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemRarity;
@@ -138,7 +139,7 @@ public class RunicItemArmor extends RunicItem implements AddedStatsHolder, ItemP
                 }
             } else if (split[0].equals("perks") && split.length >= 2) {
                 String identifier = Arrays.stream(split, 1, split.length).collect(Collectors.joining("-"));
-                for (ItemPerkType type : ItemPerkManager.getItemPerks()) {
+                for (ItemPerkType type : RunicItemsAPI.getItemPerkManager().getItemPerks()) {
                     if (type.getIdentifier().equalsIgnoreCase(identifier)) {
                         perks.add(new ItemPerk(type, nbtItem.getInteger(key)));
                         break;
@@ -297,10 +298,23 @@ public class RunicItemArmor extends RunicItem implements AddedStatsHolder, ItemP
         }
         gemTextBuilder.append(ChatColor.WHITE).append("]");
 
-        List<String> perkLore = new LinkedList<>(); // TODO: make this nicer
+        LinkedList<String> perkLore = new LinkedList<>();
+        boolean atLeastOnePerk = false;
         for (ItemPerk perk : this.itemPerks) {
-            perkLore.add("[" + perk.getStacks() + "x] " + perk.getType().getIdentifier() + " placeholder");
+            ItemPerkHandler handler = RunicItemsAPI.getItemPerkManager().getHandler(perk.getType());
+            perkLore.add(ChatColor.translateAlternateColorCodes('&',
+                    "&7[&r<"
+                            + handler.getDynamicItemPerksStacksTextPlaceholder().getIdentifier()
+                            + ">&7/"
+                            + perk.getType().getMaxStacks()
+                            + "] &f+" + perk.getStacks()
+                            + " &r" + handler.getName()));
+            List<String> handlerLore = handler.getLoreSection();
+            if (handlerLore != null) perkLore.addAll(handlerLore);
+            perkLore.add("");
+            atLeastOnePerk = true;
         }
+        if (atLeastOnePerk) perkLore.removeLast();
 
         String levelString = level > 0 ? String.valueOf(level) : "None";
         return new ItemLoreSection[]{

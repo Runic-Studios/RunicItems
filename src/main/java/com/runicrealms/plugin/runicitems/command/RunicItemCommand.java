@@ -21,7 +21,6 @@ import com.runicrealms.plugin.runicitems.item.ItemPerksHolder;
 import com.runicrealms.plugin.runicitems.item.RunicItem;
 import com.runicrealms.plugin.runicitems.item.RunicItemDynamic;
 import com.runicrealms.plugin.runicitems.item.perk.ItemPerk;
-import com.runicrealms.plugin.runicitems.item.perk.ItemPerkManager;
 import com.runicrealms.plugin.runicitems.item.perk.ItemPerkType;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemArmorTemplate;
@@ -113,7 +112,7 @@ public class RunicItemCommand extends BaseCommand {
         RunicItems.getCommandManager().getCommandCompletions().registerAsyncCompletion("perk-ids", context -> {
             if (!context.getSender().isOp()) return new HashSet<>();
             if (cachedPerkIDs.get() == null) {
-                cachedPerkIDs.set(ItemPerkManager.getItemPerks().stream().map(ItemPerkType::getIdentifier).collect(Collectors.toUnmodifiableSet()));
+                cachedPerkIDs.set(RunicItemsAPI.getItemPerkManager().getItemPerks().stream().map(ItemPerkType::getIdentifier).collect(Collectors.toUnmodifiableSet()));
             }
             return cachedPerkIDs.get();
         });
@@ -538,7 +537,7 @@ public class RunicItemCommand extends BaseCommand {
             return;
         }
 
-        ItemPerkType type = ItemPerkManager.getItemPerkFromIdentifier(args[0]);
+        ItemPerkType type = RunicItemsAPI.getItemPerkManager().getItemPerkFromIdentifier(args[0]);
         if (type == null) {
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&d" + args[0] + " is not a valid perk type!"));
             return;

@@ -1,6 +1,7 @@
 package com.runicrealms.plugin.runicitems.config;
 
 import com.runicrealms.plugin.runicitems.RunicItems;
+import com.runicrealms.plugin.runicitems.RunicItemsAPI;
 import com.runicrealms.plugin.runicitems.Stat;
 import com.runicrealms.plugin.runicitems.TemplateManager;
 import com.runicrealms.plugin.runicitems.item.RunicItem;
@@ -12,7 +13,6 @@ import com.runicrealms.plugin.runicitems.item.RunicItemGeneric;
 import com.runicrealms.plugin.runicitems.item.RunicItemOffhand;
 import com.runicrealms.plugin.runicitems.item.RunicItemWeapon;
 import com.runicrealms.plugin.runicitems.item.perk.ItemPerk;
-import com.runicrealms.plugin.runicitems.item.perk.ItemPerkManager;
 import com.runicrealms.plugin.runicitems.item.perk.ItemPerkType;
 import com.runicrealms.plugin.runicitems.item.stats.GemBonus;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStat;
@@ -177,7 +177,7 @@ public class ItemLoader {
         LinkedHashSet<ItemPerk> perks = new LinkedHashSet<>();
         Map<String, Integer> documentPerkMap = (Map<String, Integer>) document.get("perks");
         for (String perkIdentifier : documentPerkMap.keySet()) {
-            for (ItemPerkType type : ItemPerkManager.getItemPerks()) {
+            for (ItemPerkType type : RunicItemsAPI.getItemPerkManager().getItemPerks()) {
                 if (type.getIdentifier().equalsIgnoreCase(perkIdentifier)) {
                     perks.add(new ItemPerk(type, documentPerkMap.get(perkIdentifier)));
                     break;
@@ -275,7 +275,7 @@ public class ItemLoader {
 
     private static LinkedHashSet<ItemPerk> loadItemPerks(Map<String, String> itemDataMap) {
         LinkedHashSet<ItemPerk> perks = new LinkedHashSet<>();
-        for (ItemPerkType type : ItemPerkManager.getItemPerks()) {
+        for (ItemPerkType type : RunicItemsAPI.getItemPerkManager().getItemPerks()) {
             if (itemDataMap.containsKey("perks:" + type.getIdentifier())) {
                 perks.add(new ItemPerk(type, Integer.parseInt(itemDataMap.get("perks:" + type.getIdentifier()))));
             }
