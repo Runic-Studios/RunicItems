@@ -1,6 +1,8 @@
 package com.runicrealms.plugin.runicitems.item.template;
 
 import com.runicrealms.plugin.runicitems.Stat;
+import com.runicrealms.plugin.runicitems.item.ClassRequirementHolder;
+import com.runicrealms.plugin.runicitems.item.LevelRequirementHolder;
 import com.runicrealms.plugin.runicitems.item.RunicItemWeapon;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStat;
@@ -14,7 +16,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-public class RunicItemWeaponTemplate extends RunicRarityLevelItemTemplate {
+public class RunicItemWeaponTemplate extends RunicRarityLevelItemTemplate implements ClassRequirementHolder, LevelRequirementHolder {
 
     private final RunicItemStatRange damageRange;
     private final LinkedHashMap<Stat, RunicItemStatRange> stats;
@@ -35,7 +37,7 @@ public class RunicItemWeaponTemplate extends RunicRarityLevelItemTemplate {
 
     @Override
     public RunicItemWeapon generateItem(int count, long id, List<RunicItemTag> tags, Map<String, String> data) {
-        LinkedHashMap<Stat, RunicItemStat> rolledStats = new LinkedHashMap<Stat, RunicItemStat>();
+        LinkedHashMap<Stat, RunicItemStat> rolledStats = new LinkedHashMap<>();
         for (Map.Entry<Stat, RunicItemStatRange> stat : this.stats.entrySet()) {
             rolledStats.put(stat.getKey(), new RunicItemStat(stat.getValue()));
         }
@@ -66,6 +68,7 @@ public class RunicItemWeaponTemplate extends RunicRarityLevelItemTemplate {
         return this.rarity;
     }
 
+    @Override
     public RunicItemClass getRunicClass() {
         return this.runicClass;
     }

@@ -1,36 +1,23 @@
 package com.runicrealms.plugin.runicitems.item;
 
-import com.runicrealms.plugin.runicitems.item.util.ClickTrigger;
-import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
-import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.plugin.runicitems.TemplateManager;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemGenericTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
+import com.runicrealms.plugin.runicitems.item.util.ClickTrigger;
+import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
+import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Document(collection = "items")
-@TypeAlias("generic")
 public class RunicItemGeneric extends RunicItem {
-    private List<String> lore = new ArrayList<>();
-    private Map<ClickTrigger, String> triggers = new HashMap<>();
+    private final List<String> lore;
+    private final Map<ClickTrigger, String> triggers;
 
-    @SuppressWarnings("unused")
-    public RunicItemGeneric() {
-        // Default constructor for Spring
-    }
-
-    @Autowired
     public RunicItemGeneric(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
                             Map<ClickTrigger, String> triggers, List<String> lore) {
         super(templateId, displayableItem, tags, data, count, id);
@@ -63,16 +50,8 @@ public class RunicItemGeneric extends RunicItem {
         return this.lore;
     }
 
-    public void setLore(List<String> lore) {
-        this.lore = lore;
-    }
-
     public Map<ClickTrigger, String> getTriggers() {
         return this.triggers;
-    }
-
-    public void setTriggers(Map<ClickTrigger, String> triggers) {
-        this.triggers = triggers;
     }
 
 }

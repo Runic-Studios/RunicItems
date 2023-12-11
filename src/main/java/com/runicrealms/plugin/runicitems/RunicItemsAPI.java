@@ -1,6 +1,7 @@
 package com.runicrealms.plugin.runicitems;
 
 import com.runicrealms.plugin.runicitems.api.AntiDupeInventoryHandler;
+import com.runicrealms.plugin.runicitems.dynamic.DynamicItemHandler;
 import com.runicrealms.plugin.runicitems.item.RunicItem;
 import com.runicrealms.plugin.runicitems.item.stats.RunicArtifactAbility;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
@@ -321,6 +322,13 @@ public class RunicItemsAPI {
      */
     public static @Nullable RunicItemTemplate getTemplate(String templateId) {
         return TemplateManager.getTemplateFromId(templateId);
+    }
+
+    /**
+     * Gets the dynamic item handler for registering dynamic item placeholders
+     */
+    public static DynamicItemHandler getDynamicItemHandler() {
+        return RunicItems.getDynamicItemHandler();
     }
 
 }

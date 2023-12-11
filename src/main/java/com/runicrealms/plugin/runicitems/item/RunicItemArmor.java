@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RunicItemArmor extends RunicItem implements AddedStatsHolder, ItemPerksHolder {
+public class RunicItemArmor extends RunicItem implements AddedStatsHolder, ItemPerksHolder, ClassRequirementHolder, LevelRequirementHolder {
 
     private static final AttributeModifier attributeModifier = new AttributeModifier("generic.armor", 0, AttributeModifier.Operation.ADD_NUMBER);
 
@@ -306,17 +306,17 @@ public class RunicItemArmor extends RunicItem implements AddedStatsHolder, ItemP
         return new ItemLoreSection[]{
                 (maxGemSlots > 0
                         ? new ItemLoreSection(new String[]{
-                        ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + levelString,
+                        "<level> " + ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + levelString,
                         gemTextBuilder.toString()})
                         : new ItemLoreSection(new String[]{
-                        ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + levelString,
+                        "<level> " + ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + levelString,
                 })),
                 new ItemLoreSection(new String[]{healthString}),
                 new ItemLoreSection(statLore),
                 new ItemLoreSection(perkLore),
                 new ItemLoreSection(new String[]{
                         rarity.getDisplay() + " " + getArmorName(),
-                        ChatColor.GRAY + runicClass.getDisplay()
+                        "<class> " + ChatColor.GRAY + runicClass.getDisplay()
                 }),
         };
     }
@@ -369,6 +369,7 @@ public class RunicItemArmor extends RunicItem implements AddedStatsHolder, ItemP
         return this.health;
     }
 
+    @Override
     public int getLevel() {
         return this.level;
     }
@@ -381,6 +382,7 @@ public class RunicItemArmor extends RunicItem implements AddedStatsHolder, ItemP
         return this.rarity;
     }
 
+    @Override
     public RunicItemClass getRunicClass() {
         return this.runicClass;
     }

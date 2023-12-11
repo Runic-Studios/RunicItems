@@ -1,6 +1,8 @@
 package com.runicrealms.plugin.runicitems.item.template;
 
 import com.runicrealms.plugin.runicitems.Stat;
+import com.runicrealms.plugin.runicitems.item.ClassRequirementHolder;
+import com.runicrealms.plugin.runicitems.item.LevelRequirementHolder;
 import com.runicrealms.plugin.runicitems.item.RunicItemArmor;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStat;
@@ -15,7 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class RunicItemArmorTemplate extends RunicRarityLevelItemTemplate {
+public class RunicItemArmorTemplate extends RunicRarityLevelItemTemplate implements ClassRequirementHolder, LevelRequirementHolder {
 
     private final int level;
     private final RunicItemRarity rarity;
@@ -73,6 +75,7 @@ public class RunicItemArmorTemplate extends RunicRarityLevelItemTemplate {
         return this.maxGemSlots;
     }
 
+    @Override
     public RunicItemClass getRunicClass() {
         return this.runicClass;
     }

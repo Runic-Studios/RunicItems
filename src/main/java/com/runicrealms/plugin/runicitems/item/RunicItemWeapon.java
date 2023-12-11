@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RunicItemWeapon extends RunicItem implements AddedStatsHolder, ItemPerksHolder {
+public class RunicItemWeapon extends RunicItem implements AddedStatsHolder, ItemPerksHolder, ClassRequirementHolder, LevelRequirementHolder {
 
     private final int level;
     private final RunicItemRarity rarity;
@@ -186,11 +186,11 @@ public class RunicItemWeapon extends RunicItem implements AddedStatsHolder, Item
             perkLore.add("[" + perk.getStacks() + "x] " + perk.getType().getIdentifier() + " placeholder");
         }
         return new ItemLoreSection[]{
-                (level > 0 ? new ItemLoreSection(new String[]{ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level}) : new ItemLoreSection(new String[]{""})),
+                (level > 0 ? new ItemLoreSection(new String[]{"<level> " + ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level}) : new ItemLoreSection(new String[]{""})),
                 new ItemLoreSection(new String[]{ChatColor.RED + "" + damageRange.getMin() + "-" + damageRange.getMax() + " DMG"}),
                 new ItemLoreSection(statLore),
                 new ItemLoreSection(perkLore),
-                new ItemLoreSection(new String[]{rarity.getDisplay(), ChatColor.GRAY + runicClass.getDisplay()}),
+                new ItemLoreSection(new String[]{rarity.getDisplay(), "<class> " + ChatColor.GRAY + runicClass.getDisplay()}),
         };
     }
 
@@ -219,6 +219,7 @@ public class RunicItemWeapon extends RunicItem implements AddedStatsHolder, Item
         return damageRange;
     }
 
+    @Override
     public int getLevel() {
         return this.level;
     }
@@ -227,6 +228,7 @@ public class RunicItemWeapon extends RunicItem implements AddedStatsHolder, Item
         return this.rarity;
     }
 
+    @Override
     public RunicItemClass getRunicClass() {
         return this.runicClass;
     }

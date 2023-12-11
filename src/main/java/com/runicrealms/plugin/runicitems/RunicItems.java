@@ -17,6 +17,7 @@ import com.runicrealms.plugin.runicitems.config.ConfigUtil;
 import com.runicrealms.plugin.runicitems.config.TemplateLoader;
 import com.runicrealms.plugin.runicitems.converter.RunicItemReadConverter;
 import com.runicrealms.plugin.runicitems.converter.RunicItemWriteConverter;
+import com.runicrealms.plugin.runicitems.dynamic.DynamicItemHandler;
 import com.runicrealms.plugin.runicitems.item.perk.ItemPerkManager;
 import com.runicrealms.plugin.runicitems.listeners.GoldPouchListener;
 import com.runicrealms.plugin.runicitems.listeners.ItemSpawnListener;
@@ -38,6 +39,7 @@ public class RunicItems extends JavaPlugin implements Listener {
     private static PaperCommandManager commandManager;
     private static DataAPI dataAPI;
     private static WeaponSkinAPI weaponSkinAPI;
+    private static DynamicItemHandler dynamicItemHandler;
     private static MongoTask mongoTask;
     //    private static JDA jda;
     private static InventoryAPI INVENTORY_API;
@@ -71,6 +73,10 @@ public class RunicItems extends JavaPlugin implements Listener {
 
     public static WeaponSkinAPI getWeaponSkinAPI() {
         return weaponSkinAPI;
+    }
+
+    public static DynamicItemHandler getDynamicItemHandler() {
+        return dynamicItemHandler;
     }
 
 //    public static JDA getJda() {
@@ -129,6 +135,8 @@ public class RunicItems extends JavaPlugin implements Listener {
         commandManager.registerCommand(new WeaponryCommand());
 
         ItemPerkManager.initializeItemPerks();
+
+        dynamicItemHandler = new DynamicItemHandler();
 
         // Start JDA
 //        try {
