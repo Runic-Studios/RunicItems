@@ -126,13 +126,11 @@ public class PlayerStatHolder {
                         // If the previous weapon had perks, activate cooldown, beacon deactivate, don't add any new perks.
                         // Else apply perks normally.
                         if (this.recentWeapon.hasItemPerks()) {
-                            Bukkit.broadcastMessage("cooldown initiated");
                             // Both the old weapon and the new one have perks
                             beaconNoise = true; // Play beacon deactivate
                             cooldownTask = new BukkitRunnable() {
                                 @Override
                                 public void run() {
-                                    Bukkit.broadcastMessage("cooldown over");
                                     cooldownTask = null;
                                     recentWeapon = null; // Reset our recent weapon, so we can get weapon perks like normal
                                     updateWeaponAndTotal(false);
