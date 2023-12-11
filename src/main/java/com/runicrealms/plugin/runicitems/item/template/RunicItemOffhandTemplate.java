@@ -1,18 +1,19 @@
 package com.runicrealms.plugin.runicitems.item.template;
 
-import com.runicrealms.plugin.runicitems.item.RunicItemOffhand;
-import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
 import com.runicrealms.plugin.runicitems.Stat;
+import com.runicrealms.plugin.runicitems.item.LevelRequirementHolder;
+import com.runicrealms.plugin.runicitems.item.RunicItemOffhand;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStatRange;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
+import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RunicItemOffhandTemplate extends RunicRarityLevelItemTemplate {
+public class RunicItemOffhandTemplate extends RunicRarityLevelItemTemplate implements LevelRequirementHolder {
 
     private final LinkedHashMap<Stat, RunicItemStatRange> stats;
     private final int level;

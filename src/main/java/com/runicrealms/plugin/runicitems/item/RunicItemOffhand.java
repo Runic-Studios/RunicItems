@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class RunicItemOffhand extends RunicItem implements AddedStatsHolder {
+public class RunicItemOffhand extends RunicItem implements AddedStatsHolder, LevelRequirementHolder {
 
     private final LinkedHashMap<Stat, RunicItemStat> stats;
     private final int level;
@@ -146,6 +146,7 @@ public class RunicItemOffhand extends RunicItem implements AddedStatsHolder {
         return document;
     }
 
+    @Override
     public int getLevel() {
         return this.level;
     }
