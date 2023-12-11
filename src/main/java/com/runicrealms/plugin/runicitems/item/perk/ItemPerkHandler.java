@@ -2,6 +2,7 @@ package com.runicrealms.plugin.runicitems.item.perk;
 
 import com.runicrealms.plugin.runicitems.RunicItems;
 import com.runicrealms.plugin.runicitems.RunicItemsAPI;
+import com.runicrealms.plugin.runicitems.player.PlayerStatHolder;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -71,7 +72,9 @@ public abstract class ItemPerkHandler {
      * This is automatically capped by the maximum.
      */
     public int getCurrentStacks(Player player) {
-        Set<ItemPerk> activePerks = RunicItemsAPI.getCachedPlayerItems(player.getUniqueId()).getTotalStats().getItemPerks();
+        PlayerStatHolder cache = RunicItemsAPI.getCachedPlayerItems(player.getUniqueId());
+        if (cache == null) return 0;
+        Set<ItemPerk> activePerks = cache.getTotalStats().getItemPerks();
         for (ItemPerk perk : activePerks) {
             if (perk.getType() == this.type) {
                 return perk.getStacks();
@@ -85,7 +88,9 @@ public abstract class ItemPerkHandler {
      * This is not capped by the maximum number of stacks for this perk.
      */
     public int getCurrentUncappedStacks(Player player) {
-        Map<ItemPerkType, Integer> activePerks = RunicItemsAPI.getCachedPlayerItems(player.getUniqueId()).getItemPerksExceedingMax();
+        PlayerStatHolder cache = RunicItemsAPI.getCachedPlayerItems(player.getUniqueId());
+        if (cache == null) return 0;
+        Map<ItemPerkType, Integer> activePerks = cache.getItemPerksExceedingMax();
         int uncappedStacks = activePerks.getOrDefault(this.type, 0);
         if (uncappedStacks != 0) return uncappedStacks;
         return getCurrentStacks(player);

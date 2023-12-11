@@ -129,7 +129,7 @@ public class RunicItemOffhand extends RunicItem implements AddedStatsHolder, Lev
             );
         }
         return new ItemLoreSection[]{
-                (level > 0 ? new ItemLoreSection(new String[]{ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level}) : new ItemLoreSection(new String[]{""})),
+                (level > 0 ? new ItemLoreSection(new String[]{"<level> " + ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level}) : new ItemLoreSection(new String[]{""})),
                 new ItemLoreSection(lore),
                 new ItemLoreSection(Collections.singletonList(rarity.getDisplay())),
         };
