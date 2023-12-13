@@ -1,10 +1,9 @@
 package com.runicrealms.plugin.runicitems.item;
 
 import com.runicrealms.plugin.common.util.ColorUtil;
-import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
-import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.plugin.runicitems.Stat;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
+import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
 import com.runicrealms.plugin.runicitems.util.DataUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bson.Document;
@@ -16,8 +15,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +27,6 @@ public abstract class RunicItem {
     protected Map<String, String> data;
     protected Long id;
     protected int count;
-    protected List<ItemLoreSection> loreSections = new ArrayList<>();
     // If this is an icon to be used in a menu
     protected boolean isMenuDisplay = false;
 
@@ -79,47 +77,32 @@ public abstract class RunicItem {
 
     public ItemStack generateItem() {
         ItemStack item = this.displayableItem.generateItem(this.count);
-        try {
-            ItemLoreSection[] loreSections = generateLore();
-            if (loreSections != null && loreSections.length > 0) {
-                for (ItemLoreSection section : loreSections) {
-                    if (section != null) {
-                        this.loreSections.add(section);
-                    }
-                }
-            }
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
+
         ItemMeta meta = item.getItemMeta() != null ? item.getItemMeta() : Bukkit.getItemFactory().getItemMeta(item.getType());
         meta.setDisplayName(ChatColor.WHITE + this.getDisplayableItem().getDisplayName());
-        List<String> lore = new ArrayList<>();
-        for (ItemLoreSection section : this.loreSections) {
-            for (String s : section.getLore()) {
-                s = s.replace("<3", Stat.HEALTH_ICON);
-                lore.add(ColorUtil.format(s));
-            }
-            if (!section.isEmpty()
-                    && !section.getLore().get(0).equals("") // no extra space if it's a space section
-                    && !section.equals(this.loreSections.get(this.loreSections.size() - 1))) { // no space for last section
-                lore.add("");
-            }
+
+        List<String> generatedLore = generateLore();
+        List<String> processedLore = new LinkedList<>();
+        for (String line : generatedLore) {
+            processedLore.add(ColorUtil.format(line.replace("<3", Stat.HEALTH_ICON)));
         }
+
         if (this.tags.size() >= 1) {
-            lore.add("");
+            processedLore.add("");
+            for (RunicItemTag tag : this.tags) {
+                processedLore.add(tag.getDisplay());
+            }
         }
-        for (RunicItemTag tag : this.tags) {
-            lore.add(tag.getDisplay());
-        }
+
         // set other flags
         meta.setUnbreakable(true);
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-        meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+        meta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
         if (item.getType() == Material.POTION) {
             ((PotionMeta) meta).setColor(DataUtil.getColorFromData(this));
         }
-        meta.setLore(lore);
+        meta.setLore(processedLore);
         item.setItemMeta(meta);
         NBTItem nbtItem = new NBTItem(item, true);
         nbtItem.setLong("id", this.id);
@@ -135,7 +118,7 @@ public abstract class RunicItem {
         return item;
     }
 
-    protected abstract ItemLoreSection[] generateLore();
+    protected abstract List<String> generateLore();
 
     public int getCount() {
         return this.count;

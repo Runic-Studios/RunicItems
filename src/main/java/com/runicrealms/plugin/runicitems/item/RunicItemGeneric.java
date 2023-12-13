@@ -6,7 +6,6 @@ import com.runicrealms.plugin.runicitems.item.template.RunicItemGenericTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.plugin.runicitems.item.util.ClickTrigger;
 import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
-import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -42,8 +41,8 @@ public class RunicItemGeneric extends RunicItem {
     }
 
     @Override
-    protected ItemLoreSection[] generateLore() {
-        return new ItemLoreSection[]{ItemLoreSection.generateTranslateColorCodes(lore)};
+    protected List<String> generateLore() {
+        return lore;
     }
 
     public List<String> getLore() {

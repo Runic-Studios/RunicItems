@@ -9,7 +9,7 @@ import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemOffhandTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
-import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
+import com.runicrealms.plugin.runicitems.item.util.ItemLoreBuilder;
 import com.runicrealms.plugin.runicitems.player.AddedStats;
 import com.runicrealms.plugin.runicitems.util.LazyField;
 import de.tr7zw.nbtapi.NBTItem;
@@ -19,7 +19,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -118,8 +117,8 @@ public class RunicItemOffhand extends RunicItem implements AddedStatsHolder, Lev
     }
 
     @Override
-    protected ItemLoreSection[] generateLore() {
-        List<String> lore = new LinkedList<>();
+    protected List<String> generateLore() {
+        LinkedList<String> lore = new LinkedList<>();
         for (Map.Entry<Stat, RunicItemStat> entry : stats.entrySet()) {
             lore.add(
                     entry.getKey().getChatColor()
@@ -128,11 +127,13 @@ public class RunicItemOffhand extends RunicItem implements AddedStatsHolder, Lev
                             + entry.getKey().getIcon()
             );
         }
-        return new ItemLoreSection[]{
-                (level > 0 ? new ItemLoreSection(new String[]{"<level> " + ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level}) : new ItemLoreSection(new String[]{""})),
-                new ItemLoreSection(lore),
-                new ItemLoreSection(Collections.singletonList(rarity.getDisplay())),
-        };
+        return new ItemLoreBuilder()
+                .newLineIf(lore.size() > 0)
+                .appendLinesIf(lore.size() > 0, lore)
+                .newLine()
+                .appendLines(rarity.getDisplay())
+                .appendLinesIf(level > 0, "<level> " + ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level)
+                .build();
     }
 
     @Override

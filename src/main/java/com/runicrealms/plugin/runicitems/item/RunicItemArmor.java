@@ -14,7 +14,7 @@ import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemArmorTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
-import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
+import com.runicrealms.plugin.runicitems.item.util.ItemLoreBuilder;
 import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
 import com.runicrealms.plugin.runicitems.player.AddedStats;
 import com.runicrealms.plugin.runicitems.util.LazyField;
@@ -219,8 +219,9 @@ public class RunicItemArmor extends RunicItem implements AddedStatsHolder, ItemP
     }
 
     @Override
-    protected ItemLoreSection[] generateLore() {
-        List<String> statLore = new LinkedList<>();
+    protected List<String> generateLore() {
+        ItemLoreBuilder builder = new ItemLoreBuilder();
+
 
         Map<Stat, Integer> gemOnlyStats = new HashMap<>();
         for (GemBonus gemBonus : gemBonuses) {
@@ -231,6 +232,7 @@ public class RunicItemArmor extends RunicItem implements AddedStatsHolder, ItemP
             }
         }
 
+        List<String> statLore = new LinkedList<>();
         for (Stat stat : Stat.values()) {
             if (stats.get(stat) != null && stats.get(stat).getValue() == 0) continue;
             if (isMenuDisplay && stats.containsKey(stat)) {
@@ -298,6 +300,13 @@ public class RunicItemArmor extends RunicItem implements AddedStatsHolder, ItemP
         }
         gemTextBuilder.append(ChatColor.WHITE).append("]");
 
+        builder.appendLinesIf(maxGemSlots > 0, gemTextBuilder.toString())
+                .newLine()
+                .appendLines(healthString)
+                .newLine()
+                .appendLinesIf(statLore.size() > 0, statLore)
+                .newLineIf(statLore.size() > 0);
+
         LinkedList<String> perkLore = new LinkedList<>();
         boolean atLeastOnePerk = false;
         for (ItemPerk perk : this.itemPerks) {
@@ -316,23 +325,13 @@ public class RunicItemArmor extends RunicItem implements AddedStatsHolder, ItemP
         }
         if (atLeastOnePerk) perkLore.removeLast();
 
-        String levelString = level > 0 ? String.valueOf(level) : "None";
-        return new ItemLoreSection[]{
-                (maxGemSlots > 0
-                        ? new ItemLoreSection(new String[]{
-                        "<level> " + ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + levelString,
-                        gemTextBuilder.toString()})
-                        : new ItemLoreSection(new String[]{
-                        "<level> " + ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + levelString,
-                })),
-                new ItemLoreSection(new String[]{healthString}),
-                new ItemLoreSection(statLore),
-                new ItemLoreSection(perkLore),
-                new ItemLoreSection(new String[]{
-                        rarity.getDisplay() + " " + getArmorName(),
-                        "<class> " + ChatColor.GRAY + runicClass.getDisplay()
-                }),
-        };
+        builder.appendLinesIf(atLeastOnePerk, perkLore)
+                .newLineIf(atLeastOnePerk)
+                .appendLines(rarity.getDisplay() + " " + getArmorName())
+                .appendLines("<class> " + ChatColor.GRAY + runicClass.getDisplay())
+                .appendLines("<level> " + ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + (level > 0 ? String.valueOf(level) : "None"));
+
+        return builder.build();
     }
 
     @Override

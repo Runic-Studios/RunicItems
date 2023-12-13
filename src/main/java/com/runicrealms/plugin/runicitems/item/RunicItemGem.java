@@ -1,13 +1,13 @@
 package com.runicrealms.plugin.runicitems.item;
 
-import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
-import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.plugin.runicitems.Stat;
 import com.runicrealms.plugin.runicitems.TemplateManager;
 import com.runicrealms.plugin.runicitems.item.stats.GemBonus;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemGemTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
+import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
+import com.runicrealms.plugin.runicitems.item.util.ItemLoreBuilder;
 import com.runicrealms.plugin.runicitems.util.StatUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
@@ -87,28 +87,28 @@ public class RunicItemGem extends RunicItem {
     }
 
     @Override
-    protected ItemLoreSection[] generateLore() {
+    protected List<String> generateLore() {
         List<String> lore = new ArrayList<>();
 
         for (Stat stat : bonus.getStats().keySet()) {
             int value = bonus.getStats().get(stat);
             if (value == 0) continue;
-            ;
             lore.add(stat.getChatColor()
                     + (value < 0 ? "-" : "+")
                     + value
                     + stat.getIcon());
         }
 
-        return new ItemLoreSection[]{
-                new ItemLoreSection(new String[]{ChatColor.GRAY + "Req Slots " + ChatColor.WHITE + StatUtil.getGemSlots(bonus.getTier())}),
-                new ItemLoreSection(lore),
-                new ItemLoreSection(new String[]{
+        return new ItemLoreBuilder()
+                .appendLines(ChatColor.GRAY + "Req Slots " + ChatColor.WHITE + StatUtil.getGemSlots(bonus.getTier()))
+                .newLine()
+                .appendLines(lore)
+                .newLine()
+                .appendLines(
                         ChatColor.GRAY + "" + ChatColor.ITALIC + "Drag and click on armor",
                         ChatColor.GRAY + "" + ChatColor.ITALIC + "to apply this gem!"
-                }),
-        };
-
+                )
+                .build();
     }
 
     @Override

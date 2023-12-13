@@ -15,7 +15,7 @@ import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemWeaponTemplate;
 import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
-import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
+import com.runicrealms.plugin.runicitems.item.util.ItemLoreBuilder;
 import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
 import com.runicrealms.plugin.runicitems.player.AddedStats;
 import com.runicrealms.plugin.runicitems.util.LazyField;
@@ -172,7 +172,7 @@ public class RunicItemWeapon extends RunicItem implements AddedStatsHolder, Item
     }
 
     @Override
-    protected ItemLoreSection[] generateLore() {
+    protected List<String> generateLore() {
         List<String> statLore = new LinkedList<>();
         for (Map.Entry<Stat, RunicItemStat> entry : stats.entrySet()) {
             statLore.add(
@@ -201,13 +201,18 @@ public class RunicItemWeapon extends RunicItem implements AddedStatsHolder, Item
         }
         if (atLeastOnePerk) perkLore.removeLast();
 
-        return new ItemLoreSection[]{
-                (level > 0 ? new ItemLoreSection(new String[]{"<level> " + ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level}) : new ItemLoreSection(new String[]{""})),
-                new ItemLoreSection(new String[]{ChatColor.RED + "" + damageRange.getMin() + "-" + damageRange.getMax() + " DMG"}),
-                new ItemLoreSection(statLore),
-                new ItemLoreSection(perkLore),
-                new ItemLoreSection(new String[]{rarity.getDisplay(), "<class> " + ChatColor.GRAY + runicClass.getDisplay()}),
-        };
+        return new ItemLoreBuilder()
+                .newLine()
+                .appendLines(ChatColor.RED + "" + damageRange.getMin() + "-" + damageRange.getMax() + " DMG")
+                .newLineIf(statLore.size() > 0)
+                .appendLinesIf(statLore.size() > 0, statLore)
+                .newLineIf(perkLore.size() > 0)
+                .appendLines(perkLore)
+                .newLine()
+                .appendLines(rarity.getDisplay())
+                .appendLinesIf(level > 0, "<level> " + ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level)
+                .appendLines("<class> " + ChatColor.GRAY + runicClass.getDisplay())
+                .build();
     }
 
     @Override

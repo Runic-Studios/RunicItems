@@ -1,11 +1,10 @@
 package com.runicrealms.plugin.runicitems.item;
 
-import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
-import com.runicrealms.plugin.runicitems.item.util.ItemLoreSection;
 import com.runicrealms.plugin.runicitems.TemplateManager;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemBookTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
+import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -37,6 +36,16 @@ public class RunicItemBook extends RunicItem {
         );
     }
 
+    public static RunicItemBook getFromItemStack(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) return null;
+        NBTItem nbtItem = new NBTItem(item);
+        RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
+        if (!(uncastedTemplate instanceof RunicItemBookTemplate))
+            throw new IllegalArgumentException("ItemStack is not a book item!");
+        RunicItemBookTemplate template = (RunicItemBookTemplate) uncastedTemplate;
+        return new RunicItemBook(template, item.getAmount(), nbtItem.getInteger("id"));
+    }
+
     public List<String> getLore() {
         return this.lore;
     }
@@ -63,18 +72,9 @@ public class RunicItemBook extends RunicItem {
         return item;
     }
 
-    public static RunicItemBook getFromItemStack(ItemStack item) {
-        if (item == null || item.getType() == Material.AIR) return null;
-        NBTItem nbtItem = new NBTItem(item);
-        RunicItemTemplate uncastedTemplate = TemplateManager.getTemplateFromId(nbtItem.getString("template-id"));
-        if (!(uncastedTemplate instanceof RunicItemBookTemplate)) throw new IllegalArgumentException("ItemStack is not a book item!");
-        RunicItemBookTemplate template = (RunicItemBookTemplate) uncastedTemplate;
-        return new RunicItemBook(template, item.getAmount(), nbtItem.getInteger("id"));
-    }
-
     @Override
-    protected ItemLoreSection[] generateLore() {
-        return new ItemLoreSection[] {ItemLoreSection.generateTranslateColorCodes(lore)};
+    protected List<String> generateLore() {
+        return lore;
     }
 
 }
