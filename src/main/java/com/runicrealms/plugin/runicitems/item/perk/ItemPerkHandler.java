@@ -21,10 +21,18 @@ public abstract class ItemPerkHandler {
     protected final Map<String, Object> config;
     private final DynamicItemPerkStacksTextPlaceholder dynamicItemPerksStacksTextPlaceholder;
 
+    private final String configName;
+    private final @Nullable List<String> configLore;
+
+    @SuppressWarnings("unchecked")
     protected ItemPerkHandler(String identifier) {
         this.config = this.loadConfig(identifier);
         int maxStacks = (Integer) this.config.getOrDefault("max-stacks", 1);
         this.type = new ItemPerkType(identifier, maxStacks);
+
+        this.configName = (String) this.config.getOrDefault("name", this.type.getIdentifier());
+        this.configLore = (List<String>) this.config.getOrDefault("lore", null);
+
         dynamicItemPerksStacksTextPlaceholder = new DynamicItemPerkStacksTextPlaceholder(this); // used to handle lore
         dynamicItemPerksStacksTextPlaceholder.register();
     }
@@ -55,16 +63,14 @@ public abstract class ItemPerkHandler {
      * Null indicates no lore
      */
     public @Nullable List<String> getLoreSection() {
-        Object lore = this.config.getOrDefault("lore", null);
-        if (lore == null) return null;
-        return (List<String>) lore;
+        return configLore;
     }
 
     /**
      * Returns the display name for this perk to be used on item lore
      */
     public @NotNull String getName() {
-        return (String) this.config.getOrDefault("name", this.type.getIdentifier());
+        return configName;
     }
 
     /**

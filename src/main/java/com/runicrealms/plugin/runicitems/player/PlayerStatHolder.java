@@ -51,12 +51,12 @@ public class PlayerStatHolder {
 
     private final Player player;
     private final Map<ItemPerkType, Integer> itemPerksExceedingMax = new HashMap<>(); // ItemPerks that exceed the max, and how much they would've been
-    private RunicItemArmor helmet;
-    private RunicItemArmor chestplate;
-    private RunicItemArmor leggings;
-    private RunicItemArmor boots;
-    private RunicItemOffhand offhand;
-    private RunicItemWeapon weapon;
+    private volatile RunicItemArmor helmet;
+    private volatile RunicItemArmor chestplate;
+    private volatile RunicItemArmor leggings;
+    private volatile RunicItemArmor boots;
+    private volatile RunicItemOffhand offhand;
+    private volatile RunicItemWeapon weapon;
     private AddedStats cachedStats;
 
     /*
@@ -239,6 +239,8 @@ public class PlayerStatHolder {
         } else {
             this.helmet = null;
         }
+
+        if (this.helmet != null && this.helmet.hasItemPerks()) player.updateInventory(); // Update dynamic lore
     }
 
     private void updateChestplate() {
@@ -253,6 +255,8 @@ public class PlayerStatHolder {
         } else {
             this.chestplate = null;
         }
+
+        if (this.chestplate != null && this.chestplate.hasItemPerks()) player.updateInventory(); // Update dynamic lore
     }
 
     private void updateLeggings() {
@@ -267,6 +271,8 @@ public class PlayerStatHolder {
         } else {
             this.leggings = null;
         }
+
+        if (this.leggings != null && this.leggings.hasItemPerks()) player.updateInventory(); // Update dynamic lore
     }
 
     private void updateBoots() {
@@ -281,6 +287,8 @@ public class PlayerStatHolder {
         } else {
             this.boots = null;
         }
+
+        if (this.boots != null && this.boots.hasItemPerks()) player.updateInventory(); // Update dynamic lore
     }
 
     // This one also updates the total because we need to update total before we change the recent weapon to the current one
@@ -313,6 +321,8 @@ public class PlayerStatHolder {
             if (!canUseWeapon(this.player, this.weapon)) return;
             this.recentWeapon = new RecentWeapon(this.weapon);
         }
+
+        if (this.weapon != null && this.weapon.hasItemPerks()) player.updateInventory(); // Update dynamic lore
     }
 
     private void updateOffhand() {
@@ -334,6 +344,29 @@ public class PlayerStatHolder {
         }
     }
 
+    public @Nullable RunicItemArmor getHelmet() {
+        return this.helmet;
+    }
+
+    public @Nullable RunicItemArmor getChestplate() {
+        return this.chestplate;
+    }
+
+    public @Nullable RunicItemArmor getLeggings() {
+        return this.leggings;
+    }
+
+    public @Nullable RunicItemArmor getBoots() {
+        return this.boots;
+    }
+
+    public @Nullable RunicItemWeapon getWeapon() {
+        return this.weapon == null ? null : (canUseWeapon(player, this.weapon) ? this.weapon : null);
+    }
+
+    public @Nullable RunicItemOffhand getOffhand() {
+        return this.offhand;
+    }
 
     public enum StatHolderType {
         HELMET, CHESTPLATE, LEGGINGS, BOOTS, WEAPON, OFFHAND

@@ -1,7 +1,6 @@
 package com.runicrealms.plugin.runicitems.item.perk;
 
 import com.runicrealms.plugin.runicitems.RunicItemsAPI;
-import com.runicrealms.plugin.runicitems.dynamic.DynamicItemTextPlaceholder;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
@@ -12,12 +11,12 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Used to replace the ? in [?/4] +X item perks
  */
-public class DynamicItemPerkStacksTextPlaceholder extends DynamicItemTextPlaceholder {
+public class DynamicItemPerkStacksTextPlaceholder extends DynamicItemPerkTextPlaceholder {
 
     private final ItemPerkHandler handler;
 
     public DynamicItemPerkStacksTextPlaceholder(ItemPerkHandler handler) {
-        super(handler.getType().getIdentifier() + "-stacks");
+        super(handler.getType().getIdentifier() + "-equipped");
         this.handler = handler;
     }
 
@@ -29,10 +28,11 @@ public class DynamicItemPerkStacksTextPlaceholder extends DynamicItemTextPlaceho
     @Override
     public String generateReplacement(Player viewer, ItemStack item, NBTItem itemNBT, RunicItemTemplate template) {
         int stacks = handler.getCurrentUncappedStacks(viewer);
-        if (stacks > handler.getType().getMaxStacks()) {
-            return ChatColor.RED.toString() + stacks;
+        if (getEquippedSlot(viewer, item, template) != null) {
+            ChatColor stacksColor = stacks > handler.getType().getMaxStacks() ? ChatColor.RED : ChatColor.WHITE;
+            return ChatColor.GRAY + "[" + stacksColor + stacks + ChatColor.GRAY + "/" + handler.getType().getMaxStacks() + "] ";
         } else {
-            return ChatColor.WHITE.toString() + stacks;
+            return "";
         }
     }
 

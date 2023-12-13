@@ -311,13 +311,10 @@ public class RunicItemArmor extends RunicItem implements AddedStatsHolder, ItemP
         boolean atLeastOnePerk = false;
         for (ItemPerk perk : this.itemPerks) {
             ItemPerkHandler handler = RunicItemsAPI.getItemPerkManager().getHandler(perk.getType());
-            perkLore.add(ChatColor.translateAlternateColorCodes('&',
-                    "&7[&r<"
-                            + handler.getDynamicItemPerksStacksTextPlaceholder().getIdentifier()
-                            + ">&7/"
-                            + perk.getType().getMaxStacks()
-                            + "] &f+" + perk.getStacks()
-                            + " &r" + handler.getName()));
+            perkLore.add("<" + handler.getDynamicItemPerksStacksTextPlaceholder().getIdentifier() + ">"
+                    + ChatColor.WHITE
+                    + "+" + perk.getStacks()
+                    + " " + ChatColor.RESET + handler.getName());
             List<String> handlerLore = handler.getLoreSection();
             if (handlerLore != null) perkLore.addAll(handlerLore);
             perkLore.add("");
