@@ -32,7 +32,7 @@ public class DynamicItemPerkStacksTextPlaceholder extends DynamicItemPerkTextPla
             ChatColor stacksColor = stacks > handler.getType().getMaxStacks() ? ChatColor.RED : ChatColor.WHITE;
             return ChatColor.GRAY + "[" + stacksColor + stacks + ChatColor.GRAY + "/" + handler.getType().getMaxStacks() + "] ";
         } else {
-            return "";
+            return ChatColor.GRAY + "[" + handler.getType().getMaxStacks() + "] ";
         }
     }
 

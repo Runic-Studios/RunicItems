@@ -14,6 +14,7 @@ import java.util.Set;
 public class ItemPerkManager implements Listener {
 
     private final Map<ItemPerkType, ItemPerkHandler> handlers = new HashMap<>();
+    private final Map<String, ItemPerkType> types = new HashMap<>();
 
     public ItemPerkManager() {
         Bukkit.getPluginManager().registerEvents(this, RunicItems.getInstance());
@@ -41,8 +42,13 @@ public class ItemPerkManager implements Listener {
         return handlers.get(type);
     }
 
+    public @Nullable ItemPerkType getType(String identifier) {
+        return types.get(identifier);
+    }
+
     public void registerItemPerk(ItemPerkHandler handler) {
         handlers.put(handler.getType(), handler);
+        types.put(handler.getType().getIdentifier(), handler.getType());
     }
 
     @EventHandler
@@ -75,9 +81,9 @@ public class ItemPerkManager implements Listener {
                 event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 1.0F, 2.0F);
             } else if (activated) { // both activated and deactivated
                 event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 1.0F, 2.0F);
-                Bukkit.getScheduler().runTaskLater(RunicItems.getInstance(), () -> {
-                    event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.0F, 2.0F);
-                }, 10);
+                Bukkit.getScheduler().runTaskLater(RunicItems.getInstance(), () ->
+                                event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.0F, 2.0F),
+                        10);
             }
         }
     }
