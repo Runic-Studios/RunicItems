@@ -12,7 +12,6 @@ import com.runicrealms.plugin.runicitems.api.WeaponSkinAPI;
 import com.runicrealms.plugin.runicitems.command.RunicItemCommand;
 import com.runicrealms.plugin.runicitems.command.WeaponSkinCommand;
 import com.runicrealms.plugin.runicitems.command.WeaponryCommand;
-import com.runicrealms.plugin.runicitems.config.AbilityLoader;
 import com.runicrealms.plugin.runicitems.config.ConfigUtil;
 import com.runicrealms.plugin.runicitems.config.TemplateLoader;
 import com.runicrealms.plugin.runicitems.converter.RunicItemReadConverter;
@@ -104,8 +103,6 @@ public class RunicItems extends JavaPlugin implements Listener {
         INVENTORY_API = new ItemManager();
         ConfigUtil.initDirs();
 
-        // Load YML files
-        AbilityLoader.loadAbilities();
         try {
             TemplateLoader.loadTemplates();
             LootManager.sortItems(TemplateManager.getTemplates());
