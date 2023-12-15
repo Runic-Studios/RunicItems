@@ -7,7 +7,7 @@ import com.runicrealms.plugin.runicitems.item.RunicItemArmor;
 import com.runicrealms.plugin.runicitems.item.RunicItemOffhand;
 import com.runicrealms.plugin.runicitems.item.RunicItemWeapon;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
-import com.runicrealms.plugin.runicitems.player.PlayerStatHolder;
+import com.runicrealms.plugin.runicitems.player.PlayerEquipmentCache;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -24,7 +24,7 @@ public abstract class DynamicItemPerkTextPlaceholder extends DynamicItemTextPlac
      * Returns null if not equipped
      */
     protected @Nullable EquippedSlot getEquippedSlot(Player player, ItemStack item, RunicItemTemplate template) {
-        PlayerStatHolder cache = RunicItemsAPI.getCachedPlayerItems(player.getUniqueId());
+        PlayerEquipmentCache cache = RunicItemsAPI.getCachedPlayerItems(player.getUniqueId());
         if (cache == null) return null; // We haven't loaded yet
 
         if (ArmorType.matchType(item) != null) {

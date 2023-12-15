@@ -1,6 +1,6 @@
 package com.runicrealms.plugin.runicitems.item.event;
 
-import com.runicrealms.plugin.runicitems.player.PlayerStatHolder;
+import com.runicrealms.plugin.runicitems.player.PlayerEquipmentCache;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -9,9 +9,9 @@ public class RunicStatUpdateEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
     private final Player player;
-    private final PlayerStatHolder statHolder;
+    private final PlayerEquipmentCache statHolder;
 
-    public RunicStatUpdateEvent(Player player, PlayerStatHolder statHolder) {
+    public RunicStatUpdateEvent(Player player, PlayerEquipmentCache statHolder) {
         super(true);
         this.player = player;
         this.statHolder = statHolder;
@@ -25,7 +25,7 @@ public class RunicStatUpdateEvent extends Event {
         return this.player;
     }
 
-    public PlayerStatHolder getStats() {
+    public PlayerEquipmentCache getStats() {
         return this.statHolder;
     }
 

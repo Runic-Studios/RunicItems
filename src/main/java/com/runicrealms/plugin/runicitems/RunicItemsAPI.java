@@ -8,7 +8,7 @@ import com.runicrealms.plugin.runicitems.item.stats.RunicArtifactAbility;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.plugin.runicitems.player.AddedStats;
-import com.runicrealms.plugin.runicitems.player.PlayerStatHolder;
+import com.runicrealms.plugin.runicitems.player.PlayerEquipmentCache;
 import com.runicrealms.plugin.runicitems.util.NBTUtil;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Location;
@@ -122,7 +122,7 @@ public class RunicItemsAPI {
      * @param uuid - UUID of player to check
      * @return PlayerStatHolder
      */
-    public static PlayerStatHolder getCachedPlayerItems(UUID uuid) {
+    public static PlayerEquipmentCache getCachedPlayerItems(UUID uuid) {
         return PlayerManager.getCachedPlayerStats().get(uuid);
     }
 

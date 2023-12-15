@@ -32,7 +32,7 @@ import java.util.logging.Level;
 /**
  * A simple container which caches the player's stats and updates their armor stats
  */
-public class PlayerStatHolder {
+public class PlayerEquipmentCache {
 
     /*
 
@@ -74,7 +74,7 @@ public class PlayerStatHolder {
     private @Nullable BukkitTask cooldownTask = null;
 
 
-    public PlayerStatHolder(Player player) {
+    public PlayerEquipmentCache(Player player) {
         this.cachedStats = new AddedStats(new HashMap<>(), null, 0);
         this.player = player;
         updateAllItems(true, false);

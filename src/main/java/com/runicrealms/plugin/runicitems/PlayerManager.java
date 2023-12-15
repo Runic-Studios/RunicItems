@@ -4,7 +4,7 @@ import com.runicrealms.plugin.common.event.ArmorEquipEvent;
 import com.runicrealms.plugin.rdb.event.CharacterHasQuitEvent;
 import com.runicrealms.plugin.rdb.event.CharacterLoadedEvent;
 import com.runicrealms.plugin.runicitems.item.event.RunicStatUpdateEvent;
-import com.runicrealms.plugin.runicitems.player.PlayerStatHolder;
+import com.runicrealms.plugin.runicitems.player.PlayerEquipmentCache;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,9 +17,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerManager implements Listener {
-    private static final Map<UUID, PlayerStatHolder> cachedPlayerStats = new ConcurrentHashMap<>();
+    private static final Map<UUID, PlayerEquipmentCache> cachedPlayerStats = new ConcurrentHashMap<>();
 
-    public static Map<UUID, PlayerStatHolder> getCachedPlayerStats() {
+    public static Map<UUID, PlayerEquipmentCache> getCachedPlayerStats() {
         return cachedPlayerStats;
     }
 
@@ -31,13 +31,13 @@ public class PlayerManager implements Listener {
         if (!cachedPlayerStats.containsKey(uuid)) return;
         if (event.isCancelled()) return;
         Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> {
-            PlayerStatHolder holder = cachedPlayerStats.get(uuid);
+            PlayerEquipmentCache holder = cachedPlayerStats.get(uuid);
             switch (event.getType()) {
-                case HELMET -> holder.updateItems(false, PlayerStatHolder.StatHolderType.HELMET);
-                case CHESTPLATE -> holder.updateItems(false, PlayerStatHolder.StatHolderType.CHESTPLATE);
-                case LEGGINGS -> holder.updateItems(false, PlayerStatHolder.StatHolderType.LEGGINGS);
-                case BOOTS -> holder.updateItems(false, PlayerStatHolder.StatHolderType.BOOTS);
-                case OFFHAND -> holder.updateItems(false, PlayerStatHolder.StatHolderType.OFFHAND);
+                case HELMET -> holder.updateItems(false, PlayerEquipmentCache.StatHolderType.HELMET);
+                case CHESTPLATE -> holder.updateItems(false, PlayerEquipmentCache.StatHolderType.CHESTPLATE);
+                case LEGGINGS -> holder.updateItems(false, PlayerEquipmentCache.StatHolderType.LEGGINGS);
+                case BOOTS -> holder.updateItems(false, PlayerEquipmentCache.StatHolderType.BOOTS);
+                case OFFHAND -> holder.updateItems(false, PlayerEquipmentCache.StatHolderType.OFFHAND);
             }
             RunicStatUpdateEvent statUpdateEvent = new RunicStatUpdateEvent(event.getPlayer(), holder);
             Bukkit.getPluginManager().callEvent(statUpdateEvent);
@@ -49,7 +49,7 @@ public class PlayerManager implements Listener {
      */
     @EventHandler(priority = EventPriority.LOW)
     public void onCharacterLoad(CharacterLoadedEvent event) {
-        cachedPlayerStats.put(event.getPlayer().getUniqueId(), new PlayerStatHolder(event.getPlayer()));
+        cachedPlayerStats.put(event.getPlayer().getUniqueId(), new PlayerEquipmentCache(event.getPlayer()));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -57,7 +57,7 @@ public class PlayerManager implements Listener {
         if (!cachedPlayerStats.containsKey(event.getPlayer().getUniqueId())) return;
         if (event.isCancelled()) return;
         if (event.getNewSlot() == event.getPreviousSlot()) return;
-        Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(event.getPlayer().getUniqueId()).updateItems(false, PlayerStatHolder.StatHolderType.WEAPON));
+        Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(event.getPlayer().getUniqueId()).updateItems(false, PlayerEquipmentCache.StatHolderType.WEAPON));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
