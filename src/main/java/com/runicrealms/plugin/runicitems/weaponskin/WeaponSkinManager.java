@@ -144,7 +144,7 @@ public class WeaponSkinManager implements WeaponSkinAPI, Listener {
     public void onWeaponSkinObtainHandler(WeaponSkinObtainEvent event) {
         if (event.isCancelled()) return;
         LuckPermsProvider.get().getUserManager().loadUser(event.getPlayer().getUniqueId()).thenAcceptAsync(user -> {
-            user.data().add(Node.builder(event.getPermission()).build());
+            user.data().add(Node.builder(event.getPermission()).context(RunicCommon.getLuckPermsAPI().getServerSpecificContext()).build());
             LuckPermsProvider.get().getUserManager().saveUser(user);
         });
     }
