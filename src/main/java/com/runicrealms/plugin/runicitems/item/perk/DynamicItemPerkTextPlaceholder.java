@@ -7,6 +7,7 @@ import com.runicrealms.plugin.runicitems.item.RunicItemArmor;
 import com.runicrealms.plugin.runicitems.item.RunicItemOffhand;
 import com.runicrealms.plugin.runicitems.item.RunicItemWeapon;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
+import com.runicrealms.plugin.runicitems.player.PlayerStatHolder;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,29 +24,32 @@ public abstract class DynamicItemPerkTextPlaceholder extends DynamicItemTextPlac
      * Returns null if not equipped
      */
     protected @Nullable EquippedSlot getEquippedSlot(Player player, ItemStack item, RunicItemTemplate template) {
+        PlayerStatHolder cache = RunicItemsAPI.getCachedPlayerItems(player.getUniqueId());
+        if (cache == null) return null; // We haven't loaded yet
+
         if (ArmorType.matchType(item) != null) {
-            RunicItemArmor helmet = RunicItemsAPI.getCachedPlayerItems(player.getUniqueId()).getHelmet();
+            RunicItemArmor helmet = cache.getHelmet();
             ItemStack itemHelmet = player.getInventory().getHelmet();
             if (helmet != null
                     && itemHelmet != null
                     && helmet.getTemplateId().equals(template.getId())
                     && itemHelmet.equals(item)) return EquippedSlot.HELMET;
 
-            RunicItemArmor chestplate = RunicItemsAPI.getCachedPlayerItems(player.getUniqueId()).getChestplate();
+            RunicItemArmor chestplate = cache.getChestplate();
             ItemStack itemChestplate = player.getInventory().getChestplate();
             if (chestplate != null
                     && itemChestplate != null
                     && chestplate.getTemplateId().equals(template.getId())
                     && itemChestplate.equals(item)) return EquippedSlot.CHESTPLATE;
 
-            RunicItemArmor leggings = RunicItemsAPI.getCachedPlayerItems(player.getUniqueId()).getLeggings();
+            RunicItemArmor leggings = cache.getLeggings();
             ItemStack itemLeggings = player.getInventory().getLeggings();
             if (leggings != null
                     && itemLeggings != null
                     && leggings.getTemplateId().equals(template.getId())
                     && itemLeggings.equals(item)) return EquippedSlot.LEGGINGS;
 
-            RunicItemArmor boots = RunicItemsAPI.getCachedPlayerItems(player.getUniqueId()).getBoots();
+            RunicItemArmor boots = cache.getBoots();
             ItemStack itemBoots = player.getInventory().getBoots();
             if (boots != null
                     && itemBoots != null
@@ -53,13 +57,13 @@ public abstract class DynamicItemPerkTextPlaceholder extends DynamicItemTextPlac
                     && itemBoots.equals(item)) return EquippedSlot.BOOTS;
         }
 
-        RunicItemOffhand offhand = RunicItemsAPI.getCachedPlayerItems(player.getUniqueId()).getOffhand();
+        RunicItemOffhand offhand = cache.getOffhand();
         ItemStack itemOffhand = player.getInventory().getItemInOffHand();
         if (offhand != null
                 && offhand.getTemplateId().equals(template.getId())
                 && itemOffhand.equals(item)) return EquippedSlot.OFFHAND;
 
-        RunicItemWeapon weapon = RunicItemsAPI.getCachedPlayerItems(player.getUniqueId()).getWeapon();
+        RunicItemWeapon weapon = cache.getWeapon();
         ItemStack itemWeapon = player.getInventory().getItemInMainHand();
         if (weapon != null
                 && weapon.getTemplateId().equals(template.getId())
