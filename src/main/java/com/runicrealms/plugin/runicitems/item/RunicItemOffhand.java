@@ -1,5 +1,6 @@
 package com.runicrealms.plugin.runicitems.item;
 
+import com.runicrealms.plugin.common.util.LazyField;
 import com.runicrealms.plugin.common.util.Pair;
 import com.runicrealms.plugin.runicitems.Stat;
 import com.runicrealms.plugin.runicitems.TemplateManager;
@@ -11,7 +12,6 @@ import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
 import com.runicrealms.plugin.runicitems.item.util.ItemLoreBuilder;
 import com.runicrealms.plugin.runicitems.player.AddedStats;
-import com.runicrealms.plugin.runicitems.util.LazyField;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
