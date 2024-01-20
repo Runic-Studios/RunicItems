@@ -24,10 +24,10 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 /**
  * A simple container which caches the player's stats and updates their armor stats
@@ -162,16 +162,13 @@ public class PlayerEquipmentCache {
         Set<ItemPerk> perks = this.cachedStats.getItemPerks();
         this.itemPerksExceedingMax.clear();
         if (perks != null) {
-            Iterator<ItemPerk> iterator = perks.iterator();
-            while (iterator.hasNext()) { // do not replace with for, you will get CME
-                ItemPerk perk = iterator.next();
+            this.cachedStats.setItemPerks(perks.stream().map(perk -> {
                 if (perk.getStacks() > perk.getType().getMaxStacks()) {
-                    ItemPerk newPerk = new ItemPerk(perk.getType(), perk.getType().getMaxStacks());
-                    this.itemPerksExceedingMax.put(perk.getType(), perk.getStacks());
-                    perks.remove(perk);
-                    perks.add(newPerk);
+                    itemPerksExceedingMax.put(perk.getType(), perk.getStacks());
+                    return new ItemPerk(perk.getType(), perk.getType().getMaxStacks());
                 }
-            }
+                return perk;
+            }).collect(Collectors.toSet()));
         }
 
         if (oldPerks == null) oldPerks = EMPTY_SET;
