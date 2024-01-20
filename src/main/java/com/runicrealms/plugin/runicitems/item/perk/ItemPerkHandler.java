@@ -81,9 +81,11 @@ public abstract class ItemPerkHandler {
         PlayerEquipmentCache cache = RunicItemsAPI.getCachedPlayerItems(player.getUniqueId());
         if (cache == null) return 0;
         Set<ItemPerk> activePerks = cache.getTotalStats().getItemPerks();
-        for (ItemPerk perk : activePerks) {
-            if (perk.getType() == this.type) {
-                return perk.getStacks();
+        if (activePerks != null) {
+            for (ItemPerk perk : activePerks) {
+                if (perk.getType() == this.type) {
+                    return perk.getStacks();
+                }
             }
         }
         return 0;

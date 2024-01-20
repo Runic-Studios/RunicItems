@@ -23,6 +23,18 @@ public class DynamicItemPerkPercentStatPlaceholder extends DynamicItemPerkTextPl
         this.supplier = supplier;
     }
 
+    private static double roundToNearestHundredth(double number) {
+        return Math.round(number * 100.0) / 100.0;
+    }
+
+    /**
+     * Turns things like 10.0% into 10%
+     * But leaves 10.5% as 10.5%
+     */
+    private static String formatStringPercentage(double percentage) {
+        return Math.floor(percentage) == percentage ? String.valueOf((int) percentage) : String.valueOf(percentage);
+    }
+
     @Nullable
     @Override
     public String generateReplacement(Player viewer, ItemStack item, NBTItem itemNBT, RunicItemTemplate template) {
@@ -36,13 +48,10 @@ public class DynamicItemPerkPercentStatPlaceholder extends DynamicItemPerkTextPl
         }
 
         if (percentage != basePercentage) {
-            return ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + basePercentage + "%" + ChatColor.YELLOW + " " + percentage + "%";
+            return ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + formatStringPercentage(basePercentage) + "%" + ChatColor.YELLOW + " " + formatStringPercentage(percentage) + "%";
         } else {
-            return ChatColor.YELLOW.toString() + basePercentage + "%";
+            return ChatColor.YELLOW.toString() + formatStringPercentage(basePercentage) + "%";
         }
     }
 
-    private static double roundToNearestHundredth(double number) {
-        return Math.round(number * 100.0) / 100.0;
-    }
 }
