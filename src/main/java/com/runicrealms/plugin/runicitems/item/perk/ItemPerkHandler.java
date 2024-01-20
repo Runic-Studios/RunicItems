@@ -1,9 +1,13 @@
 package com.runicrealms.plugin.runicitems.item.perk;
 
+import com.runicrealms.plugin.rdb.event.CharacterQuitEvent;
 import com.runicrealms.plugin.runicitems.RunicItems;
 import com.runicrealms.plugin.runicitems.RunicItemsAPI;
 import com.runicrealms.plugin.runicitems.player.PlayerEquipmentCache;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
@@ -11,14 +15,18 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class ItemPerkHandler {
+public abstract class ItemPerkHandler implements Listener {
 
     protected final ItemPerkType type;
     protected final Map<String, Object> config;
+    private final Set<UUID> active = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private final DynamicItemPerkStacksTextPlaceholder dynamicItemPerksStacksTextPlaceholder;
 
     private final String configName;
@@ -33,8 +41,10 @@ public abstract class ItemPerkHandler {
         this.configName = (String) this.config.getOrDefault("name", this.type.getIdentifier());
         this.configLore = (List<String>) this.config.getOrDefault("lore", null);
 
-        dynamicItemPerksStacksTextPlaceholder = new DynamicItemPerkStacksTextPlaceholder(this); // used to handle lore
-        dynamicItemPerksStacksTextPlaceholder.register();
+        this.dynamicItemPerksStacksTextPlaceholder = new DynamicItemPerkStacksTextPlaceholder(this);
+        RunicItemsAPI.getDynamicItemHandler().registerTextPlaceholder(this.dynamicItemPerksStacksTextPlaceholder); // used to handle lore
+
+        Bukkit.getPluginManager().registerEvents(this, RunicItems.getInstance());
     }
 
     public ItemPerkType getType() {
@@ -44,10 +54,29 @@ public abstract class ItemPerkHandler {
     /**
      * Called when the number of stacks of this item perk changes.
      * Fires async.
+     * Optional to override this or not.
      *
      * @param stacks Number of stacks, 0 indicates no stacks (item perk deactivated).
      */
-    public abstract void onChange(Player player, int stacks);
+    public void onChange(Player player, int stacks) {
+
+    }
+
+    /**
+     * Updates the status of a player's item perk stacks.
+     * Used internally, cannot override.
+     *
+     * @param player Player who has the item perk equipped/de-equipped
+     * @param stacks How many item perk stacks the player has (0 if unequipped)
+     */
+    public final void updateActive(Player player, int stacks) {
+        if (stacks > 0) {
+            active.add(player.getUniqueId());
+        } else {
+            active.remove(player.getUniqueId());
+        }
+        onChange(player, stacks);
+    }
 
     /**
      * Gets the lore for this item perk.
@@ -104,6 +133,27 @@ public abstract class ItemPerkHandler {
         return getCurrentStacks(player);
     }
 
+    /**
+     * Gets whether a given player has this item perk equipped.
+     * Use getCurrentStacks(Player) to get the number of stacks.
+     *
+     * @param player Player to check
+     * @return If they have this perk equipped
+     */
+    public boolean isActive(Player player) {
+        return active.contains(player.getUniqueId());
+    }
+
+    /**
+     * Gets the current set of active players who have this item perk equipped.
+     * Do not modify this set.
+     *
+     * @return Active players' UUIDs
+     */
+    public Set<UUID> getActive() {
+        return this.active;
+    }
+
     private Map<String, Object> loadConfig(String identifier) {
         File filePath = new File(RunicItems.getInstance().getDataFolder(), "itemperks/" + identifier + ".yml");
         if (filePath.exists()) {
@@ -120,6 +170,11 @@ public abstract class ItemPerkHandler {
 
     public DynamicItemPerkStacksTextPlaceholder getDynamicItemPerksStacksTextPlaceholder() {
         return this.dynamicItemPerksStacksTextPlaceholder;
+    }
+
+    @EventHandler
+    private void onCharacterQuit(CharacterQuitEvent event) {
+        active.remove(event.getPlayer().getUniqueId());
     }
 
 }

@@ -49,10 +49,6 @@ public class ItemPerkManager implements Listener {
     public void registerItemPerk(ItemPerkHandler handler) {
         handlers.put(handler.getType(), handler);
         types.put(handler.getType().getIdentifier(), handler.getType());
-
-        if (handler instanceof Listener listener) {
-            Bukkit.getPluginManager().registerEvents(listener, RunicItems.getInstance());
-        }
     }
 
     @EventHandler
@@ -69,7 +65,7 @@ public class ItemPerkManager implements Listener {
             int oldCount = oldPerks.getOrDefault(handlerType, 0);
             int newCount = newPerks.getOrDefault(handlerType, 0);
             if (oldCount != newCount) {
-                handlers.get(handlerType).onChange(event.getPlayer(), newCount);
+                handlers.get(handlerType).updateActive(event.getPlayer(), newCount);
                 if (newCount > oldCount) {
                     activated = true;
                 } else {
