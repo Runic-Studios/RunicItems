@@ -49,6 +49,10 @@ public class ItemPerkManager implements Listener {
     public void registerItemPerk(ItemPerkHandler handler) {
         handlers.put(handler.getType(), handler);
         types.put(handler.getType().getIdentifier(), handler.getType());
+
+        if (handler instanceof Listener listener) {
+            Bukkit.getPluginManager().registerEvents(listener, RunicItems.getInstance());
+        }
     }
 
     @EventHandler
