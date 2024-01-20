@@ -94,6 +94,10 @@ public abstract class RunicItem {
         if (this.tags.size() >= 1) {
             processedLore.add("");
             for (RunicItemTag tag : this.tags) {
+                if (tag.getDisplay() == null) {
+                    continue;
+                }
+
                 processedLore.add(tag.getDisplay());
             }
         }
