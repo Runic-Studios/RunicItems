@@ -58,6 +58,7 @@ public class PlayerEquipmentCache {
     private volatile RunicItemOffhand offhand;
     private volatile RunicItemWeapon weapon;
     private AddedStats cachedStats;
+    private Set<StatsModifier> statsModifiers = new HashSet<>();
 
     /*
     - we store the "most recently used weapon" for a player
@@ -107,6 +108,11 @@ public class PlayerEquipmentCache {
         if (this.leggings != null) this.cachedStats.combine(this.leggings.getAddedStats());
         if (this.boots != null) this.cachedStats.combine(this.boots.getAddedStats());
         if (this.offhand != null) this.cachedStats.combine(this.offhand.getAddedStats());
+        AddedStats modifierStats = new AddedStats(new HashMap<>(), new HashSet<>(), 0);
+        for (StatsModifier modifier : this.statsModifiers) {
+            modifierStats.combine(modifier.getChanges(this.cachedStats));
+        }
+        this.cachedStats.combine(modifierStats);
 
         Boolean beaconNoise = null; // Null indicates default behavior, true indicates yes, false indicates no
 
@@ -376,10 +382,17 @@ public class PlayerEquipmentCache {
         return this.offhand;
     }
 
+    public void addModifier(StatsModifier modifier) {
+        this.statsModifiers.add(modifier);
+    }
+
+    public void removeModifier(StatsModifier modifier) {
+        this.statsModifiers.remove(modifier);
+    }
+
     public enum StatHolderType {
         HELMET, CHESTPLATE, LEGGINGS, BOOTS, WEAPON, OFFHAND
     }
-
 
     private record RecentWeapon(String templateID, Set<ItemPerk> itemPerks) {
 
