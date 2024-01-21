@@ -384,10 +384,12 @@ public class PlayerEquipmentCache {
 
     public void addModifier(StatsModifier modifier) {
         this.statsModifiers.add(modifier);
+        this.updateTotalStats(false, false);
     }
 
     public void removeModifier(StatsModifier modifier) {
         this.statsModifiers.remove(modifier);
+        this.updateTotalStats(false, false);
     }
 
     public enum StatHolderType {

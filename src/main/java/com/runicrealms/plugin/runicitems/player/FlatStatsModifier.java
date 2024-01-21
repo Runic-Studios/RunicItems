@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class FlatStatsModifier implements StatsModifier {
 
-    private AddedStats stats;
+    private final AddedStats stats;
 
     // Pass null for no item perks
     public FlatStatsModifier(Map<Stat, Integer> stats, @Nullable Set<ItemPerk> itemPerks, int health) {
