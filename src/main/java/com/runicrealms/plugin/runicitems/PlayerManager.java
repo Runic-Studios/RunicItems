@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 
 import java.util.Map;
@@ -58,6 +60,18 @@ public class PlayerManager implements Listener {
         if (event.isCancelled()) return;
         if (event.getNewSlot() == event.getPreviousSlot()) return;
         Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(event.getPlayer().getUniqueId()).updateItems(false, PlayerEquipmentCache.StatHolderType.WEAPON));
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerChangeHeldItem(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+        if (!cachedPlayerStats.containsKey(player.getUniqueId())) return;
+        if (event.isCancelled()) return;
+        if (event.getClickedInventory() == null
+                || event.getClickedInventory().getType() != InventoryType.PLAYER) return;
+        if (event.getSlot() == player.getInventory().getHeldItemSlot()) {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(player.getUniqueId()).updateItems(false, PlayerEquipmentCache.StatHolderType.WEAPON), 1L);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
