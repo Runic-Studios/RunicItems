@@ -54,6 +54,19 @@ public class PlayerManager implements Listener {
         cachedPlayerStats.put(event.getPlayer().getUniqueId(), new PlayerEquipmentCache(event.getPlayer()));
     }
 
+    /**
+     * This is for a very specific scenario.
+     * Problem:
+     * updateTotalStats is called automatically when constructing a new PlayerEquipmentCache, which we do already on priority=LOW
+     * However, the equipment cache needs to know the player's class to evaluate if they can use their weapon when updating.
+     * But the CharacterAPI only updates the player's class value on priority=HIGH
+     * So we run another update on HIGHEST once we know the player's class
+     */
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onCharacterLoadHighest(CharacterLoadedEvent event) {
+        cachedPlayerStats.get(event.getPlayer().getUniqueId()).updateTotalStats(false, false);
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerItemHeld(PlayerItemHeldEvent event) {
         if (!cachedPlayerStats.containsKey(event.getPlayer().getUniqueId())) return;

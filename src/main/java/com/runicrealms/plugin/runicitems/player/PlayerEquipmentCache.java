@@ -82,9 +82,10 @@ public class PlayerEquipmentCache {
     }
 
     private static boolean canUseWeapon(Player player, RunicItemWeapon weapon) {
+        String type = RunicDatabase.getAPI().getCharacterAPI().getPlayerClass(player);
+        if (type == null) return false;
         return weapon.getLevel() <= player.getLevel()
-                && RunicDatabase.getAPI().getCharacterAPI().getPlayerClass(player)
-                .equalsIgnoreCase(weapon.getRunicClass().getIdentifier());
+                && type.equalsIgnoreCase(weapon.getRunicClass().getIdentifier());
     }
 
     public Player getPlayer() {
@@ -100,7 +101,7 @@ public class PlayerEquipmentCache {
     }
 
     // Synchronized ensures no overlapping calls. This function runs async always anyway.
-    private synchronized void updateTotalStats(boolean onLogin, boolean weaponSwitched) {
+    public synchronized void updateTotalStats(boolean onLogin, boolean weaponSwitched) {
         Set<ItemPerk> oldPerks = this.cachedStats.getItemPerks();
         this.cachedStats = new AddedStats(new HashMap<>(), new HashSet<>(), 0);
         if (this.helmet != null) this.cachedStats.combine(this.helmet.getAddedStats());
