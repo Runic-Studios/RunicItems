@@ -551,7 +551,7 @@ public class RunicItemCommand extends BaseCommand {
 
         RunicItem item = RunicItemsAPI.getRunicItemFromItemStack(heldItem);
         if (!(item instanceof ItemPerksHolder perkHolder)) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dYou must be holding armor or a weapon to add a perk to it."));
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dYou must be holding armor, weapon or offhand to add a perk to it."));
             return;
         }
 

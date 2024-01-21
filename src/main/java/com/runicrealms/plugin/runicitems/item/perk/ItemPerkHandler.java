@@ -54,7 +54,7 @@ public abstract class ItemPerkHandler implements Listener {
     /**
      * Called when the number of stacks of this item perk changes.
      * Fires async.
-     * Optional to override this or not.
+     * Override this method to track changes to a player's stacks.
      *
      * @param stacks Number of stacks, 0 indicates no stacks (item perk deactivated).
      */

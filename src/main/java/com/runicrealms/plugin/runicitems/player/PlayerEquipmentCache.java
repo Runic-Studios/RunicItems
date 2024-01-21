@@ -311,6 +311,17 @@ public class PlayerEquipmentCache {
 
         this.updateTotalStats(onLogin, true);
 
+        if (this.weapon != null && this.weapon.hasItemPerks()) {
+            // Experimental change that didn't work to force update the weapon
+//            PacketContainer container = new PacketContainer(PacketType.Play.Server.SET_SLOT);
+//            container.getBytes().write(-2, (byte) 0); // Window ID: -2 means ignore state ID
+//            container.getIntegers().write(0, 0); // State ID: bogus value 0
+//            container.getShorts().write(0, (short) player.getInventory().getHeldItemSlot()); // Slot number
+//            container.getItemModifier().write(0, player.getInventory().getItemInMainHand()); // ItemStack
+//            ProtocolLibrary.getProtocolManager().sendServerPacket(player, container);
+            player.updateInventory(); // Update dynamic lore
+        }
+
         // For item perks warmup
         if (this.weapon != null && isNotOnCooldown) {
             if (this.recentWeapon != null && this.recentWeapon.matchesItem(this.weapon))
@@ -318,8 +329,6 @@ public class PlayerEquipmentCache {
             if (!canUseWeapon(this.player, this.weapon)) return;
             this.recentWeapon = new RecentWeapon(this.weapon);
         }
-
-        if (this.weapon != null && this.weapon.hasItemPerks()) player.updateInventory(); // Update dynamic lore
     }
 
     private void updateOffhand() {
@@ -339,6 +348,8 @@ public class PlayerEquipmentCache {
         } else {
             this.offhand = null;
         }
+
+        if (this.offhand != null && this.offhand.hasItemPerks()) player.updateInventory(); // Update dynamic lore
     }
 
     public @Nullable RunicItemArmor getHelmet() {

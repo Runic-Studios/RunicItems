@@ -10,6 +10,7 @@ import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
 import com.runicrealms.plugin.runicitems.item.util.DisplayableItem;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +39,7 @@ public class RunicItemOffhandTemplate extends RunicRarityLevelItemTemplate imple
         if (data == null) data = this.data;
         return new RunicItemOffhand(
                 this.id, this.displayableItem, tags, data, count, id,
-                rolledStats,
+                rolledStats, new LinkedHashSet<>(),
                 this.level, this.rarity
         );
     }
