@@ -1,6 +1,5 @@
 package com.runicrealms.plugin.runicitems.item.perk;
 
-import com.runicrealms.plugin.runicitems.RunicItemsAPI;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
@@ -18,10 +17,6 @@ public class DynamicItemPerkStacksTextPlaceholder extends DynamicItemPerkTextPla
     public DynamicItemPerkStacksTextPlaceholder(ItemPerkHandler handler) {
         super(handler.getType().getIdentifier() + "-equipped");
         this.handler = handler;
-    }
-
-    public void register() {
-        RunicItemsAPI.getDynamicItemHandler().registerTextPlaceholder(this);
     }
 
     @Nullable

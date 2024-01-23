@@ -10,6 +10,8 @@ import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -21,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class RunicItem {
+    private static final AttributeModifier attributeModifier = new AttributeModifier("generic.attackSpeed", Integer.MAX_VALUE, AttributeModifier.Operation.ADD_NUMBER);
+
     protected DisplayableItem displayableItem; // Base ItemStack information that we get from the template
     protected String templateId; // Template ID
     protected List<RunicItemTag> tags; // List of tags (soulbound, untradeable, etc.)
@@ -80,7 +84,7 @@ public abstract class RunicItem {
 
         ItemMeta meta = item.getItemMeta() != null ? item.getItemMeta() : Bukkit.getItemFactory().getItemMeta(item.getType());
         meta.setDisplayName(ChatColor.WHITE + this.getDisplayableItem().getDisplayName());
-
+        meta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, attributeModifier);
         List<String> generatedLore = generateLore();
         List<String> processedLore = new LinkedList<>();
         for (String line : generatedLore) {
@@ -90,6 +94,10 @@ public abstract class RunicItem {
         if (this.tags.size() >= 1) {
             processedLore.add("");
             for (RunicItemTag tag : this.tags) {
+                if (tag.getDisplay() == null) {
+                    continue;
+                }
+
                 processedLore.add(tag.getDisplay());
             }
         }

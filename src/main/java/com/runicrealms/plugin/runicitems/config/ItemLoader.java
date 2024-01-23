@@ -75,7 +75,7 @@ public class ItemLoader {
             } else if (template instanceof RunicItemGenericTemplate) {
                 return new RunicItemGeneric((RunicItemGenericTemplate) template, count, id);
             } else if (template instanceof RunicItemOffhandTemplate offhandTemplate) {
-                return new RunicItemOffhand(offhandTemplate, count, id, loadStats(document, offhandTemplate.getStats()));
+                return new RunicItemOffhand(offhandTemplate, count, id, loadStats(document, offhandTemplate.getStats()), loadItemPerks(document));
             } else if (template instanceof RunicItemWeaponTemplate weaponTemplate) {
                 return new RunicItemWeapon(weaponTemplate, count, id, loadStats(document, weaponTemplate.getStats()), loadItemPerks(document), skin);
             } else if (template instanceof RunicItemGemTemplate gemTemplate) {
@@ -122,7 +122,7 @@ public class ItemLoader {
             } else if (template instanceof RunicItemGenericTemplate) {
                 return new RunicItemGeneric((RunicItemGenericTemplate) template, count, id);
             } else if (template instanceof RunicItemOffhandTemplate offhandTemplate) {
-                return new RunicItemOffhand(offhandTemplate, count, id, loadStats(itemDataMap, offhandTemplate.getStats()));
+                return new RunicItemOffhand(offhandTemplate, count, id, loadStats(itemDataMap, offhandTemplate.getStats()), loadItemPerks(itemDataMap));
             } else if (template instanceof RunicItemWeaponTemplate weaponTemplate) {
                 return new RunicItemWeapon(weaponTemplate, count, id, loadStats(itemDataMap, weaponTemplate.getStats()), loadItemPerks(itemDataMap), skin);
             } else if (template instanceof RunicItemGemTemplate gemTemplate) {

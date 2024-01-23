@@ -207,8 +207,8 @@ public class RunicItemWeapon extends RunicItem implements AddedStatsHolder, Item
                 .appendLines(perkLore)
                 .newLine()
                 .appendLines(rarity.getDisplay())
-                .appendLinesIf(level > 0, "<level> " + ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level)
                 .appendLines("<class> " + ChatColor.GRAY + runicClass.getDisplay())
+                .appendLinesIf(level > 0, "<level> " + ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level)
                 .build();
     }
 

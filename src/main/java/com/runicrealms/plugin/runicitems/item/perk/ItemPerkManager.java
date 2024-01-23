@@ -65,7 +65,7 @@ public class ItemPerkManager implements Listener {
             int oldCount = oldPerks.getOrDefault(handlerType, 0);
             int newCount = newPerks.getOrDefault(handlerType, 0);
             if (oldCount != newCount) {
-                handlers.get(handlerType).onChange(event.getPlayer(), newCount);
+                handlers.get(handlerType).updateActive(event.getPlayer(), newCount);
                 if (newCount > oldCount) {
                     activated = true;
                 } else {

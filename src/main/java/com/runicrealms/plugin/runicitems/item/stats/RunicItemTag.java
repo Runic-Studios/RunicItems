@@ -1,6 +1,8 @@
 package com.runicrealms.plugin.runicitems.item.stats;
 
 import org.bukkit.ChatColor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public enum RunicItemTag {
 
@@ -9,7 +11,8 @@ public enum RunicItemTag {
     POTION("potion", ChatColor.BLUE + "Potion"),
     SOULBOUND("soulbound", ChatColor.DARK_GRAY + "Soulbound"),
     UNTRADEABLE("untradeable", ChatColor.DARK_RED + "Untradeable"),
-    QUEST_ITEM("quest-item", ChatColor.GOLD + "Quest Item");
+    QUEST_ITEM("quest-item", ChatColor.GOLD + "Quest Item"),
+    DUNGEON_ITEM("dungeon-item", null);
 
     private final String identifier;
     private final String display;
@@ -28,12 +31,13 @@ public enum RunicItemTag {
         return null;
     }
 
+    @Nullable
     public String getDisplay() {
         return this.display;
     }
 
+    @NotNull
     public String getIdentifier() {
         return identifier;
     }
-
 }

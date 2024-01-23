@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 
 import java.util.Map;
@@ -52,12 +54,37 @@ public class PlayerManager implements Listener {
         cachedPlayerStats.put(event.getPlayer().getUniqueId(), new PlayerEquipmentCache(event.getPlayer()));
     }
 
+    /**
+     * This is for a very specific scenario.
+     * Problem:
+     * updateTotalStats is called automatically when constructing a new PlayerEquipmentCache, which we do already on priority=LOW
+     * However, the equipment cache needs to know the player's class to evaluate if they can use their weapon when updating.
+     * But the CharacterAPI only updates the player's class value on priority=HIGH
+     * So we run another update on HIGHEST once we know the player's class
+     */
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onCharacterLoadHighest(CharacterLoadedEvent event) {
+        cachedPlayerStats.get(event.getPlayer().getUniqueId()).updateTotalStats(false, false);
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerItemHeld(PlayerItemHeldEvent event) {
         if (!cachedPlayerStats.containsKey(event.getPlayer().getUniqueId())) return;
         if (event.isCancelled()) return;
         if (event.getNewSlot() == event.getPreviousSlot()) return;
         Bukkit.getScheduler().runTaskAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(event.getPlayer().getUniqueId()).updateItems(false, PlayerEquipmentCache.StatHolderType.WEAPON));
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerChangeHeldItem(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+        if (!cachedPlayerStats.containsKey(player.getUniqueId())) return;
+        if (event.isCancelled()) return;
+        if (event.getClickedInventory() == null
+                || event.getClickedInventory().getType() != InventoryType.PLAYER) return;
+        if (event.getSlot() == player.getInventory().getHeldItemSlot()) {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(RunicItems.getInstance(), () -> cachedPlayerStats.get(player.getUniqueId()).updateItems(false, PlayerEquipmentCache.StatHolderType.WEAPON), 1L);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

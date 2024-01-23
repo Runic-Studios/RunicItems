@@ -2,8 +2,12 @@ package com.runicrealms.plugin.runicitems.item;
 
 import com.runicrealms.plugin.common.util.LazyField;
 import com.runicrealms.plugin.common.util.Pair;
+import com.runicrealms.plugin.runicitems.RunicItemsAPI;
 import com.runicrealms.plugin.runicitems.Stat;
 import com.runicrealms.plugin.runicitems.TemplateManager;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerk;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerkHandler;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerkType;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemTag;
@@ -19,25 +23,38 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-public class RunicItemOffhand extends RunicItem implements AddedStatsHolder, LevelRequirementHolder {
+public class RunicItemOffhand extends RunicItem implements AddedStatsHolder, ItemPerksHolder, LevelRequirementHolder {
 
     private final LinkedHashMap<Stat, RunicItemStat> stats;
     private final int level;
     private final RunicItemRarity rarity;
     private final LazyField<AddedStats> addedStats;
+    private final LinkedHashSet<ItemPerk> itemPerks;
 
-    public RunicItemOffhand(String templateId, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data, int count, long id,
-                            LinkedHashMap<Stat, RunicItemStat> stats,
-                            int level, RunicItemRarity rarity) {
+    public RunicItemOffhand(
+            String templateId,
+            DisplayableItem displayableItem,
+            List<RunicItemTag> tags,
+            Map<String, String> data,
+            int count,
+            long id,
+            LinkedHashMap<Stat, RunicItemStat> stats,
+            LinkedHashSet<ItemPerk> itemPerks,
+            int level,
+            RunicItemRarity rarity) {
         super(templateId, displayableItem, tags, data, count, id);
         this.stats = stats;
+        this.itemPerks = itemPerks;
         this.level = level;
         this.rarity = rarity;
         this.addedStats = new LazyField<>(() -> {
@@ -45,14 +62,14 @@ public class RunicItemOffhand extends RunicItem implements AddedStatsHolder, Lev
             for (Stat stat : stats.keySet()) {
                 addedStats.put(stat, stats.get(stat).getValue());
             }
-            return new AddedStats(addedStats, null, 0);
+            return new AddedStats(addedStats, this.itemPerks, 0);
         });
     }
 
-    public RunicItemOffhand(RunicItemOffhandTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats) {
+    public RunicItemOffhand(RunicItemOffhandTemplate template, int count, long id, LinkedHashMap<Stat, RunicItemStat> stats, LinkedHashSet<ItemPerk> itemPerks) {
         this(
                 template.getId(), template.getDisplayableItem(), template.getTags(), template.getData(), count, id,
-                stats,
+                stats, itemPerks,
                 template.getLevel(), template.getRarity()
         );
     }
@@ -75,19 +92,28 @@ public class RunicItemOffhand extends RunicItem implements AddedStatsHolder, Lev
         for (int i = 0; i < amountOfStats; i++) {
             statsList.add(null);
         }
+        LinkedHashSet<ItemPerk> perks = new LinkedHashSet<>();
         for (String key : keys) {
             String[] split = key.split("-");
             if (split[0].equals("stat")) {
                 Stat statType = Stat.getFromIdentifier(split[2]);
                 RunicItemStat stat = new RunicItemStat(template.getStats().get(statType), nbtItem.getFloat(key));
                 statsList.set(Integer.parseInt(split[1]), new Pair<>(statType, stat));
+            } else if (split[0].equals("perks") && split.length >= 2) {
+                String identifier = Arrays.stream(split, 1, split.length).collect(Collectors.joining("-"));
+                for (ItemPerkType type : RunicItemsAPI.getItemPerkManager().getItemPerks()) {
+                    if (type.getIdentifier().equalsIgnoreCase(identifier)) {
+                        perks.add(new ItemPerk(type, nbtItem.getInteger(key)));
+                        break;
+                    }
+                }
             }
         }
         LinkedHashMap<Stat, RunicItemStat> stats = new LinkedHashMap<>();
         for (Pair<Stat, RunicItemStat> stat : statsList) {
             stats.put(stat.first, stat.second);
         }
-        return new RunicItemOffhand(template, item.getAmount(), nbtItem.getInteger("id"), stats);
+        return new RunicItemOffhand(template, item.getAmount(), nbtItem.getInteger("id"), stats, perks);
     }
 
     @Override
@@ -95,6 +121,9 @@ public class RunicItemOffhand extends RunicItem implements AddedStatsHolder, Lev
         Map<String, String> jedisDataMap = super.addToRedis();
         for (Stat statType : this.stats.keySet()) {
             jedisDataMap.put("stats:" + statType.getIdentifier(), String.valueOf(this.stats.get(statType).getRollPercentage()));
+        }
+        for (ItemPerk perk : this.itemPerks) {
+            jedisDataMap.put("perks." + perk.getType().getIdentifier(), String.valueOf(perk.getStacks()));
         }
         return jedisDataMap;
     }
@@ -113,23 +142,44 @@ public class RunicItemOffhand extends RunicItem implements AddedStatsHolder, Lev
             nbtItem.setDouble("stat-" + count + "-" + statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
             count++;
         }
+        for (ItemPerk perk : this.itemPerks) {
+            nbtItem.setInteger("perks-" + perk.getType().getIdentifier(), perk.getStacks());
+        }
         return item;
     }
 
     @Override
     protected List<String> generateLore() {
-        LinkedList<String> lore = new LinkedList<>();
+        LinkedList<String> statLore = new LinkedList<>();
         for (Map.Entry<Stat, RunicItemStat> entry : stats.entrySet()) {
-            lore.add(
+            statLore.add(
                     entry.getKey().getChatColor()
                             + (entry.getValue().getValue() < 0 ? "-" : "+")
                             + entry.getValue().getValue()
                             + entry.getKey().getIcon()
             );
         }
+
+        LinkedList<String> perkLore = new LinkedList<>();
+        boolean atLeastOnePerk = false;
+        for (ItemPerk perk : this.itemPerks) {
+            ItemPerkHandler handler = RunicItemsAPI.getItemPerkManager().getHandler(perk.getType());
+            perkLore.add("<" + handler.getDynamicItemPerksStacksTextPlaceholder().getIdentifier() + ">"
+                    + ChatColor.WHITE
+                    + "+" + perk.getStacks()
+                    + " " + ChatColor.RESET + handler.getName());
+            List<String> handlerLore = handler.getLoreSection();
+            if (handlerLore != null) perkLore.addAll(handlerLore);
+            perkLore.add("");
+            atLeastOnePerk = true;
+        }
+        if (atLeastOnePerk) perkLore.removeLast();
+
         return new ItemLoreBuilder()
-                .newLineIf(lore.size() > 0)
-                .appendLinesIf(lore.size() > 0, lore)
+                .newLineIf(statLore.size() > 0)
+                .appendLinesIf(statLore.size() > 0, statLore)
+                .newLineIf(perkLore.size() > 0)
+                .appendLines(perkLore)
                 .newLine()
                 .appendLines(rarity.getDisplay())
                 .appendLinesIf(level > 0, "<level> " + ChatColor.GRAY + "Lv. Min " + ChatColor.WHITE + "" + level)
@@ -144,6 +194,13 @@ public class RunicItemOffhand extends RunicItem implements AddedStatsHolder, Lev
             statsMap.put(statType.getIdentifier(), this.stats.get(statType).getRollPercentage());
         }
         document.put("stats", statsMap);
+        Map<String, Integer> perksMap = new HashMap<>();
+        for (ItemPerk perk : this.itemPerks) {
+            perksMap.put(perk.getType().getIdentifier(), perk.getStacks());
+        }
+        if (!perksMap.isEmpty()) {
+            document.put("perks", perksMap);
+        }
         return document;
     }
 
@@ -158,6 +215,16 @@ public class RunicItemOffhand extends RunicItem implements AddedStatsHolder, Lev
 
     public LinkedHashMap<Stat, RunicItemStat> getStats() {
         return this.stats;
+    }
+
+    @Override
+    public LinkedHashSet<ItemPerk> getItemPerks() {
+        return this.itemPerks;
+    }
+
+    @Override
+    public boolean hasItemPerks() {
+        return this.itemPerks != null && this.itemPerks.size() > 0;
     }
 
     @Override

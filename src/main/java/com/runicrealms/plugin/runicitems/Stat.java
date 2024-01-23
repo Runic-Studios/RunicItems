@@ -43,7 +43,7 @@ public enum Stat {
     // Dexterity
     private static final double ABILITY_HASTE = 0.004; // .4%
     // Intelligence
-    private static final double MANA_REGEN_MULT = 0.01; // 1%
+    private static final double MANA_REGEN_MULT = 0.015; // 1.5%
     private static final double MAGIC_DMG_MULT = 0.01; // 1%
     // Strength
     private static final double PHYSICAL_DMG_MULT = 0.0075; // 0.75%

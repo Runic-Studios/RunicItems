@@ -1,9 +1,12 @@
 package com.runicrealms.plugin.runicitems.item.template;
 
+import com.runicrealms.plugin.runicitems.RunicItems;
 import com.runicrealms.plugin.runicitems.Stat;
 import com.runicrealms.plugin.runicitems.item.ClassRequirementHolder;
 import com.runicrealms.plugin.runicitems.item.LevelRequirementHolder;
 import com.runicrealms.plugin.runicitems.item.RunicItemArmor;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerk;
+import com.runicrealms.plugin.runicitems.item.perk.ItemPerkType;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStat;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemStatRange;
@@ -24,10 +27,11 @@ public class RunicItemArmorTemplate extends RunicRarityLevelItemTemplate impleme
     private final int health;
     private final LinkedHashMap<Stat, RunicItemStatRange> stats;
     private final int maxGemSlots;
+    private final LinkedHashMap<String, Integer> defaultItemPerks;
     private final RunicItemClass runicClass;
 
     public RunicItemArmorTemplate(String id, DisplayableItem displayableItem, List<RunicItemTag> tags, Map<String, String> data,
-                                  int health, LinkedHashMap<Stat, RunicItemStatRange> stats, int maxGemSlots,
+                                  int health, LinkedHashMap<Stat, RunicItemStatRange> stats, int maxGemSlots, LinkedHashMap<String, Integer> defaultItemPerks,
                                   int level, RunicItemRarity rarity, RunicItemClass runicClass) {
         super(id, displayableItem, tags, data);
         this.level = level;
@@ -35,6 +39,7 @@ public class RunicItemArmorTemplate extends RunicRarityLevelItemTemplate impleme
         this.health = health;
         this.stats = stats;
         this.maxGemSlots = maxGemSlots;
+        this.defaultItemPerks = defaultItemPerks;
         this.runicClass = runicClass;
     }
 
@@ -46,9 +51,17 @@ public class RunicItemArmorTemplate extends RunicRarityLevelItemTemplate impleme
         }
         if (tags == null) tags = this.tags;
         if (data == null) data = this.data;
+        LinkedHashSet<ItemPerk> itemPerks = new LinkedHashSet<>();
+        for (String itemPerkIdentifier : defaultItemPerks.keySet()) {
+            ItemPerkType type = RunicItems.getItemPerkManager().getType(itemPerkIdentifier);
+            if (type == null) continue;
+            int amount = defaultItemPerks.get(itemPerkIdentifier);
+            if (amount <= 0) continue;
+            itemPerks.add(new ItemPerk(type, amount));
+        }
         return new RunicItemArmor(
                 this.id, displayableItem, tags, data, count, id,
-                this.health, rolledStats, new LinkedList<>(), this.maxGemSlots, new LinkedHashSet<>(),
+                this.health, rolledStats, new LinkedList<>(), this.maxGemSlots, itemPerks,
                 this.level, this.rarity, this.runicClass
         );
     }

@@ -24,10 +24,10 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 /**
  * A simple container which caches the player's stats and updates their armor stats
@@ -58,6 +58,7 @@ public class PlayerEquipmentCache {
     private volatile RunicItemOffhand offhand;
     private volatile RunicItemWeapon weapon;
     private AddedStats cachedStats;
+    private Set<StatsModifier> statsModifiers = new HashSet<>();
 
     /*
     - we store the "most recently used weapon" for a player
@@ -81,9 +82,10 @@ public class PlayerEquipmentCache {
     }
 
     private static boolean canUseWeapon(Player player, RunicItemWeapon weapon) {
+        String type = RunicDatabase.getAPI().getCharacterAPI().getPlayerClass(player);
+        if (type == null) return false;
         return weapon.getLevel() <= player.getLevel()
-                && RunicDatabase.getAPI().getCharacterAPI().getPlayerClass(player)
-                .equalsIgnoreCase(weapon.getRunicClass().getIdentifier());
+                && type.equalsIgnoreCase(weapon.getRunicClass().getIdentifier());
     }
 
     public Player getPlayer() {
@@ -99,7 +101,7 @@ public class PlayerEquipmentCache {
     }
 
     // Synchronized ensures no overlapping calls. This function runs async always anyway.
-    private synchronized void updateTotalStats(boolean onLogin, boolean weaponSwitched) {
+    public synchronized void updateTotalStats(boolean onLogin, boolean weaponSwitched) {
         Set<ItemPerk> oldPerks = this.cachedStats.getItemPerks();
         this.cachedStats = new AddedStats(new HashMap<>(), new HashSet<>(), 0);
         if (this.helmet != null) this.cachedStats.combine(this.helmet.getAddedStats());
@@ -107,6 +109,11 @@ public class PlayerEquipmentCache {
         if (this.leggings != null) this.cachedStats.combine(this.leggings.getAddedStats());
         if (this.boots != null) this.cachedStats.combine(this.boots.getAddedStats());
         if (this.offhand != null) this.cachedStats.combine(this.offhand.getAddedStats());
+        AddedStats modifierStats = new AddedStats(new HashMap<>(), new HashSet<>(), 0);
+        for (StatsModifier modifier : this.statsModifiers) {
+            modifierStats.combine(modifier.getChanges(this.cachedStats));
+        }
+        this.cachedStats.combine(modifierStats);
 
         Boolean beaconNoise = null; // Null indicates default behavior, true indicates yes, false indicates no
 
@@ -162,16 +169,13 @@ public class PlayerEquipmentCache {
         Set<ItemPerk> perks = this.cachedStats.getItemPerks();
         this.itemPerksExceedingMax.clear();
         if (perks != null) {
-            Iterator<ItemPerk> iterator = perks.iterator();
-            while (iterator.hasNext()) { // do not replace with for, you will get CME
-                ItemPerk perk = iterator.next();
+            this.cachedStats.setItemPerks(perks.stream().map(perk -> {
                 if (perk.getStacks() > perk.getType().getMaxStacks()) {
-                    ItemPerk newPerk = new ItemPerk(perk.getType(), perk.getType().getMaxStacks());
-                    this.itemPerksExceedingMax.put(perk.getType(), perk.getStacks());
-                    perks.remove(perk);
-                    perks.add(newPerk);
+                    itemPerksExceedingMax.put(perk.getType(), perk.getStacks());
+                    return new ItemPerk(perk.getType(), perk.getType().getMaxStacks());
                 }
-            }
+                return perk;
+            }).collect(Collectors.toSet()));
         }
 
         if (oldPerks == null) oldPerks = EMPTY_SET;
@@ -314,6 +318,17 @@ public class PlayerEquipmentCache {
 
         this.updateTotalStats(onLogin, true);
 
+        if (this.weapon != null && this.weapon.hasItemPerks()) {
+            // Experimental change that didn't work to force update the weapon
+//            PacketContainer container = new PacketContainer(PacketType.Play.Server.SET_SLOT);
+//            container.getBytes().write(-2, (byte) 0); // Window ID: -2 means ignore state ID
+//            container.getIntegers().write(0, 0); // State ID: bogus value 0
+//            container.getShorts().write(0, (short) player.getInventory().getHeldItemSlot()); // Slot number
+//            container.getItemModifier().write(0, player.getInventory().getItemInMainHand()); // ItemStack
+//            ProtocolLibrary.getProtocolManager().sendServerPacket(player, container);
+            player.updateInventory(); // Update dynamic lore
+        }
+
         // For item perks warmup
         if (this.weapon != null && isNotOnCooldown) {
             if (this.recentWeapon != null && this.recentWeapon.matchesItem(this.weapon))
@@ -321,8 +336,6 @@ public class PlayerEquipmentCache {
             if (!canUseWeapon(this.player, this.weapon)) return;
             this.recentWeapon = new RecentWeapon(this.weapon);
         }
-
-        if (this.weapon != null && this.weapon.hasItemPerks()) player.updateInventory(); // Update dynamic lore
     }
 
     private void updateOffhand() {
@@ -342,6 +355,8 @@ public class PlayerEquipmentCache {
         } else {
             this.offhand = null;
         }
+
+        if (this.offhand != null && this.offhand.hasItemPerks()) player.updateInventory(); // Update dynamic lore
     }
 
     public @Nullable RunicItemArmor getHelmet() {
@@ -368,10 +383,19 @@ public class PlayerEquipmentCache {
         return this.offhand;
     }
 
+    public void addModifier(StatsModifier modifier) {
+        this.statsModifiers.add(modifier);
+        this.updateTotalStats(false, false);
+    }
+
+    public void removeModifier(StatsModifier modifier) {
+        this.statsModifiers.remove(modifier);
+        this.updateTotalStats(false, false);
+    }
+
     public enum StatHolderType {
         HELMET, CHESTPLATE, LEGGINGS, BOOTS, WEAPON, OFFHAND
     }
-
 
     private record RecentWeapon(String templateID, Set<ItemPerk> itemPerks) {
 

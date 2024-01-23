@@ -109,7 +109,7 @@ public class TemplateLoader {
         if (itemConfig.getString("type").equalsIgnoreCase("armor")) {
             return new RunicItemArmorTemplate(
                     id, displayableItem, tags, data,
-                    itemConfig.getInt("health"), loadStats(itemConfig), itemConfig.getInt("max-gem-slots"),
+                    itemConfig.getInt("health"), loadStats(itemConfig), itemConfig.getInt("max-gem-slots"), loadItemPerks(itemConfig),
                     itemConfig.getInt("level"), RunicItemRarity.getFromIdentifier(itemConfig.getString("rarity")), RunicItemClass.getFromIdentifier(itemConfig.getString("class"))
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase(RunicItemDynamic.getDynamicFieldString())) {
@@ -125,13 +125,13 @@ public class TemplateLoader {
         } else if (itemConfig.getString("type").equalsIgnoreCase("offhand")) {
             return new RunicItemOffhandTemplate(
                     id, displayableItem, tags, data,
-                    loadStats(itemConfig),
+                    loadStats(itemConfig), loadItemPerks(itemConfig),
                     itemConfig.getInt("level"), RunicItemRarity.getFromIdentifier(itemConfig.getString("rarity"))
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("weapon")) {
             return new RunicItemWeaponTemplate(
                     id, displayableItem, tags, data,
-                    loadDamage(itemConfig), loadStats(itemConfig),
+                    loadDamage(itemConfig), loadStats(itemConfig), loadItemPerks(itemConfig),
                     itemConfig.getInt("level"), RunicItemRarity.getFromIdentifier(itemConfig.getString("rarity")), RunicItemClass.getFromIdentifier(itemConfig.getString("class"))
             );
         } else if (itemConfig.getString("type").equalsIgnoreCase("book")) {
@@ -180,4 +180,15 @@ public class TemplateLoader {
         }
         return triggers;
     }
+
+    // Note: we store the item perk ID instead of the ItemPerkType object because they haven't been loaded yet by core D:
+    private static LinkedHashMap<String, Integer> loadItemPerks(ConfigurationSection section) {
+        if (!section.contains("item-perks")) return new LinkedHashMap<>();
+        LinkedHashMap<String, Integer> perks = new LinkedHashMap<>();
+        for (String key : section.getConfigurationSection("item-perks").getKeys(false)) {
+            perks.put(key, section.getInt("item-perks." + key));
+        }
+        return perks;
+    }
+
 }
