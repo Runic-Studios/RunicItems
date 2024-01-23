@@ -9,7 +9,6 @@ import com.runicrealms.plugin.rdb.event.CharacterDeleteEvent;
 import com.runicrealms.plugin.rdb.event.CharacterLoadedEvent;
 import com.runicrealms.plugin.rdb.event.CharacterQuitEvent;
 import com.runicrealms.plugin.rdb.event.CharacterSelectEvent;
-import com.runicrealms.plugin.rdb.event.MongoSaveEvent;
 import com.runicrealms.plugin.rdb.model.CharacterField;
 import com.runicrealms.plugin.runicitems.RunicItems;
 import com.runicrealms.plugin.runicitems.api.DataAPI;
@@ -163,6 +162,12 @@ public class InventoryDataManager implements DataAPI, ItemWriteOperation, Listen
         // Shutdown JDA
 //        RunicItems.getJda().shutdownNow();
         // Cancel the task timer
+        RunicItems.getMongoTask().getTask().cancel();
+        // Manually save all data (flush players marked for save)
+        RunicItems.getMongoTask().saveAllToMongo(() -> event.markPluginSaved("items"));
+    }
+
+    private void onShutdown() {
         RunicItems.getMongoTask().getTask().cancel();
         // Manually save all data (flush players marked for save)
         RunicItems.getMongoTask().saveAllToMongo(() -> event.markPluginSaved("items"));
