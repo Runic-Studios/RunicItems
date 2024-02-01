@@ -60,7 +60,7 @@ public enum Stat {
     /*
     Capped values
      */
-    private static final double DAMAGE_REDUCTION_CAP = 30; // 30%
+    private static final double DAMAGE_REDUCTION_CAP = 40; // 40%
 
     /*
     Enum fields

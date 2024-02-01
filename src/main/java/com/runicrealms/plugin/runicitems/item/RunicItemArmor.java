@@ -36,6 +36,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -235,7 +236,7 @@ public class RunicItemArmor extends RunicItem implements AddedStatsHolder, ItemP
         List<String> statLore = new LinkedList<>();
         for (Stat stat : Stat.values()) {
             if (stats.get(stat) != null && stats.get(stat).getValue() == 0) continue;
-            if (isMenuDisplay && stats.containsKey(stat)) {
+            if (isMenuDisplay && stats.containsKey(stat) && !Objects.equals(stats.get(stat).getRange().getMin(), stats.get(stat).getRange().getMax())) {
                 statLore.add(stat.getChatColor() + "+" + stats.get(stat).getRange().getMin() +
                         "-" + stats.get(stat).getRange().getMax() + stat.getIcon());
             } else if (stats.containsKey(stat)) {
