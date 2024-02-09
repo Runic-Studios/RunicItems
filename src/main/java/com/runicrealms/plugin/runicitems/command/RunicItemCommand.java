@@ -693,7 +693,7 @@ public class RunicItemCommand extends BaseCommand {
     private enum GetRandomFlag {
         RANGE("range", input -> Stream.of("10,20", "20,30", "30,40", "40,50", "50,60", "60,60").filter(element -> element.startsWith(input)).toList()),
         RARITY("rarity", input -> Stream.of("common", "uncommon", "rare", "epic", "common,uncommon").filter(element -> element.startsWith(input)).toList()),
-        CLASS("class", input -> Stream.of("mage", "mage,rouge", "mage,rouge,warrior").filter(element -> element.startsWith(input)).toList()),
+        CLASS("class", input -> Stream.of("mage", "mage,rogue", "mage,rogue,warrior").filter(element -> element.startsWith(input)).toList()),
         ITEMS("items", input -> Stream.of("helmet", "chestplate", "leggings", "boots", "weapon", "helmet,chestplate,leggings,boots").filter(element -> element.startsWith(input)).toList()),
         LQM("lqm", input -> Stream.of("1", "1.5", "0.5").filter(element -> element.startsWith(input)).toList());
 
