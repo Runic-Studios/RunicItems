@@ -46,11 +46,12 @@ public class DynamicItemPerkPercentStatPlaceholder extends DynamicItemPerkTextPl
         } else {
             percentage = itemNBT.getInteger("perks-" + this.handler.getType().getIdentifier()) * basePercentage;
         }
+        percentage = roundToNearestHundredth(percentage);
 
         if (percentage != basePercentage) {
             return ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + formatStringPercentage(basePercentage) + "%" + ChatColor.YELLOW + " " + formatStringPercentage(percentage) + "%";
         } else {
-            return ChatColor.YELLOW.toString() + formatStringPercentage(basePercentage) + "%";
+            return ChatColor.YELLOW + formatStringPercentage(basePercentage) + "%";
         }
     }
 
