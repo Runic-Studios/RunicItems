@@ -10,6 +10,9 @@ dependencies {
     compileOnly(commonLibs.mongodbdriversync)
     compileOnly(commonLibs.jedis)
     compileOnly(commonLibs.luckperms)
+    compileOnly(commonLibs.holographicdisplays)
+    compileOnly(commonLibs.modelengine)
     compileOnly(project(":Projects:Database"))
     compileOnly(project(":Projects:Common"))
+    compileOnly(project(":Projects:Restart"))
 }

@@ -9,3 +9,6 @@ depend:
   - RunicCommon
   - ProtocolLib
   - MythicMobs
+  - RunicRestart
+  - ModelEngine
+  - HolographicDisplays

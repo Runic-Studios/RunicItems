@@ -13,7 +13,7 @@ import com.runicrealms.plugin.common.util.ColorUtil;
 import com.runicrealms.plugin.common.util.Pair;
 import com.runicrealms.plugin.rdb.RunicDatabase;
 import com.runicrealms.plugin.runicitems.DupeManager;
-import com.runicrealms.plugin.runicitems.LootManager;
+import com.runicrealms.plugin.runicitems.LootTools;
 import com.runicrealms.plugin.runicitems.RunicItems;
 import com.runicrealms.plugin.runicitems.RunicItemsAPI;
 import com.runicrealms.plugin.runicitems.TemplateManager;
@@ -227,7 +227,7 @@ public class RunicItemCommand extends BaseCommand {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Level min and level max must be integers!"));
             return;
         }
-        RunicItemTemplate template = LootManager.getRandomItemInRange(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+        RunicItemTemplate template = LootTools.getRandomItemInRange(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
         int count = 1;
         if (template == null) {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!"));
@@ -373,7 +373,7 @@ public class RunicItemCommand extends BaseCommand {
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Level min and level max must be integers!"));
             return;
         }
-        RunicItemTemplate template = LootManager.getRandomItemInRange(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+        RunicItemTemplate template = LootTools.getRandomItemInRange(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
         int count = 1;
         if (template == null) {
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!"));
@@ -456,7 +456,7 @@ public class RunicItemCommand extends BaseCommand {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Level min and level max must be integers!"));
             return;
         }
-        RunicItemTemplate template = LootManager.getRandomItemInRange(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+        RunicItemTemplate template = LootTools.getRandomItemInRange(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
         int count = 1;
         if (template == null) {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat item ID does not exist!"));
@@ -650,10 +650,10 @@ public class RunicItemCommand extends BaseCommand {
         }
 
         String types = parameters.get(GetRandomFlag.ITEMS);
-        Set<LootManager.ItemType> items = null;
+        Set<LootTools.ItemType> items = null;
 
         for (String rawType : types != null ? types.split(",") : new String[0]) {
-            LootManager.ItemType parsed = LootManager.ItemType.getItemType(rawType.trim());
+            LootTools.ItemType parsed = LootTools.ItemType.getItemType(rawType.trim());
 
             if (parsed == null) {
                 player.sendMessage(ColorUtil.format(PREFIX + "&cInvalid item type of " + rawType.trim() + " entered!"));
@@ -675,7 +675,7 @@ public class RunicItemCommand extends BaseCommand {
         }
 
         //iterating and picking item is async, slight delay and item is given on main thread after async task is complete
-        LootManager.getItem(range, rarities, clazz, items, lqm)
+        LootTools.getItem(range, rarities, clazz, items, lqm)
                 .thenAccept(template -> {
                     if (template.isEmpty()) {
                         player.sendMessage(ColorUtil.format(PREFIX + "&cThere are no item templates that match your conditions!"));

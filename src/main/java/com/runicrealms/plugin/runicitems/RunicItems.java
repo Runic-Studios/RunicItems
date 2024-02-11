@@ -23,6 +23,8 @@ import com.runicrealms.plugin.runicitems.listeners.ItemSpawnListener;
 import com.runicrealms.plugin.runicitems.listeners.MoveToInventoryListener;
 import com.runicrealms.plugin.runicitems.listeners.PlayerMTIListener;
 import com.runicrealms.plugin.runicitems.listeners.SoulboundListener;
+import com.runicrealms.plugin.runicitems.loot.LootAPI;
+import com.runicrealms.plugin.runicitems.loot.LootManager;
 import com.runicrealms.plugin.runicitems.model.InventoryDataManager;
 import com.runicrealms.plugin.runicitems.model.MongoTask;
 import com.runicrealms.plugin.runicitems.weaponskin.WeaponSkinManager;
@@ -38,6 +40,7 @@ public class RunicItems extends JavaPlugin implements Listener {
     private static PaperCommandManager commandManager;
     private static DataAPI dataAPI;
     private static WeaponSkinAPI weaponSkinAPI;
+    private static LootAPI lootAPI;
     private static DynamicItemHandler dynamicItemHandler;
     private static ItemPerkManager itemPerkManager;
     private static MongoTask mongoTask;
@@ -75,6 +78,10 @@ public class RunicItems extends JavaPlugin implements Listener {
         return weaponSkinAPI;
     }
 
+    public static LootAPI getLootAPI() {
+        return lootAPI;
+    }
+
     public static DynamicItemHandler getDynamicItemHandler() {
         return dynamicItemHandler;
     }
@@ -105,7 +112,7 @@ public class RunicItems extends JavaPlugin implements Listener {
 
         try {
             TemplateLoader.loadTemplates();
-            LootManager.sortItems(TemplateManager.getTemplates());
+            LootTools.sortItems(TemplateManager.getTemplates());
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -136,6 +143,7 @@ public class RunicItems extends JavaPlugin implements Listener {
         commandManager.registerCommand(new WeaponSkinCommand());
         commandManager.registerCommand(new WeaponryCommand());
 
+        lootAPI = new LootManager();
         itemPerkManager = new ItemPerkManager();
         dynamicItemHandler = new DynamicItemHandler();
 

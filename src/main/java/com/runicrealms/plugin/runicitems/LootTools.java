@@ -1,12 +1,12 @@
 package com.runicrealms.plugin.runicitems;
 
 import com.runicrealms.plugin.common.util.Pair;
-import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
 import com.runicrealms.plugin.runicitems.item.stats.RunicItemRarity;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemArmorTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemWeaponTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicRarityLevelItemTemplate;
+import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,9 +25,14 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class LootManager {
+public class LootTools {
     public static final List<RunicItemRarity> RARITY_DROP_TABLE_WEIGHTED;
     private static final List<RarityItemType> RARITY_ARMOR_WEAPON_DISTRIB_WEIGHTED;
+    // Maps level to a mapping between rarities and a list of available templates
+    private static final Map<Integer, Map<RunicItemRarity, List<RunicRarityLevelItemTemplate>>> armorItems = new HashMap<>();
+    // This includes artifacts because artifact instanceof weapon
+    private static final Map<Integer, Map<RunicItemRarity, List<RunicRarityLevelItemTemplate>>> weaponItems = new HashMap<>();
+    private static final Random random = ThreadLocalRandom.current();
 
     static {
         Map<RunicItemRarity, Integer> weights = new HashMap<>();
@@ -48,14 +53,7 @@ public class LootManager {
         RARITY_ARMOR_WEAPON_DISTRIB_WEIGHTED.add(RarityItemType.WEAPON);
     }
 
-    // Maps level to a mapping between rarities and a list of available templates
-    private static final Map<Integer, Map<RunicItemRarity, List<RunicRarityLevelItemTemplate>>> armorItems = new HashMap<>();
-    // This includes artifacts because artifact instanceof weapon
-    private static final Map<Integer, Map<RunicItemRarity, List<RunicRarityLevelItemTemplate>>> weaponItems = new HashMap<>();
-
-    private static final Random random = ThreadLocalRandom.current();
-
-    private LootManager() {
+    private LootTools() {
 
     }
 
@@ -71,7 +69,7 @@ public class LootManager {
      */
     @NotNull
     public static CompletableFuture<Optional<RunicRarityLevelItemTemplate>> getItem(@Nullable Pair<Integer, Integer> range, @Nullable Set<RunicItemRarity> rarities, @Nullable RunicItemClass playerClass, @Nullable Set<ItemType> itemTypes, @Nullable Float lqm) {
-        Set<RunicItemRarity> rarity = rarities != null && !rarities.isEmpty() ? rarities : Collections.singleton(LootManager.rollRarity());
+        Set<RunicItemRarity> rarity = rarities != null && !rarities.isEmpty() ? rarities : Collections.singleton(LootTools.rollRarity());
 
         return CompletableFuture.supplyAsync(() ->
                                 TemplateManager.getTemplates().entrySet()
@@ -218,6 +216,19 @@ public class LootManager {
         }
     }
 
+    @Nullable
+    private static RunicItemClass getItemClass(@NotNull RunicRarityLevelItemTemplate template) {
+        if (template instanceof RunicItemArmorTemplate armorTemplate) {
+            return armorTemplate.getRunicClass();
+        }
+
+        if (template instanceof RunicItemWeaponTemplate weaponTemplate) {
+            return weaponTemplate.getRunicClass();
+        }
+
+        return null;
+    }
+
     public enum ItemType {
         WEAPON,
         HELMET,
@@ -252,19 +263,6 @@ public class LootManager {
 
             throw new IllegalStateException("item " + item.getDisplayableItem().getDisplayName() + " is a type of armor that is not implemented in com.runicrealms.runicitems.LootManager.ItemType");
         }
-    }
-
-    @Nullable
-    private static RunicItemClass getItemClass(@NotNull RunicRarityLevelItemTemplate template) {
-        if (template instanceof RunicItemArmorTemplate armorTemplate) {
-            return armorTemplate.getRunicClass();
-        }
-
-        if (template instanceof RunicItemWeaponTemplate weaponTemplate) {
-            return weaponTemplate.getRunicClass();
-        }
-
-        return null;
     }
 
     private enum RarityItemType {

@@ -79,7 +79,7 @@ public class RunicItemsAPI {
      * @return a RunicItem object
      */
     public static RunicItem generateItemInRange(int minimumLevel, int maximumLevel, int count) {
-        RunicItemTemplate template = LootManager.getRandomItemInRange(minimumLevel, maximumLevel);
+        RunicItemTemplate template = LootTools.getRandomItemInRange(minimumLevel, maximumLevel);
         return template.generateItem(count, DupeManager.getNextItemId(), null, null);
     }
 
