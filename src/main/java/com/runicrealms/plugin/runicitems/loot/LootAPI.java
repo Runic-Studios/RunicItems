@@ -22,6 +22,11 @@ public interface LootAPI {
     LootTable getLootTable(@NotNull String identifier);
 
     /**
+     * Gets all loaded loot tables.
+     */
+    Collection<LootTable> getLootTables();
+
+    /**
      * Get a loot chest template based off of its identifier.
      * These define different types of physical chests that exist in the world.
      */

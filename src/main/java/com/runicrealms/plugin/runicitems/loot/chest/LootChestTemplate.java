@@ -34,7 +34,7 @@ public class LootChestTemplate {
             int itemCount = ThreadLocalRandom.current().nextInt(lootTable.getMaxCount() - lootTable.getMinCount() + 1) + lootTable.getMinCount();
 
             for (int i = 0; i < itemCount; i++) {
-                items.add(lootTable.getLootTable().generateLoot(lootChest, player));
+                items.add(lootTable.getLootTable().generateLoot(lootChest));
             }
         }
 

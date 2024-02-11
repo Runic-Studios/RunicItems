@@ -99,19 +99,11 @@ public abstract class LootChest implements LootHolder {
     }
 
     @Override
-    public int getItemMinLevel(@NotNull Player player) {
-        return getItemMinLevel();
-    }
-
     public int getItemMinLevel() {
         return this.itemMinLevel;
     }
 
     @Override
-    public int getItemMaxLevel(@NotNull Player player) {
-        return getItemMaxLevel();
-    }
-
     public int getItemMaxLevel() {
         return this.itemMaxLevel;
     }

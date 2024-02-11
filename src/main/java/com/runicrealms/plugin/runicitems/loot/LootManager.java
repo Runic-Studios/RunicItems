@@ -544,6 +544,11 @@ public class LootManager implements LootAPI {
     }
 
     @Override
+    public Collection<LootTable> getLootTables() {
+        return lootTables.values();
+    }
+
+    @Override
     public LootChestTemplate getLootChestTemplate(@NotNull String identifier) {
         if (!lootChestTemplates.containsKey(identifier))
             throw new IllegalArgumentException("Cannot get loot chest template " + identifier + " because it does nto exist");

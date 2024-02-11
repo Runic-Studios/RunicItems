@@ -27,6 +27,8 @@ import com.runicrealms.plugin.runicitems.item.template.RunicItemArmorTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemTemplate;
 import com.runicrealms.plugin.runicitems.item.template.RunicItemWeaponTemplate;
 import com.runicrealms.plugin.runicitems.item.util.RunicItemClass;
+import com.runicrealms.plugin.runicitems.loot.GenericLootHolder;
+import com.runicrealms.plugin.runicitems.loot.LootTable;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -115,6 +117,11 @@ public class RunicItemCommand extends BaseCommand {
                 cachedPerkIDs.set(RunicItemsAPI.getItemPerkManager().getItemPerks().stream().map(ItemPerkType::getIdentifier).collect(Collectors.toUnmodifiableSet()));
             }
             return cachedPerkIDs.get();
+        });
+
+        RunicItems.getCommandManager().getCommandCompletions().registerAsyncCompletion("loot-tables", context -> {
+            if (!context.getSender().isOp()) return new HashSet<>();
+            return RunicItems.getLootAPI().getLootTables().stream().map(LootTable::getIdentifier).collect(Collectors.toSet());
         });
     }
 
@@ -250,6 +257,35 @@ public class RunicItemCommand extends BaseCommand {
         }
         RunicItem item = template.generateItem(count, DupeManager.getNextItemId(), null, null);
         location.getWorld().dropItem(location, item.generateItem());
+    }
+
+    @Subcommand("drop-lt")
+    @Conditions("is-op")
+    @Syntax("<loot-table> <min-level> <max-level> <location>")
+    @CommandCompletion("@loot-tables @nothing")
+    public void onCommandDropLootTable(CommandSender sender, String[] args) {
+        if (args.length != 4) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dInvalid syntax! Please check &7/runicitem help"));
+            return;
+        }
+        LootTable table = RunicItems.getLootAPI().getLootTable(args[0]);
+        if (table == null) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + "&dThat loot table does not exist!"));
+            return;
+        }
+
+        int minLevel = Integer.parseInt(args[1]);
+        int maxLevel = Integer.parseInt(args[2]);
+
+        String[] splitLocation = args[3].split(",");
+        Location location = new Location(
+                Bukkit.getWorld(splitLocation[0]),
+                Double.parseDouble(splitLocation[1]),
+                Double.parseDouble(splitLocation[2]),
+                Double.parseDouble(splitLocation[3])
+        );
+        ItemStack item = table.generateLoot(new GenericLootHolder(minLevel, maxLevel));
+        location.getWorld().dropItem(location, item);
     }
 
     @Subcommand("dupe-item")
