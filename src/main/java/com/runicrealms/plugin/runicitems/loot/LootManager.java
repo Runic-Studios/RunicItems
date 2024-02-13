@@ -37,12 +37,8 @@ import java.util.logging.Level;
 
 // today's sponsor is chat gpt!
 public class LootManager implements LootAPI {
-    /*
-    TODO:
-    - add particles
-    - Add it to file pull
-    - add loot quality
-     */
+
+    public static final int DEFAULT_MAX_BOSS_LOOT_RANGE = 1024; // In blocks, how close do players need to be to the boss to gain loot
 
     private final Map<String, LootTable> lootTables = new HashMap<>();
     private final Map<String, LootChestTemplate> lootChestTemplates = new HashMap<>();
@@ -421,7 +417,9 @@ public class LootManager implements LootAPI {
                 throw new IllegalArgumentException("Boss timed loot chest missing boss.location data");
             }
 
-            return new BossTimedLoot(chest, mmID, lootDamageThreshold, new Location(Bukkit.getWorld(completeWorld), completeX, completeY, completeZ, completeYaw, completePitch));
+            int lootRange = config.getInt("boss.loot-range", DEFAULT_MAX_BOSS_LOOT_RANGE);
+
+            return new BossTimedLoot(chest, mmID, lootDamageThreshold, lootRange, new Location(Bukkit.getWorld(completeWorld), completeX, completeY, completeZ, completeYaw, completePitch));
         } else if ("custom".equalsIgnoreCase(type)) {
             String identifier = config.getString("custom.identifier");
 

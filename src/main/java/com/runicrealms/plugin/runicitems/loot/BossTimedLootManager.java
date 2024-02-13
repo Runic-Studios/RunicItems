@@ -11,18 +11,19 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class BossTimedLootManager implements Listener {
-    private static final int TELEPORT_RADIUS = 1024;
 
     private final Map<String, BossTimedLoot> bossLoot = new HashMap<>(); // maps mm IDs to boss loot
-    private final Map<UUID, HashMap<Player, Integer>> bossFighters = new HashMap<>(); // a single boss is mapped to many players (damage threshold tracked here)
+    private final Map<UUID, HashMap<UUID, Integer>> bossFighters = new HashMap<>(); // a single boss is mapped to many players (damage threshold tracked here)
 
     public BossTimedLootManager(Collection<BossTimedLoot> bossTimedLoot) {
         Bukkit.getPluginManager().registerEvents(this, RunicItems.getInstance());
@@ -33,18 +34,17 @@ public class BossTimedLootManager implements Listener {
 
     @EventHandler
     public void onBossDeath(MythicMobDeathEvent event) {
-        if (!bossLoot.containsKey(event.getMob().getMobType())) return;
-        if (!bossFighters.containsKey(event.getMob().getUniqueId())) return;
         BossTimedLoot loot = bossLoot.get(event.getMob().getMobType());
+        if (loot == null) return;
+        if (!bossFighters.containsKey(event.getMob().getUniqueId())) return;
         Location location = event.getEntity().getLocation();
         try {
-            if (loot == null)
-                throw new IllegalStateException("Boss loot cannot be distributed when boss loot is not defined!");
-            bossFighters.get(event.getEntity().getUniqueId()).forEach((player, damage) -> {
-                if (!player.getWorld().equals(location.getWorld()) || location.distance(player.getLocation()) > TELEPORT_RADIUS) {
+            bossFighters.get(event.getEntity().getUniqueId()).forEach((uuid, damage) -> {
+                Player player = Objects.requireNonNull(Bukkit.getPlayer(uuid));
+                if (!player.getWorld().equals(location.getWorld())) return;
+                // Too far from boss
+                if (loot.getLootRange() != -1 && event.getEntity().getLocation().distanceSquared(player.getLocation()) > Math.pow(loot.getLootRange(), 2))
                     return;
-                }
-
                 player.sendMessage(ChatColor.YELLOW + "You dealt " + ChatColor.RED + ChatColor.BOLD + damage + ChatColor.YELLOW + " damage to the boss!");
                 double percent = damage / event.getMob().getEntity().getMaxHealth();
                 if (percent >= loot.getLootDamageThreshold()) {
@@ -68,9 +68,13 @@ public class BossTimedLootManager implements Listener {
     public void trackBossDamage(Player player, Entity entity, int amount) {
         if (!bossFighters.containsKey(entity.getUniqueId())) return;
         UUID bossId = entity.getUniqueId();
-        if (!bossFighters.get(bossId).containsKey(player))
-            bossFighters.get(bossId).put(player, 0);
-        int currentDamageToBossFromPlayer = bossFighters.get(bossId).get(player);
-        bossFighters.get(bossId).put(player, currentDamageToBossFromPlayer + amount);
+        bossFighters.get(bossId).put(player.getUniqueId(), bossFighters.get(bossId).getOrDefault(player.getUniqueId(), 0) + amount);
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        for (UUID bossId : bossFighters.keySet()) {
+            bossFighters.get(bossId).remove(event.getPlayer().getUniqueId());
+        }
     }
 }
