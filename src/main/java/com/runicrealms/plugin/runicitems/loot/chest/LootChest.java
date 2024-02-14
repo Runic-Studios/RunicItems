@@ -54,7 +54,8 @@ public abstract class LootChest implements LootHolder {
 
         this.modelID = modelID;
 
-        Dummy dummy = ModelEngineAPI.createDummy();
+        Dummy<?> dummy = new Dummy<>();
+        dummy.setRenderRadius(0);
 
         Location target = position.getLocation().clone();
         target.setX(target.getX() + .5);
@@ -67,7 +68,7 @@ public abstract class LootChest implements LootHolder {
         dummy.setYBodyRot(target.getYaw());
 
         this.entity = ModelEngineAPI.createModeledEntity(dummy);
-        this.entity.getRangeManager().setRenderDistance(0);
+//        this.entity.setRenderDistance(0);
 
         this.blockData = Material.CHEST.createBlockData();
         ((Directional) this.blockData).setFacing(this.position.getDirection());
@@ -144,7 +145,9 @@ public abstract class LootChest implements LootHolder {
             return;
         }
 
-        this.entity.getRangeManager().forceSpawn(player);
+        ((Dummy<?>) this.entity.getBase()).setForceHidden(player, false);
+        ((Dummy<?>) this.entity.getBase()).setForceViewing(player, true);
+//        this.entity.getRangeManager().forceSpawn(player);
     }
 
     public void hideFromPlayer(@NotNull Player player, boolean showParticles) {
@@ -158,7 +161,8 @@ public abstract class LootChest implements LootHolder {
             return;
         }
 
-        this.entity.getRangeManager().removePlayer(player);
+        ((Dummy<?>) this.entity.getBase()).setForceHidden(player, true);
+        ((Dummy<?>) this.entity.getBase()).setForceViewing(player, false);
     }
 
     public void hideFromPlayer(@NotNull Player player) {
