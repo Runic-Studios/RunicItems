@@ -19,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class LootChest implements LootHolder {
-
     protected static final BlockData AIR_BLOCK_DATA = Material.AIR.createBlockData();
     protected static final BlockData BARRIER_BLOCK_DATA = Material.BARRIER.createBlockData();
 
@@ -68,16 +67,11 @@ public abstract class LootChest implements LootHolder {
         dummy.setYBodyRot(target.getYaw());
 
         this.entity = ModelEngineAPI.createModeledEntity(dummy);
-//        this.entity.setRenderDistance(0);
 
         this.blockData = Material.CHEST.createBlockData();
         ((Directional) this.blockData).setFacing(this.position.getDirection());
 
         Bukkit.getScheduler().runTaskLater(RunicItems.getInstance(), () -> this.position.getLocation().getBlock().setType(Material.AIR), 10);
-    }
-
-    public LootChest(@NotNull LootChestPosition position, @NotNull LootChestTemplate lootChestTemplate, @NotNull LootChestConditions conditions, int minLevel, int itemMinLevel, int itemMaxLevel, @NotNull String inventoryTitle) {
-        this(position, lootChestTemplate, conditions, minLevel, itemMinLevel, itemMaxLevel, inventoryTitle, null);
     }
 
     @NotNull
@@ -147,7 +141,6 @@ public abstract class LootChest implements LootHolder {
 
         ((Dummy<?>) this.entity.getBase()).setForceHidden(player, false);
         ((Dummy<?>) this.entity.getBase()).setForceViewing(player, true);
-//        this.entity.getRangeManager().forceSpawn(player);
     }
 
     public void hideFromPlayer(@NotNull Player player, boolean showParticles) {
