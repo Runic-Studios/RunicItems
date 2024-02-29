@@ -136,8 +136,9 @@ public class RunicItems extends JavaPlugin implements Listener {
                 throw new ConditionFailedException("This command cannot be run from console!");
         });
         commandManager.getCommandConditions().addCondition("is-op", context -> {
-            if (!context.getIssuer().getIssuer().isOp())
+            if (!(context.getIssuer().getIssuer().isOp() || context.getIssuer().hasPermission("runic.op"))) {
                 throw new ConditionFailedException("You must be an operator to run this command!");
+            }
         });
         commandManager.registerCommand(new RunicItemCommand());
         commandManager.registerCommand(new WeaponSkinCommand());
